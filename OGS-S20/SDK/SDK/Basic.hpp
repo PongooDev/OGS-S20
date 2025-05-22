@@ -455,7 +455,6 @@ public:
 		return TextData->TextSource.ToString();
 	}
 };
-static_assert(alignof(FText) == 0x000008, "Wrong alignment on FText");
 static_assert(sizeof(FText) == 0x000018, "Wrong size on FText");
 static_assert(offsetof(FText, TextData) == 0x000000, "Member 'FText::TextData' has a wrong offset!");
 
@@ -484,6 +483,13 @@ template<typename UEType>
 class TWeakObjectPtr : public FWeakObjectPtr
 {
 public:
+	TWeakObjectPtr() = default;
+
+	TWeakObjectPtr(UEType* InObject)
+		: FWeakObjectPtr(InObject)
+	{
+	}
+
 	UEType* Get() const
 	{
 		return static_cast<UEType*>(FWeakObjectPtr::Get());

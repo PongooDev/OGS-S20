@@ -37,7 +37,7 @@ namespace Tick {
 
 	inline float GetMaxTickRate()
 	{
-		return 30.f;
+		return Globals::MaxTickRate;
 	}
 
 	void Hook() {

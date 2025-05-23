@@ -660,6 +660,7 @@ namespace Replication {
 		if (!Channel || !ReplicateActor || !IsNetReady(Channel, false))
 			return false;
 		if (ReplicateActor(Channel)) {
+			ReplicateActor(Channel);
 			ActorInfo->LastNetReplicateTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
 			return true;
 		}
@@ -910,7 +911,7 @@ namespace Replication {
 			}
 		}
 
-		/*for (UNetConnection* Conn : Driver->ClientConnections) {
+		for (UNetConnection* Conn : Driver->ClientConnections) {
 			if (!Conn || !Conn->ViewTarget) continue;
 
 			if (Conn->PlayerController)
@@ -943,7 +944,7 @@ namespace Replication {
 					ReplicateActorIfReady(Driver, Conn, Channel, ActorInfo);
 				}
 			}
-		}*/
+		}
 
 		ConsiderList.Free();
 

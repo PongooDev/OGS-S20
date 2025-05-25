@@ -39,6 +39,7 @@ namespace Misc {
 
         // No FortLocalPlayer patch
         MH_CreateHook((LPVOID)(ImageBase + 0x426A2D4), nullFunc, nullptr);
+        MH_CreateHook((LPVOID)(ImageBase + 0x10B93F4), nullFunc, nullptr);
 
         Log("Misc Hooked!");
     }

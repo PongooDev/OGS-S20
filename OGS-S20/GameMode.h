@@ -20,6 +20,9 @@ namespace GameMode {
 			if (Globals::bCreativeEnabled) {
 				Playlist = StaticLoadObject<UFortPlaylistAthena>("/Game/Athena/Playlists/Creative/Playlist_PlaygroundV2.Playlist_PlaygroundV2");
 			}
+			else if (Globals::bEventEnabled) {
+				Playlist = StaticLoadObject<UFortPlaylistAthena>("/ArmadilloPlaylist/Playlist/Playlist_Armadillo.Playlist_Armadillo");
+			}
 			else {
 				Playlist = StaticLoadObject<UFortPlaylistAthena>("/Game/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo");
 			}
@@ -73,6 +76,29 @@ namespace GameMode {
 
 			GameState->DefaultParachuteDeployTraceForGroundDistance = 10000;
 
+			for (auto& Level : Playlist->AdditionalLevels)
+			{
+				bool Success = false;
+				Log("Level: " + Level.Get()->Name.ToString());
+				ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(UWorld::GetWorld(), Level, FVector(), FRotator(), &Success, FString(), nullptr);
+				FAdditionalLevelStreamed level{};
+				level.bIsServerOnly = false;
+				level.LevelName = Level.ObjectID.AssetPathName;
+				if (Success) GameState->AdditionalPlaylistLevelsStreamed.Add(level);
+			}
+			for (auto& Level : Playlist->AdditionalLevelsServerOnly)
+			{
+				bool Success = false;
+				Log("Server Level: " + Level.Get()->Name.ToString());
+				ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(UWorld::GetWorld(), Level, FVector(), FRotator(), &Success, FString(), nullptr);
+				FAdditionalLevelStreamed level{};
+				level.bIsServerOnly = true;
+				level.LevelName = Level.ObjectID.AssetPathName;
+				if (Success) GameState->AdditionalPlaylistLevelsStreamed.Add(level);
+			}
+			GameState->OnRep_AdditionalPlaylistLevelsStreamed();
+			GameState->OnFinishedStreamingAdditionalPlaylistLevel();
+
 			Log("Setup Playlist!");
 		}
 
@@ -112,32 +138,6 @@ namespace GameMode {
 			}
 
 			SetWorld(UWorld::GetWorld()->NetDriver, UWorld::GetWorld());
-
-			for (int i = 0; i < GameState->CurrentPlaylistInfo.BasePlaylist->AdditionalLevels.Num(); i++)
-			{
-				FVector Loc{};
-				FRotator Rot{};
-				bool bSuccess = false;
-				((ULevelStreamingDynamic*)ULevelStreamingDynamic::StaticClass()->DefaultObject)->LoadLevelInstanceBySoftObjectPtr(UWorld::GetWorld(), GameState->CurrentPlaylistInfo.BasePlaylist->AdditionalLevels[i], Loc, Rot, &bSuccess, FString(), nullptr);
-				FAdditionalLevelStreamed NewLevel{};
-				NewLevel.LevelName = GameState->CurrentPlaylistInfo.BasePlaylist->AdditionalLevels[i].ObjectID.AssetPathName;
-				NewLevel.bIsServerOnly = false;
-				GameState->AdditionalPlaylistLevelsStreamed.Add(NewLevel);
-			}
-
-			for (int i = 0; i < GameState->CurrentPlaylistInfo.BasePlaylist->AdditionalLevelsServerOnly.Num(); i++)
-			{
-				FVector Loc{};
-				FRotator Rot{};
-				bool bSuccess = false;
-				((ULevelStreamingDynamic*)ULevelStreamingDynamic::StaticClass()->DefaultObject)->LoadLevelInstanceBySoftObjectPtr(UWorld::GetWorld(), GameState->CurrentPlaylistInfo.BasePlaylist->AdditionalLevelsServerOnly[i], Loc, Rot, &bSuccess, FString(), nullptr);
-				FAdditionalLevelStreamed NewLevel{};
-				NewLevel.LevelName = GameState->CurrentPlaylistInfo.BasePlaylist->AdditionalLevelsServerOnly[i].ObjectID.AssetPathName;
-				NewLevel.bIsServerOnly = true;
-				GameState->AdditionalPlaylistLevelsStreamed.Add(NewLevel);
-			}
-			GameState->OnRep_AdditionalPlaylistLevelsStreamed();
-			GameState->OnFinishedStreamingAdditionalPlaylistLevel();
 
 			GameMode->bWorldIsReady = true;
 
@@ -203,6 +203,11 @@ namespace GameMode {
 		auto Pawn = GameMode->SpawnDefaultPawnAtTransform(Player, Transform);
 
 		Abilities::InitAbilitiesForPlayer(PC);
+
+		Pawn->NetUpdateFrequency = 100.f;
+		Pawn->MinNetUpdateFrequency = 100.f;
+		Pawn->bAlwaysRelevant = true;
+		Pawn->bReplicateMovement = true;
 
 		auto SprintCompClass = StaticLoadObject<UClass>("/TacticalSprint/Gameplay/TacticalSprintControllerComponent.TacticalSprintControllerComponent_C");
 		auto EnergyCompClass = StaticLoadObject<UClass>("/TacticalSprint/Gameplay/TacticalSprintEnergyComponent.TacticalSprintEnergyComponent_C");
@@ -270,14 +275,116 @@ namespace GameMode {
 		GameState->OnRep_SafeZoneIndicator();
 		GameState->OnRep_SafeZonePhase();
 
+		Pawn->OnRep_ReplicateMovement();
+		Pawn->OnRep_ReplicatedMovement();
+
+		Pawn->OnRep_PlayerState();
+		Pawn->OnRep_Controller();
+
+		Pawn->ForceNetUpdate();
+		PC->ForceNetUpdate();
+		PlayerState->ForceNetUpdate();
+
 		return Pawn;
 		//return (AFortPlayerPawnAthena*)GameMode->SpawnDefaultPawnAtTransform(Player, Transform);
+	}
+
+	static inline void (*StartNewSafeZonePhaseOG)(AFortGameModeAthena* GameMode, int32 a2);
+	static void StartNewSafeZonePhase(AFortGameModeAthena* GameMode, int32 a2) {
+		auto GameState = AFortGameStateAthena::GetDefaultObj();
+
+		FFortSafeZoneDefinition* SafeZoneDefinition = &GameState->MapInfo->SafeZoneDefinition;
+
+		static bool bFirstCall = false;
+
+		auto Duration = 30.f;
+		auto HoldDuration = 10.f;
+		static auto DPS = 1.f;
+		static int ZoneIndex = 0;
+
+		switch (ZoneIndex) {
+		case 0:
+			Duration = 105.f;
+			HoldDuration = 30.f;
+			break;
+		case 1:
+			Duration = 120.f;
+			HoldDuration = 110.f;
+			DPS = 2.f;
+			break;
+		case 2:
+			Duration = 90.f;
+			HoldDuration = 110.f;
+			DPS = 3.f;
+			break;
+		case 3:
+			Duration = 95.f;
+			HoldDuration = 95.f;
+			DPS = 4.f;
+			break;
+		case 4:
+			Duration = 90.f;
+			HoldDuration = 90.f;
+			DPS = 5.f;
+			break;
+		case 5:
+			Duration = 50.f;
+			HoldDuration = 70.f;
+			break;
+		case 6:
+			Duration = 50.f;
+			HoldDuration = 70.f;
+			DPS = 10.f;
+			break;
+		case 7:
+			Duration = 50.f;
+			HoldDuration = 70.f;
+			break;
+		case 8:
+			Duration = 35.f;
+			HoldDuration = 60.f;
+			DPS = 10.f;
+			break;
+		case 9:
+			Duration = 20.f;
+			HoldDuration = 60.f;
+			break;
+		case 10:
+			Duration = 55.f;
+			HoldDuration = 60.f;
+			break;
+		case 11:
+			Duration = 50.f;
+			HoldDuration = 60.f;
+			break;
+		case 12:
+			Duration = 80.f;
+			HoldDuration = 60.f;
+			break;
+		default:
+			Duration = 15.f;
+			HoldDuration = 45.f;
+			break;
+		}
+
+		GameMode->SafeZoneIndicator->SafeZoneStartShrinkTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + HoldDuration;
+		GameMode->SafeZoneIndicator->SafeZoneFinishShrinkTime = GameMode->SafeZoneIndicator->SafeZoneStartShrinkTime + Duration;
+		GameState->SafeZoneDamage = DPS;
+		ZoneIndex++;
+
+		GameState->OnRep_SafeZoneDamage();
+		GameState->OnRep_SafeZoneIndicator();
+		GameState->OnRep_SafeZonePhase();
+
+		StartNewSafeZonePhaseOG(GameMode, a2);
 	}
 
 	void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + 0x660b124), ReadyToStartMatch, (LPVOID*)&ReadyToStartMatchOG);
 
 		MH_CreateHook((LPVOID)(ImageBase + 0x6610804), SpawnDefaultPawnFor, nullptr);
+
+		MH_CreateHook((LPVOID)(ImageBase + 0x66151a8), StartNewSafeZonePhase, (LPVOID*)&StartNewSafeZonePhaseOG);
 
 		Log("Gamemode Hooked!");
 	}

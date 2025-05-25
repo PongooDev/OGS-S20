@@ -230,7 +230,6 @@ namespace Inventory {
 
 	static void ServerExecuteInventoryItem(AFortPlayerControllerAthena* PC, FGuid Guid)
 	{
-		Log("ServerExecuteInventoryItem Called!");
 		if (!PC || !PC->MyFortPawn)
 			return;
 

@@ -5,31 +5,69 @@
 namespace Replication {
 	struct FNetworkObjectInfo
 	{
-		class SDK::AActor* Actor;
+		/** Pointer to the replicated actor. */
+		AActor* Actor;
 
-		TWeakObjectPtr<class SDK::AActor> WeakActor;
+		/** WeakPtr to actor. This is cached here to prevent constantly constructing one when needed for (things like) keys in TMaps/TSets */
+		TWeakObjectPtr<AActor> WeakActor;
 
+		/** Next time to consider replicating the actor. Based on FPlatformTime::Seconds(). */
 		double NextUpdateTime;
 
+		/** Last absolute time in seconds since actor actually sent something during replication */
 		double LastNetReplicateTime;
 
+		/** Optimal delta between replication updates based on how frequently actor properties are actually changing */
 		float OptimalNetUpdateDelta;
 
+		/** Last time this actor was updated for replication via NextUpdateTime
+		* @warning: internal net driver time, not related to WorldSettings.TimeSeconds */
 		double LastNetUpdateTimestamp;
 
-		TSet<TWeakObjectPtr<class SDK::UNetConnection>> DormantConnections;
+		/** List of connections that this actor is dormant on */
+		TSet<TWeakObjectPtr<class UNetConnection>> DormantConnections;
 
-		TSet<TWeakObjectPtr<class SDK::UNetConnection>> RecentlyDormantConnections;
+		/** A list of connections that this actor has recently been dormant on, but the actor doesn't have a channel open yet.
+		*  These need to be differentiated from actors that the client doesn't know about, but there's no explicit list for just those actors.
+		*  (this list will be very transient, with connections being moved off the DormantConnections list, onto this list, and then off once the actor has a channel again)
+		*/
+		TSet<TWeakObjectPtr<class UNetConnection>> RecentlyDormantConnections;
 
+		/** Is this object still pending a full net update due to clients that weren't able to replicate the actor at the time of LastNetUpdateTime */
 		uint8 bPendingNetUpdate : 1;
 
+		/** Should this object be considered for replay checkpoint writes */
 		uint8 bDirtyForReplay : 1;
 
+		/** Should channel swap roles while calling ReplicateActor */
 		uint8 bSwapRolesOnReplicate : 1;
 
+		/** Force this object to be considered relevant for at least one update */
 		uint32 ForceRelevantFrame = 0;
-	};
 
+		FNetworkObjectInfo()
+			: Actor(nullptr)
+			, NextUpdateTime(0.0)
+			, LastNetReplicateTime(0.0)
+			, OptimalNetUpdateDelta(0.0f)
+			, LastNetUpdateTimestamp(0.0)
+			, bPendingNetUpdate(false)
+			, bDirtyForReplay(false)
+			, bSwapRolesOnReplicate(false) {
+		}
+
+		FNetworkObjectInfo(AActor* InActor)
+			: Actor(InActor)
+			, WeakActor(InActor)
+			, NextUpdateTime(0.0)
+			, LastNetReplicateTime(0.0)
+			, OptimalNetUpdateDelta(0.0f)
+			, LastNetUpdateTimestamp(0.0)
+			, bPendingNetUpdate(false)
+			, bDirtyForReplay(false)
+			, bSwapRolesOnReplicate(false) {
+		}
+	};
 
 	template< class ObjectType>
 	class TSharedPtr
@@ -516,6 +554,7 @@ namespace Replication {
 
 			OutConsiderList.Add(ActorInfo);
 
+			Actor->bCallPreReplication = true;
 			//Actor->CallPreReplication(this); // Doesent exist (maybe version specific)
 		}
 
@@ -529,8 +568,7 @@ namespace Replication {
 
 	__forceinline bool IsActorRelevantToConnection(const AActor* Actor, const TArray<FNetViewer>& ConnectionViewers)
 	{
-		/*using IsNetRelevantForFn = bool(*)(const AActor*, const AActor*, const AActor*, const FVector&);
-		IsNetRelevantForFn IsNetRelevantFor = (IsNetRelevantForFn)(Actor->VTable[0x9a]);
+		bool (*IsNetRelevantFor)(const AActor*, const AActor*, const AActor*, const FVector&) = decltype(IsNetRelevantFor)(Actor->VTable[0x9a]);
 
 		for (auto& Viewer : ConnectionViewers)
 		{
@@ -540,8 +578,8 @@ namespace Replication {
 			}
 		}
 
-		return false;*/
-		return true;
+		return false;
+		//return true;
 	}
 
 	__forceinline FNetViewer ConstructNetViewer(UNetConnection* NetConnection)
@@ -659,9 +697,17 @@ namespace Replication {
 		static ReplicateActorFn ReplicateActor = (ReplicateActorFn)(ImageBase + 0x838c068);
 		if (!Channel || !ReplicateActor || !IsNetReady(Channel, false))
 			return false;
-		if (ReplicateActor(Channel)) {
-			ReplicateActor(Channel);
+
+		bool bReplicated = ReplicateActor(Channel);
+		if (bReplicated) {
 			ActorInfo->LastNetReplicateTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
+			ActorInfo->Actor->ForceNetUpdate();
+			Channel->Actor->ForceNetUpdate();
+
+			if (ActorInfo->Actor->bReplicateMovement) {
+				ActorInfo->Actor->OnRep_ReplicateMovement();
+				ActorInfo->Actor->OnRep_ReplicatedMovement();
+			}
 			return true;
 		}
 		return false;
@@ -720,7 +766,13 @@ namespace Replication {
 
 				Actor->NetTag = GetNetTag(Driver);
 
+				FVector ViewLocation = ConnectionViewers[0].ViewLocation;
+				float DistanceSquared = (Actor->K2_GetActorLocation() - ViewLocation).SizeSquared();
+
+				int32 Priority = static_cast<int32>(UKismetMathLibrary::GetDefaultObj()->Clamp(1000000.0f - DistanceSquared, 0.0f, 1000000.0f));
+
 				OutPriorityList[FinalSortedCount] = FActorPriority(Channel, ActorInfo);
+				OutPriorityList[FinalSortedCount].Priority = Priority;
 				OutPriorityActors[FinalSortedCount] = &OutPriorityList[FinalSortedCount];
 				FinalSortedCount++;
 			}

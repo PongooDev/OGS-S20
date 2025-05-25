@@ -835,6 +835,9 @@ public:
 	{
 		return std::sqrt((X * X) + (Y * Y) + (Z * Z));
 	}
+	float SizeSquared() const {
+		return X * X + Y * Y + Z * Z;
+	}
 	bool operator!=(const FVector& Other) const
 	{
 		return X != Other.X || Y != Other.Y || Z != Other.Z;

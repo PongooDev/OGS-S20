@@ -689,7 +689,7 @@ namespace Replication {
 		if (Channel) {
 			SetChannelActor(Channel, Actor);
 			return Channel;
-		}
+		}//thinking
 		return nullptr;
 	}
 
@@ -806,6 +806,9 @@ namespace Replication {
 
 			AActor* Actor = ActorInfo->Actor;
 			UActorChannel* Channel = FindChannel(Actor, Connection);
+
+			if (Actor->IsA(APlayerController::StaticClass()) && Actor != Connection->PlayerController)
+				continue;
 
 			if (!Channel && IsNetReady(Connection, false)) {
 				Channel = CreateActorChannel(Connection, Actor);

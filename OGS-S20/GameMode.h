@@ -23,6 +23,9 @@ namespace GameMode {
 			else if (Globals::bEventEnabled) {
 				Playlist = StaticLoadObject<UFortPlaylistAthena>("/ArmadilloPlaylist/Playlist/Playlist_Armadillo.Playlist_Armadillo");
 			}
+			else if (Globals::bZeroBuild) {
+				Playlist = StaticLoadObject<UFortPlaylistAthena>("/Game/Athena/Playlists/NoBuildBR/Playlist_NoBuildBR_Solo.Playlist_NoBuildBR_Solo");
+			}
 			else {
 				Playlist = StaticLoadObject<UFortPlaylistAthena>("/Game/Athena/Playlists/Playlist_DefaultSolo.Playlist_DefaultSolo");
 			}
@@ -284,6 +287,8 @@ namespace GameMode {
 		Pawn->ForceNetUpdate();
 		PC->ForceNetUpdate();
 		PlayerState->ForceNetUpdate();
+
+		ApplyCharacterCustomization(PlayerState, Pawn);
 
 		return Pawn;
 		//return (AFortPlayerPawnAthena*)GameMode->SpawnDefaultPawnAtTransform(Player, Transform);

@@ -27,7 +27,7 @@ namespace Misc {
     void Hook() {
         //MH_CreateHook((LPVOID)(ImageBase + 0x100e038), True, nullptr); // collectgarbage
         MH_CreateHook((LPVOID)(ImageBase + 0x83f36d4), KickPlayer, (LPVOID*)&KickPlayerOG); // Kickplayer
-        //MH_CreateHook((LPVOID)(ImageBase + ), DispatchRequest, (LPVOID*)&DispatchRequestOG); // dont have the offset
+        MH_CreateHook((LPVOID)(ImageBase + 0x16BBFE0), DispatchRequest, (LPVOID*)&DispatchRequestOG); // dont have the offset
 
         MH_CreateHook((LPVOID)(ImageBase + 0x4834b50), nullFunc, nullptr);
         MH_CreateHook((LPVOID)(ImageBase + 0xd4fc70), nullFunc, nullptr);

@@ -5,9 +5,11 @@ namespace Globals {
 	bool bSTWEnabled = false;
 
 	bool bEventEnabled = false;
+	bool bZeroBuild = false;
+
 	bool bBotsEnabled = true;
 
-	float MaxTickRate = 60.f;
+	float MaxTickRate = 30.f;
 
 	int MinPlayersForEarlyStart = 2;
 }

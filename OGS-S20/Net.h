@@ -14,13 +14,18 @@ namespace Net {
 
 	constexpr ENetMode NetMode = ENetMode::NM_DedicatedServer;
 
+	ENetMode AActorGetNetMode(AActor* a1)
+	{
+		return NetMode;
+	}
+
 	static ENetMode GetNetMode()
 	{
 		return NetMode;
 	}
 
 	void Hook() {
-		//MH_CreateHook((LPVOID)(ImageBase + ), AActorGetNetMode, nullptr); i have yet to find this
+		MH_CreateHook((LPVOID)(ImageBase + 0xF233DC), AActorGetNetMode, nullptr); // i have yet to find this (found 25/06/25)
 		MH_CreateHook((LPVOID)(ImageBase + 0xf5d6f8), GetNetMode, nullptr);
 
 		Log("Hooked Net!");

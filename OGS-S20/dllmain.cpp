@@ -43,6 +43,29 @@ void Hook() {
     MH_EnableHook(MH_ALL_HOOKS);
 }
 
+static void WaitForLogin() {
+    Log("Waiting for login!");
+
+    FName Frontend = UKismetStringLibrary::Conv_StringToName(L"Frontend");
+    FName MatchState = UKismetStringLibrary::Conv_StringToName(L"InProgress");
+
+    while (true) {
+        UWorld* CurrentWorld = ((UWorld*)UWorld::GetWorld());
+        if (CurrentWorld) {
+            if (CurrentWorld->Name == Frontend) {
+                auto GameMode = (AGameMode*)CurrentWorld->AuthorityGameMode;
+                if (GameMode->GetMatchState() == MatchState) {
+                    break;
+                }
+            }
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000 * 1));
+}
+
 DWORD Main(LPVOID) {
     InitConsole();
     MH_Initialize();
@@ -50,6 +73,8 @@ DWORD Main(LPVOID) {
 
     while (UEngine::GetEngine() == 0)
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
+    WaitForLogin();
 
     Hook();
 

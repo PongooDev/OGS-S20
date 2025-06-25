@@ -555,7 +555,8 @@ namespace Replication {
 			OutConsiderList.Add(ActorInfo);
 
 			Actor->bCallPreReplication = true;
-			//Actor->CallPreReplication(this); // Doesent exist (maybe version specific)
+			static void (*CallPreReplication)(AActor*, UNetDriver* NetDriver) = decltype(CallPreReplication)(ImageBase + 0x82A7038);
+			CallPreReplication(Actor, Driver); // Doesent exist (maybe version specific) (Exist now 6/24/25)
 		}
 
 		for (AActor* Actor : ActorsToRemove)

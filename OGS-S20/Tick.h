@@ -4,7 +4,7 @@
 #include "Replication.h"
 
 namespace Tick {
-	void (*ServerReplicateActors)(void*) = decltype(ServerReplicateActors)(ImageBase + 0x11333c0);
+	void (*ServerReplicateActors)(void*) = decltype(ServerReplicateActors)(UReplicationGraph::GetDefaultObj()->VTable[0x66]);
 
 	inline void (*TickFlushOG)(UNetDriver*, float);
 	void TickFlush(UNetDriver* Driver, float DeltaTime)
@@ -16,7 +16,7 @@ namespace Tick {
 		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
 
 		Replication::ServerReplicateActors(Driver, DeltaTime);
-		ServerReplicateActors(Driver->ReplicationDriver);
+		//ServerReplicateActors(Driver->ReplicationDriver);
 
 		if (GameState->GamePhase == EAthenaGamePhase::Warmup
 			&& (GameMode->NumPlayers + GameMode->NumBots) >= Globals::MinPlayersForEarlyStart

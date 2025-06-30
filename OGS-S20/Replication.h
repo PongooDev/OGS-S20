@@ -777,7 +777,7 @@ namespace Replication {
 		int32 FinalSortedCount = 0;
 		int32 DeletedCount = 0; //i think??
 
-		TWeakObjectPtr<UNetConnection> WeakConnection(Connection);
+		//TWeakObjectPtr<UNetConnection> WeakConnection(Connection);
 
 		const int32 MaxSortedActors = ConsiderList.Num() + GetDestroyedStartupOrDormantActors(Driver).Num();
 		if (MaxSortedActors > 0)
@@ -1014,7 +1014,7 @@ namespace Replication {
 				FActorPriority** PriorityActors = NULL;
 
 				const int32 FinalSortCount = ServerReplicateActors_PrioritizeActors(Driver, Connection, ConnectionViewers, ConsiderList, PriorityList, PriorityActors);
-				const int32 LastprocessedActor = ServerReplicateActors_ProcessPrioritizedActors(Driver, Connection, ConnectionViewers, PriorityActors, FinalSortCount, Updated);
+				const int32 LastProcessedActor = ServerReplicateActors_ProcessPrioritizedActors(Driver, Connection, ConnectionViewers, PriorityActors, FinalSortCount, Updated);
 			}
 		}
 	}

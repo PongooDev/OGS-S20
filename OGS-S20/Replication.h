@@ -363,7 +363,7 @@ namespace Replication {
 
 			AActor* OwningActor = Connection->OwningActor;
 
-			if (OwningActor != NULL)
+			if (OwningActor != NULL && GetElapsedTime(Connection->Driver) - Connection->LastReceiveTime < 1.5)
 			{
 				bFoundReadyConnection = true;
 

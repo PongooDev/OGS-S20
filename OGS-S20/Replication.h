@@ -682,12 +682,16 @@ namespace Replication {
 		static CreateChannelByNameFn CreateChannelByName = (CreateChannelByNameFn)(ImageBase + 0x16fda6c);
 		static SetChannelActorFn SetChannelActor = (SetChannelActorFn)(ImageBase + 0x1273ec0);
 
+		if (Actor->IsA(APlayerController::StaticClass()) && Actor != Conn->PlayerController)
+			return nullptr;
+
 		static FName ActorChannelName = FName(298);
 		UActorChannel* Channel = (UActorChannel*)CreateChannelByName(Conn, &ActorChannelName, EChannelCreateFlags::OpenedLocally, -1);
 		if (Channel) {
 			SetChannelActor(Channel, Actor);
 			return Channel;
 		}//thinking
+
 		return nullptr;
 	}
 

@@ -629,12 +629,11 @@ namespace Replication {
 
 	__forceinline bool IsLevelInitializedForActor(const UNetDriver* NetDriver, const AActor* InActor, UNetConnection* InConnection)
 	{
-		/*bool (*ClientHasInitializedLevelFor)(const UNetConnection*, const AActor*) = decltype(ClientHasInitializedLevelFor)();
+		bool (*ClientHasInitializedLevelFor)(const UNetConnection*, const AActor*) = decltype(ClientHasInitializedLevelFor)(ImageBase + 0x8473B58);
 
 		const bool bCorrectWorld = NetDriver->WorldPackage != nullptr && (GetClientWorldPackageName(InConnection) == NetDriver->WorldPackage->Name) && ClientHasInitializedLevelFor(InConnection, InActor);
 		const bool bIsConnectionPC = (InActor == InConnection->PlayerController);
-		return bCorrectWorld || bIsConnectionPC;*/
-		return true;
+		return bCorrectWorld || bIsConnectionPC;
 	}
 
 	__forceinline void SendClientAdjustment(APlayerController* PlayerController)
@@ -656,9 +655,8 @@ namespace Replication {
 	}
 
 	__forceinline bool IsNetReady(UNetConnection* Connection, bool bSaturate) {
-		//bool (*IsNetReady)(UNetConnection*, bool) = decltype(IsNetReady)(OFFSET);
-		//return IsNetReady(Connection, bSaturate);
-		return true;
+		bool (*IsNetReady)(UNetConnection*, bool) = decltype(IsNetReady)(ImageBase + 0x8479048);
+		return IsNetReady(Connection, bSaturate);
 	}
 
 	__forceinline bool IsNetReady(UChannel* Channel, bool bSaturate) {

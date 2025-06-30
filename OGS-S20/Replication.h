@@ -874,6 +874,9 @@ namespace Replication {
 					{
 						if (bLevelInitializedForActor)
 						{
+							if (Actor->IsA(APlayerController::StaticClass()) && Actor != Connection->PlayerController)
+								continue;
+
 							Channel = CreateActorChannel(Connection, Actor);
 						}
 					}

@@ -15,20 +15,22 @@ namespace Tick {
 		AFortGameModeAthena* GameMode = (AFortGameModeAthena*)UWorld::GetWorld()->AuthorityGameMode;
 		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
 
-		Replication::ServerReplicateActors(Driver, DeltaTime);
-		//ServerReplicateActors(Driver->ReplicationDriver);
+		if (GameMode->NumPlayers > 0) {
+			Replication::ServerReplicateActors(Driver, DeltaTime);
+			//ServerReplicateActors(Driver->ReplicationDriver);
 
-		if (GameState->GamePhase == EAthenaGamePhase::Warmup
-			&& (GameMode->NumPlayers + GameMode->NumBots) >= Globals::MinPlayersForEarlyStart
-			&& GameState->WarmupCountdownEndTime > UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + 10.f) {
+			if (GameState->GamePhase == EAthenaGamePhase::Warmup
+				&& (GameMode->NumPlayers + GameMode->NumBots) >= Globals::MinPlayersForEarlyStart
+				&& GameState->WarmupCountdownEndTime > UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + 10.f) {
 
-			auto TS = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
-			auto DR = 10.f;
+				auto TS = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
+				auto DR = 10.f;
 
-			GameState->WarmupCountdownEndTime = TS + DR;
-			GameMode->WarmupCountdownDuration = DR;
-			GameState->WarmupCountdownStartTime = TS;
-			GameMode->WarmupEarlyCountdownDuration = DR;
+				GameState->WarmupCountdownEndTime = TS + DR;
+				GameMode->WarmupCountdownDuration = DR;
+				GameState->WarmupCountdownStartTime = TS;
+				GameMode->WarmupEarlyCountdownDuration = DR;
+			}
 		}
 
 		return TickFlushOG(Driver, DeltaTime);

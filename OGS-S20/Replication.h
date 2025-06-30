@@ -397,7 +397,7 @@ namespace Replication {
 			{
 				Connection->ViewTarget = NULL;
 				for (int32 ChildIdx = 0; ChildIdx < Connection->Children.Num(); ChildIdx++)
-					Connection->Children[ChildIdx]->ViewTarget = NULL;
+					Connection->Children[ChildIdx]->ViewTarget;
 			}
 		}
 
@@ -1016,59 +1016,60 @@ namespace Replication {
 				continue;
 
 			if (!Connection->ViewTarget)
+				continue;
+
+			TArray<FNetViewer>& ConnectionViewers = AWorldSettings::GetDefaultObj()->ReplicationViewers;
+
+			ConnectionViewers.Free();
+			ConnectionViewers.Add(ConstructNetViewer(Connection));
+			for (int32 ViewerIndex = 0; ViewerIndex < Connection->Children.Num(); ViewerIndex++)
 			{
-				TArray<FNetViewer>& ConnectionViewers = AWorldSettings::GetDefaultObj()->ReplicationViewers;
+				if (Connection->Children[ViewerIndex]->ViewTarget != NULL)
+					ConnectionViewers.Add(ConstructNetViewer(Connection->Children[ViewerIndex]));
+			}
 
-				ConstructNetViewer(Connection);
-				for (int32 ViewerIndex = 0; ViewerIndex < Connection->Children.Num(); ViewerIndex++)
+			if (Connection->PlayerController)
+				SendClientAdjustment(Connection->PlayerController);
+
+			for (int32 ChildIdx = 0; ChildIdx < Connection->Children.Num(); ChildIdx++)
+			{
+				if (Connection->Children[ChildIdx]->PlayerController != NULL)
+					SendClientAdjustment(Connection->Children[ChildIdx]->PlayerController);
+			}
+
+			FActorPriority* PriorityList = NULL;
+			FActorPriority** PriorityActors = NULL;
+
+			const int32 FinalSortCount = ServerReplicateActors_PrioritizeActors(Driver, Connection, ConnectionViewers, ConsiderList, PriorityList, PriorityActors);
+			const int32 LastProcessedActor = ServerReplicateActors_ProcessPrioritizedActors(Driver, Connection, ConnectionViewers, PriorityActors, FinalSortCount, Updated);
+
+			for (int32 k = LastProcessedActor; k < FinalSortCount; k++)
+			{
+				if (!PriorityActors[k]->ActorInfo)
+					continue;
+
+				AActor* Actor = PriorityActors[k]->ActorInfo->Actor;
+				UActorChannel* Channel = PriorityActors[k]->Channel;
+
+				if (Channel != NULL)
 				{
-					if (Connection->Children[ViewerIndex]->ViewTarget != NULL)
-						ConstructNetViewer(Connection->Children[ViewerIndex]);
+					PriorityActors[k]->ActorInfo->bPendingNetUpdate = true;
 				}
-
-				if (Connection->PlayerController)
-					SendClientAdjustment(Connection->PlayerController);
-
-				for (int32 ChildIdx = 0; ChildIdx < Connection->Children.Num(); ChildIdx++)
+				else if (IsActorRelevantToConnection(Actor, ConnectionViewers))
 				{
-					if (Connection->Children[ChildIdx]->PlayerController != NULL)
-						SendClientAdjustment(Connection->Children[ChildIdx]->PlayerController);
+					PriorityActors[k]->ActorInfo->bPendingNetUpdate = true;
 				}
+			}
 
-				FActorPriority* PriorityList = NULL;
-				FActorPriority** PriorityActors = NULL;
-
-				const int32 FinalSortCount = ServerReplicateActors_PrioritizeActors(Driver, Connection, ConnectionViewers, ConsiderList, PriorityList, PriorityActors);
-				const int32 LastProcessedActor = ServerReplicateActors_ProcessPrioritizedActors(Driver, Connection, ConnectionViewers, PriorityActors, FinalSortCount, Updated);
-
-				for (int32 k = LastProcessedActor; k < FinalSortCount; k++)
+			if (NumClientsToTick < Driver->ClientConnections.Num())
+			{
+				int32 NumConnectionsToMove = NumClientsToTick;
+				while (NumConnectionsToMove > 0)
 				{
-					if (!PriorityActors[k]->ActorInfo)
-						continue;
-
-					AActor* Actor = PriorityActors[k]->ActorInfo->Actor;
-					UActorChannel* Channel = PriorityActors[k]->Channel;
-
-					if (Channel != NULL)
-					{
-						PriorityActors[k]->ActorInfo->bPendingNetUpdate = true;
-					}
-					else if (IsActorRelevantToConnection(Actor, ConnectionViewers))
-					{
-						PriorityActors[k]->ActorInfo->bPendingNetUpdate = true;
-					}
-				}
-
-				if (NumClientsToTick < Driver->ClientConnections.Num())
-				{
-					int32 NumConnectionsToMove = NumClientsToTick;
-					while (NumConnectionsToMove > 0)
-					{
-						UNetConnection* Connection = Driver->ClientConnections[0];
-						Driver->ClientConnections.Remove(0);
-						Driver->ClientConnections.Add(Connection);
-						NumConnectionsToMove--;
-					}
+					UNetConnection* Connection = Driver->ClientConnections[0];
+					Driver->ClientConnections.Remove(0);
+					Driver->ClientConnections.Add(Connection);
+					NumConnectionsToMove--;
 				}
 			}
 		}

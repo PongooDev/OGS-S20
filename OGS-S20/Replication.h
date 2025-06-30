@@ -1015,7 +1015,39 @@ namespace Replication {
 
 				const int32 FinalSortCount = ServerReplicateActors_PrioritizeActors(Driver, Connection, ConnectionViewers, ConsiderList, PriorityList, PriorityActors);
 				const int32 LastProcessedActor = ServerReplicateActors_ProcessPrioritizedActors(Driver, Connection, ConnectionViewers, PriorityActors, FinalSortCount, Updated);
+
+				for (int32 k = LastProcessedActor; k < FinalSortCount; k++)
+				{
+					if (!PriorityActors[k]->ActorInfo)
+						continue;
+
+					AActor* Actor = PriorityActors[k]->ActorInfo->Actor;
+					UActorChannel* Channel = PriorityActors[k]->Channel;
+
+					if (Channel != NULL)
+					{
+						PriorityActors[k]->ActorInfo->bPendingNetUpdate = true;
+					}
+					else if (IsActorRelevantToConnection(Actor, ConnectionViewers))
+					{
+						PriorityActors[k]->ActorInfo->bPendingNetUpdate = true;
+					}
+				}
+
+				if (NumClientsToTick < Driver->ClientConnections.Num())
+				{
+					int32 NumConnectionsToMove = NumClientsToTick;
+					while (NumConnectionsToMove > 0)
+					{
+						UNetConnection* Connection = Driver->ClientConnections[0];
+						Driver->ClientConnections.Remove(0);
+						Driver->ClientConnections.Add(Connection);
+						NumConnectionsToMove--;
+					}
+				}
 			}
 		}
+
+		return Updated;
 	}
 }

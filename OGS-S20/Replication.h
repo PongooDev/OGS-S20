@@ -354,39 +354,50 @@ namespace Replication {
 		int32 NumClientsToTick = Driver->ClientConnections.Num();
 		bool bFoundReadyConnection = false;
 
-		for (UNetConnection* Conn : Driver->ClientConnections) {
-			AActor* OwningActor = Conn->OwningActor;
+		for (int32 ConnIdx = 0; ConnIdx < Driver->ClientConnections.Num(); ConnIdx++)
+		{
+			UNetConnection* Connection = Driver->ClientConnections[ConnIdx];
+			if (!Connection)
+				continue;
 
-			if (OwningActor && (GetElapsedTime(Driver) - Conn->LastReceiveTime < 1.5f)) {
+			AActor* OwningActor = Connection->OwningActor;
+
+			if (OwningActor != NULL)
+			{
 				bFoundReadyConnection = true;
 
 				AActor* DesiredViewTarget = OwningActor;
 
-				if (Conn->PlayerController) {
-					if (AActor* ViewTarget = Conn->PlayerController->GetViewTarget()) {
+				if (Connection->PlayerController)
+				{
+					if (AActor* ViewTarget = Connection->PlayerController->GetViewTarget())
+					{
 						DesiredViewTarget = ViewTarget;
 					}
 				}
 
-				Conn->ViewTarget = DesiredViewTarget;
+				Connection->ViewTarget = DesiredViewTarget;
 
-				for (UNetConnection* Child : Conn->Children) {
-					AActor* DesiredChildViewTarget = Child->OwningActor;
+				for (int32 ChildIdx = 0; ChildIdx < Connection->Children.Num(); ChildIdx++)
+				{
+					UNetConnection* Child = Connection->Children[ChildIdx];
+					APlayerController* ChildPlayerController = Child->PlayerController;
 
-					if (Child->PlayerController) {
-						if (AActor* ChildViewTarget = Child->PlayerController->GetViewTarget()) {
-							DesiredChildViewTarget = ChildViewTarget;
-						}
+					if (ChildPlayerController != NULL)
+					{
+						Child->ViewTarget = ChildPlayerController->GetViewTarget();
 					}
-
-					Child->ViewTarget = DesiredChildViewTarget;
+					else
+					{
+						Child->ViewTarget = NULL;
+					}
 				}
 			}
-			else {
-				Conn->ViewTarget = nullptr;
-				for (UNetConnection* Child : Conn->Children) {
-					Child->ViewTarget = nullptr;
-				}
+			else
+			{
+				Connection->ViewTarget = NULL;
+				for (int32 ChildIdx = 0; ChildIdx < Connection->Children.Num(); ChildIdx++)
+					Connection->Children[ChildIdx]->ViewTarget = NULL;
 			}
 		}
 
@@ -975,7 +986,10 @@ namespace Replication {
 
 		const int32 NumClientsToTick = ServerReplicateActors_PrepConnections(Driver, DeltaTime);
 		if (NumClientsToTick == 0)
+		{
+			Log("ServerReplicateActors::NumClientsToTick");
 			return 0;
+		}
 
 		float ServerTickTime = Globals::MaxTickRate;
 		if (ServerTickTime == 0.f)

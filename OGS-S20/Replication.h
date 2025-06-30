@@ -118,9 +118,18 @@ namespace Replication {
 		inline void Remove(AActor* const Actor) // mannn idk, there is no children of TSet that allows us to remove an object from the set
 		{
 			if (Actor == nullptr)
+				return;
+
+			for (int32 Index = 0; Index < AllNetworkObjects.Num(); ++Index)
 			{
-				return; //i come back to you when i finish shit
+				TSharedPtr<FNetworkObjectInfo>& NetworkObjectInfoPtr = AllNetworkObjects[Index];
+				if (NetworkObjectInfoPtr.Get() && NetworkObjectInfoPtr.Get()->Actor == Actor)
+				{
+					NetworkObjectInfoPtr = TSharedPtr<FNetworkObjectInfo>(); //Removes Actor
+				}
 			}
+
+			Log("Work?");
 		}
 	};
 
@@ -564,11 +573,10 @@ namespace Replication {
 			CallPreReplication(Actor, Driver);
 		}
 
-		/* Work on you soon enough
 		for (AActor* Actor : ActorsToRemove)
 		{
 			RemoveNetworkActor(Driver, Actor);
-		}*/
+		}
 
 		ActorsToRemove.Free();
 	}

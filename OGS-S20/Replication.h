@@ -836,7 +836,7 @@ namespace Replication {
 	{
 		int32 FinalRelevantCount = 0;
 
-		if (IsNetReady(Connection, false)) //false = 0
+		if (!IsNetReady(Connection, false)) //false = 0
 		{
 			Log("ServerReplicateActors_ProcessPrioritizedActors::IsNetReady");
 			return 0;

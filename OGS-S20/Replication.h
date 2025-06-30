@@ -828,10 +828,22 @@ namespace Replication {
 				if (Actor->NetTag != GetNetTag(Driver))
 				{
 					Actor->NetTag = GetNetTag(Driver);
+
+					FVector ViewLocation = ConnectionViewers[0].ViewLocation;
+					float DistanceSquared = (Actor->K2_GetActorLocation() - ViewLocation).SizeSquared();
+					int32 Priority = static_cast<int32>(UKismetMathLibrary::GetDefaultObj()->Clamp(1000000.0f - DistanceSquared, 0.0f, 1000000.0f));
+
 					OutPriorityList[FinalSortedCount] = FActorPriority(Channel, ActorInfo);
-					OutPriorityActors[FinalSortedCount] = OutPriorityList + FinalSortedCount;
+					OutPriorityList[FinalSortedCount].Priority = Priority;
+					OutPriorityActors[FinalSortedCount] = &OutPriorityList[FinalSortedCount];
+
 					FinalSortedCount++;
 				}
+
+				std::sort(OutPriorityActors, OutPriorityActors + FinalSortedCount, [](FActorPriority* A, FActorPriority* B)
+					{
+						return A->Priority > B->Priority;
+					});
 			}
 		}
 

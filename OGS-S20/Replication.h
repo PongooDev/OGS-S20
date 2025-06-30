@@ -178,7 +178,8 @@ namespace Replication {
 		}
 
 		FActorPriority(UActorChannel* InChannel, FNetworkObjectInfo* InActorInfo)
-			: Priority(0), ActorInfo(InActorInfo), Channel(InChannel) {
+			: Priority(0), ActorInfo(InActorInfo), Channel(InChannel) 
+		{
 		}
 	};
 
@@ -776,9 +777,7 @@ namespace Replication {
 		UNetDriver* Driver,
 		UNetConnection* Connection,
 		const TArray<FNetViewer>& ConnectionViewers,
-		const TArray<FNetworkObjectInfo*>& ConsiderList,
-		FActorPriority*& OutPriorityList,
-		FActorPriority**& OutPriorityActors)
+		const TArray<FNetworkObjectInfo*>& ConsiderList)
 	{
 		GetNetTag(Driver)++;
 
@@ -826,27 +825,14 @@ namespace Replication {
 				}
 
 
-				if (Actor->NetTag == GetNetTag(Driver))
-					continue;
-
-				Actor->NetTag = GetNetTag(Driver);
-
-				FVector ViewLocation = ConnectionViewers[0].ViewLocation;
-				float DistanceSquared = (Actor->K2_GetActorLocation() - ViewLocation).SizeSquared();
-				int32 Priority = static_cast<int32>(UKismetMathLibrary::GetDefaultObj()->Clamp(1000000.0f - DistanceSquared, 0.0f, 1000000.0f));
-
-				OutPriorityList[FinalSortedCount] = FActorPriority(Channel, ActorInfo);
-				OutPriorityList[FinalSortedCount].Priority = Priority;
-				OutPriorityActors[FinalSortedCount] = &OutPriorityList[FinalSortedCount];
-
-				//FinalSortedCount++;
+				FinalSortedCount++;
 			}
 		}
 
 		return FinalSortedCount;
 	}
 
-	int32 ServerReplicateActors_ProcessPrioritizedActors(UNetDriver* Driver, UNetConnection* Connection, const TArray<FNetViewer>& ConnectionViewers, FActorPriority** PriorityActors, const int32 FinalSortedCount, int32& OutUpdated)
+	int32 ServerReplicateActors_ProcessPrioritizedActors(UNetDriver* Driver, UNetConnection* Connection, const TArray<FNetViewer>& ConnectionViewers, TArray<FNetworkObjectInfo*> OutConsiderList, const int32 FinalSortedCount, int32& OutUpdated)
 	{
 		int32 FinalRelevantCount = 0;
 
@@ -856,9 +842,8 @@ namespace Replication {
 			return 0;
 		}
 
-		for (int32 j = 0; j < FinalSortedCount; j++)
+		for (FNetworkObjectInfo* ActorInfo : OutConsiderList)
 		{
-			FNetworkObjectInfo* ActorInfo = PriorityActors[j]->ActorInfo;
 
 			if (ActorInfo == NULL)
 			{
@@ -866,11 +851,11 @@ namespace Replication {
 				continue;
 			}
 
-			UActorChannel* Channel = PriorityActors[j]->Channel;
+			AActor* Actor = ActorInfo->Actor;
+			UActorChannel* Channel = FindChannel(Actor, Connection);
 
 			if (!Channel || Channel->Actor)
 			{
-				AActor* Actor = ActorInfo->Actor;
 				bool bIsRelevant = false;
 
 				const bool bLevelInitializedForActor = IsLevelInitializedForActor(Driver, Actor, Connection);
@@ -932,7 +917,7 @@ namespace Replication {
 					}
 
 					if (!IsNetReady(Connection, false))
-						return j;
+						return FinalRelevantCount;
 				}
 
 				if ((!bIsRecentlyRelevant || Actor->bTearOff) && Channel != NULL)
@@ -975,7 +960,8 @@ namespace Replication {
 		}
 	}
 
-	int32 ServerReplicateActors(UNetDriver* Driver, float DeltaTime) {
+	int32 ServerReplicateActors(UNetDriver* Driver, float DeltaTime) 
+	{
 		if (!Driver || !Driver->World) {
 			if (!Driver) {
 				Log("NetDriver does not exist!");
@@ -1045,27 +1031,30 @@ namespace Replication {
 					SendClientAdjustment(Connection->Children[ChildIdx]->PlayerController);
 			}
 
-			FActorPriority* PriorityList = NULL;
-			FActorPriority** PriorityActors = NULL;
+			//FActorPriority* PriorityList = NULL;
+			//FActorPriority** PriorityActors = NULL;
 
-			const int32 FinalSortCount = ServerReplicateActors_PrioritizeActors(Driver, Connection, ConnectionViewers, ConsiderList, PriorityList, PriorityActors);
-			const int32 LastProcessedActor = ServerReplicateActors_ProcessPrioritizedActors(Driver, Connection, ConnectionViewers, PriorityActors, FinalSortCount, Updated);
+			const int32 FinalSortCount = ServerReplicateActors_PrioritizeActors(Driver, Connection, ConnectionViewers, ConsiderList);
+			const int32 LastProcessedActor = ServerReplicateActors_ProcessPrioritizedActors(Driver, Connection, ConnectionViewers, ConsiderList, FinalSortCount, Updated);
 
 			for (int32 k = LastProcessedActor; k < FinalSortCount; k++)
 			{
-				if (!PriorityActors[k]->ActorInfo)
-					continue;
-
-				AActor* Actor = PriorityActors[k]->ActorInfo->Actor;
-				UActorChannel* Channel = PriorityActors[k]->Channel;
-
-				if (Channel != NULL)
+				for (FNetworkObjectInfo* ActorInfo : ConsiderList)
 				{
-					PriorityActors[k]->ActorInfo->bPendingNetUpdate = true;
-				}
-				else if (IsActorRelevantToConnection(Actor, ConnectionViewers))
-				{
-					PriorityActors[k]->ActorInfo->bPendingNetUpdate = true;
+					if (!ActorInfo)
+						continue;
+
+					AActor* Actor = ActorInfo->Actor;
+					UActorChannel* Channel = FindChannel(Actor, Connection);
+
+					if (Channel != NULL)
+					{
+						ActorInfo->bPendingNetUpdate = true;
+					}
+					else if (IsActorRelevantToConnection(Actor, ConnectionViewers))
+					{
+						ActorInfo->bPendingNetUpdate = true;
+					}
 				}
 			}
 

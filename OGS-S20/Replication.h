@@ -825,25 +825,21 @@ namespace Replication {
 					continue;
 				}
 
-				if (Actor->NetTag != GetNetTag(Driver))
-				{
-					Actor->NetTag = GetNetTag(Driver);
 
-					FVector ViewLocation = ConnectionViewers[0].ViewLocation;
-					float DistanceSquared = (Actor->K2_GetActorLocation() - ViewLocation).SizeSquared();
-					int32 Priority = static_cast<int32>(UKismetMathLibrary::GetDefaultObj()->Clamp(1000000.0f - DistanceSquared, 0.0f, 1000000.0f));
+				if (Actor->NetTag == GetNetTag(Driver))
+					continue;
 
-					OutPriorityList[FinalSortedCount] = FActorPriority(Channel, ActorInfo);
-					OutPriorityList[FinalSortedCount].Priority = Priority;
-					OutPriorityActors[FinalSortedCount] = &OutPriorityList[FinalSortedCount];
+				Actor->NetTag = GetNetTag(Driver);
 
-					FinalSortedCount++;
-				}
+				FVector ViewLocation = ConnectionViewers[0].ViewLocation;
+				float DistanceSquared = (Actor->K2_GetActorLocation() - ViewLocation).SizeSquared();
+				int32 Priority = static_cast<int32>(UKismetMathLibrary::GetDefaultObj()->Clamp(1000000.0f - DistanceSquared, 0.0f, 1000000.0f));
 
-				std::sort(OutPriorityActors, OutPriorityActors + FinalSortedCount, [](FActorPriority* A, FActorPriority* B)
-					{
-						return A->Priority > B->Priority;
-					});
+				OutPriorityList[FinalSortedCount] = FActorPriority(Channel, ActorInfo);
+				OutPriorityList[FinalSortedCount].Priority = Priority;
+				OutPriorityActors[FinalSortedCount] = &OutPriorityList[FinalSortedCount];
+
+				//FinalSortedCount++;
 			}
 		}
 

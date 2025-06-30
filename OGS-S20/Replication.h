@@ -832,14 +832,20 @@ namespace Replication {
 		int32 FinalRelevantCount = 0;
 
 		if (IsNetReady(Connection, false)) //false = 0
+		{
+			Log("ServerReplicateActors_ProcessPrioritizedActors::IsNetReady");
 			return 0;
+		}
 
 		for (int32 j = 0; j < FinalSortedCount; j++)
 		{
 			FNetworkObjectInfo* ActorInfo = PriorityActors[j]->ActorInfo;
 
 			if (ActorInfo == NULL)
+			{
+				Log("ServerReplicateActors_ProcessPrioritizedActors::ActorInfo");
 				continue;
+			}
 
 			UActorChannel* Channel = PriorityActors[j]->Channel;
 
@@ -859,6 +865,10 @@ namespace Replication {
 							bIsRelevant = true;
 						}
 					}
+				}
+				else
+				{
+					Log("Level not initialized for actor " + Actor->GetFullName());
 				}
 
 				const bool bIsRecentlyRelevant = bIsRelevant;
@@ -927,6 +937,7 @@ namespace Replication {
 		{
 			if (!PriorityActors[k]->ActorInfo)
 			{
+
 				continue;
 			}
 

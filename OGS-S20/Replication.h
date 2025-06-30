@@ -575,7 +575,7 @@ namespace Replication {
 
 	__forceinline bool IsActorRelevantToConnection(const AActor* Actor, const TArray<FNetViewer>& ConnectionViewers)
 	{
-		bool (*IsNetRelevantFor)(const AActor*, const AActor*, const AActor*, const FVector&) = decltype(IsNetRelevantFor)(Actor->VTable[0x9a]);
+		bool (*IsNetRelevantFor)(const AActor*, const AActor*, const AActor*, const FVector&) = decltype(IsNetRelevantFor)(Actor->VTable[0x9A]);
 
 		for (auto& Viewer : ConnectionViewers)
 		{
@@ -874,8 +874,8 @@ namespace Replication {
 					{
 						if (bLevelInitializedForActor)
 						{
-							if (Actor->IsA(APlayerController::StaticClass()) && Actor != Connection->PlayerController)
-								continue;
+							/*if (Actor->IsA(APlayerController::StaticClass()) && Actor != Connection->PlayerController)
+								continue;*/
 
 							Channel = CreateActorChannel(Connection, Actor);
 						}
@@ -1000,6 +1000,18 @@ namespace Replication {
 
 			if (i >= NumClientsToTick)
 				continue;
+
+			for (int32 ConsiderIdx = 0; ConsiderIdx < ConsiderList.Num(); ConsiderIdx++)
+			{
+				AActor* Actor = ConsiderList[ConsiderIdx]->Actor;
+
+				if (Actor != NULL && !ConsiderList[ConsiderIdx]->bPendingNetUpdate)
+				{
+					UActorChannel* Channel = FindChannel(ConsiderList[ConsiderIdx]->WeakActor.Get(), Connection);
+					if (Channel != NULL)
+						ConsiderList[ConsiderIdx]->bPendingNetUpdate = true; //atleast try??/
+				}
+			}
 
 			if (!Connection->ViewTarget)
 				continue;

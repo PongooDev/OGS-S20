@@ -657,11 +657,12 @@ namespace Replication {
 
 	__forceinline bool IsLevelInitializedForActor(const UNetDriver* NetDriver, const AActor* InActor, UNetConnection* InConnection)
 	{
-		bool (*ClientHasInitializedLevelFor)(const UNetConnection*, const AActor*) = decltype(ClientHasInitializedLevelFor)(ImageBase + 0x8473B58);
+		/*bool (*ClientHasInitializedLevelFor)(const UNetConnection*, const AActor*) = decltype(ClientHasInitializedLevelFor)();
 
 		const bool bCorrectWorld = NetDriver->WorldPackage != nullptr && (GetClientWorldPackageName(InConnection) == NetDriver->WorldPackage->Name) && ClientHasInitializedLevelFor(InConnection, InActor);
 		const bool bIsConnectionPC = (InActor == InConnection->PlayerController);
-		return bCorrectWorld || bIsConnectionPC;
+		return bCorrectWorld || bIsConnectionPC;*/
+		return true;
 	}
 
 	__forceinline void SendClientAdjustment(APlayerController* PlayerController)
@@ -683,8 +684,9 @@ namespace Replication {
 	}
 
 	__forceinline bool IsNetReady(UNetConnection* Connection, bool bSaturate) {
-		bool (*IsNetReady)(UNetConnection*, bool) = decltype(IsNetReady)(ImageBase + 0x8479048);
-		return IsNetReady(Connection, bSaturate);
+		//bool (*IsNetReady)(UNetConnection*, bool) = decltype(IsNetReady)(OFFSET);
+		//return IsNetReady(Connection, bSaturate);
+		return true;
 	}
 
 	__forceinline bool IsNetReady(UChannel* Channel, bool bSaturate) {
@@ -715,7 +717,7 @@ namespace Replication {
 		if (Channel) {
 			SetChannelActor(Channel, Actor);
 			return Channel;
-		}//thinking
+		}
 		return nullptr;
 	}
 
@@ -728,8 +730,8 @@ namespace Replication {
 		bool bReplicated = ReplicateActor(Channel);
 		if (bReplicated) {
 			ActorInfo->LastNetReplicateTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
-			ActorInfo->Actor->ForceNetUpdate();
-			Channel->Actor->ForceNetUpdate();
+			//ActorInfo->Actor->ForceNetUpdate();
+			//Channel->Actor->ForceNetUpdate();
 
 			if (ActorInfo->Actor->bReplicateMovement) {
 				ActorInfo->Actor->OnRep_ReplicateMovement();
@@ -1011,8 +1013,8 @@ namespace Replication {
 
 				if (!IsActorRelevantToConnection(Actor, Viewers))
 					continue;
-				/*if (!IsLevelInitializedForActor(Driver, Actor, Conn))
-					continue;*/
+				if (!IsLevelInitializedForActor(Driver, Actor, Conn))
+					continue;
 
 				UActorChannel* Channel = FindChannel(Actor, Conn);
 				if (!Channel && IsNetReady(Conn, false)) {

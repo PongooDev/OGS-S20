@@ -121,6 +121,34 @@ namespace Replication {
 			{
 				return;
 			}
+
+			auto RemoveFromSet = [&](FNetworkObjectSet& Set)
+				{
+					for (int32 i = 0; i < Set.Elements.NumAllocated();)
+					{
+						if (!Set.Elements.IsValidIndex(i))
+						{
+							++i;
+							continue;
+						}
+
+						TSharedPtr<FNetworkObjectInfo>& InfoPtr = Set.Elements[i].Value;
+
+						if (InfoPtr.Get() && InfoPtr.Get()->Actor == Actor)
+						{
+							Set.Elements[i] = Set.Elements[Set.Elements.NumAllocated() - 1];
+							Set.Elements.Data.Remove(Set.Elements.NumAllocated() - 1);
+						}
+						else
+						{
+							++i;
+						}
+					}
+				};
+
+			RemoveFromSet(ActiveNetworkObjects);
+			RemoveFromSet(AllNetworkObjects);
+			RemoveFromSet(ObjectsDormantOnAllConnections);
 		}
 	};
 

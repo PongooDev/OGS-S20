@@ -200,7 +200,7 @@ namespace UC
 			template<typename SetDataType>
 			friend class TSet;
 
-		private:
+		public:
 			SetType Value;
 			int32 HashNextId;
 			int32 HashIndex;
@@ -484,7 +484,7 @@ namespace UC
 	private:
 		using FElementOrFreeListLink = ContainerImpl::TSparseArrayElementOrFreeListLink<ContainerImpl::TAlignedBytes<ElementSize, ElementAlign>>;
 
-	private:
+	public:
 		TArray<FElementOrFreeListLink> Data;
 		ContainerImpl::FBitArray AllocationFlags;
 		int32 FirstFreeIndex;
@@ -542,7 +542,7 @@ namespace UC
 		using SetDataType = ContainerImpl::SetElement<SetElementType>;
 		using HashType = ContainerImpl::TInlineAllocator<1>::ForElementType<int32>;
 
-	private:
+	public:
 		TSparseArray<SetDataType> Elements;
 		HashType Hash;
 		int32 HashSize;

@@ -516,7 +516,7 @@ namespace Replication {
 
 			if (Actor->bActorIsBeingDestroyed)
 			{
-				Log("Actor " + Actor->GetName() + " was found in the NetworkObjectList, but is PendingKillPending");
+				//Log("Actor " + Actor->GetName() + " was found in the NetworkObjectList, but is PendingKillPending");
 				ActorsToRemove.Add(Actor);
 				continue;
 			}

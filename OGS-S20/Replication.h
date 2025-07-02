@@ -521,7 +521,7 @@ namespace Replication {
 				continue;
 			}
 
-			if (Actor->GetRemoteRole() == ENetRole::ROLE_None)
+			if (Actor->RemoteRole == ENetRole::ROLE_None)
 			{
 				ActorsToRemove.Add(Actor);
 				continue;
@@ -529,7 +529,7 @@ namespace Replication {
 
 			if (Actor->NetDriverName != Driver->NetDriverName)
 			{
-				Log("Actor " + Actor->GetName() + " in wrong network actors list! (Has net driver '" + Actor->NetDriverName.ToString() + "', expected '" + Driver->NetDriverName.ToString() + "')");
+				//Log("Actor " + Actor->GetName() + " in wrong network actors list! (Has net driver '" + Actor->NetDriverName.ToString() + "', expected '" + Driver->NetDriverName.ToString() + "')");
 				continue;
 			}
 

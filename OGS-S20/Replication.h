@@ -527,11 +527,11 @@ namespace Replication {
 				continue;
 			}
 
-			if (Actor->NetDriverName != Driver->NetDriverName)
+			/*if (Actor->NetDriverName != Driver->NetDriverName)
 			{
 				//Log("Actor " + Actor->GetName() + " in wrong network actors list! (Has net driver '" + Actor->NetDriverName.ToString() + "', expected '" + Driver->NetDriverName.ToString() + "')");
 				continue;
-			}
+			}*/
 
 			if (IsDormInitialStartupActor(Actor))
 			{

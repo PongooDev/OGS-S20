@@ -254,7 +254,7 @@ namespace GameMode {
 		GameState->GameMemberInfoArray.Members.Add(Member);
 		GameState->GameMemberInfoArray.MarkItemDirty(Member);
 
-		/*UAthenaPickaxeItemDefinition* PickDef;
+		UAthenaPickaxeItemDefinition* PickDef;
 		FFortAthenaLoadout& CosmecticLoadoutPC = PC->CosmeticLoadoutPC;
 		PickDef = CosmecticLoadoutPC.Pickaxe != nullptr ? CosmecticLoadoutPC.Pickaxe : StaticLoadObject<UAthenaPickaxeItemDefinition>("/Game/Athena/Items/Weapons/WID_Harvest_Pickaxe_Athena_C_T01.WID_Harvest_Pickaxe_Athena_C_T01");
 		//UFortWeaponMeleeItemDefinition* PickDef = StaticLoadObject<UFortWeaponMeleeItemDefinition>("/Game/Athena/Items/Weapons/WID_Harvest_Pickaxe_Athena_C_T01.WID_Harvest_Pickaxe_Athena_C_T01");
@@ -272,7 +272,7 @@ namespace GameMode {
 			{
 				Inventory::GiveItem(PC, GameMode->StartingItems[i].Item, GameMode->StartingItems[i].Count, 0);
 			}
-		}*/
+		}
 
 		GameState->OnRep_SafeZoneDamage();
 		GameState->OnRep_SafeZoneIndicator();

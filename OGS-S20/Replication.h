@@ -493,24 +493,18 @@ namespace Replication {
 
 		for (const TSharedPtr<FNetworkObjectInfo>& ObjectInfo : GetNetworkObjectList(Driver).ActiveNetworkObjects)
 		{
-			if (!ObjectInfo.Get()) {
-				Log("Skipping Due to ObjectInfo being nullptr!");
+			FNetworkObjectInfo* ActorInfo = ObjectInfo.Get();
+			if (!ActorInfo) {
 				continue;
 			}
-			FNetworkObjectInfo* ActorInfo = ObjectInfo.Get();
 
 			if (!ActorInfo->bPendingNetUpdate && UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) <= ActorInfo->NextUpdateTime)
 			{
 				continue;
 			}
 
-			if (!ActorInfo) {
-				Log("Skipping Due to ActorInfo being nullptr!");
-				continue;
-			}
 			AActor* Actor = ActorInfo->Actor;
 			if (!Actor) {
-				Log("Skipping Due to Actor being nullptr!");
 				continue;
 			}
 
@@ -527,11 +521,11 @@ namespace Replication {
 				continue;
 			}
 
-			/*if (Actor->NetDriverName != Driver->NetDriverName)
+			if (Actor->NetDriverName != Driver->NetDriverName)
 			{
 				//Log("Actor " + Actor->GetName() + " in wrong network actors list! (Has net driver '" + Actor->NetDriverName.ToString() + "', expected '" + Driver->NetDriverName.ToString() + "')");
 				continue;
-			}*/
+			}
 
 			if (IsDormInitialStartupActor(Actor))
 			{
@@ -657,12 +651,13 @@ namespace Replication {
 
 	__forceinline bool IsLevelInitializedForActor(const UNetDriver* NetDriver, const AActor* InActor, UNetConnection* InConnection)
 	{
-		/*bool (*ClientHasInitializedLevelFor)(const UNetConnection*, const AActor*) = decltype(ClientHasInitializedLevelFor)();
+		return true;
+		/*bool (*ClientHasInitializedLevelFor)(const UNetConnection*, const AActor*) = decltype(ClientHasInitializedLevelFor)(ImageBase + 0x8473B58);
+		return ClientHasInitializedLevelFor(InConnection, InActor);*/
 
-		const bool bCorrectWorld = NetDriver->WorldPackage != nullptr && (GetClientWorldPackageName(InConnection) == NetDriver->WorldPackage->Name) && ClientHasInitializedLevelFor(InConnection, InActor);
+		/*const bool bCorrectWorld = NetDriver->WorldPackage != nullptr && (GetClientWorldPackageName(InConnection) == NetDriver->WorldPackage->Name) && ClientHasInitializedLevelFor(InConnection, InActor);
 		const bool bIsConnectionPC = (InActor == InConnection->PlayerController);
 		return bCorrectWorld || bIsConnectionPC;*/
-		return true;
 	}
 
 	__forceinline void SendClientAdjustment(APlayerController* PlayerController)
@@ -684,9 +679,8 @@ namespace Replication {
 	}
 
 	__forceinline bool IsNetReady(UNetConnection* Connection, bool bSaturate) {
-		//bool (*IsNetReady)(UNetConnection*, bool) = decltype(IsNetReady)(OFFSET);
-		//return IsNetReady(Connection, bSaturate);
-		return true;
+		bool (*IsNetReady)(UNetConnection*, bool) = decltype(IsNetReady)(ImageBase + 0x8479048);
+		return IsNetReady(Connection, bSaturate);
 	}
 
 	__forceinline bool IsNetReady(UChannel* Channel, bool bSaturate) {

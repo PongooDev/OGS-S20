@@ -9,7 +9,7 @@ namespace Globals {
 
 	bool bBotsEnabled = true;
 
-	float MaxTickRate = 30.f;
+	float MaxTickRate = 60.f;
 
 	int MinPlayersForEarlyStart = 3;
 }

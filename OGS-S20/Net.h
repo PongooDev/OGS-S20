@@ -26,7 +26,7 @@ namespace Net {
 
 	void Hook() {
 		MH_CreateHook((LPVOID)(ImageBase + 0xF233DC), AActorGetNetMode, nullptr); // i have yet to find this (found 25/06/25)
-		MH_CreateHook((LPVOID)(ImageBase + 0xf5d6f8), GetNetMode, nullptr);
+		MH_CreateHook((LPVOID)(ImageBase + 0xF5D6F8), GetNetMode, nullptr);
 
 		Log("Hooked Net!");
 	}

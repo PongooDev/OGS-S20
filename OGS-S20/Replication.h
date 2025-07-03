@@ -677,6 +677,13 @@ namespace Replication {
 		{
 			return;
 		}
+
+		auto Interface = GetInterface<INetworkPredictionInterface>(Pawn->CharacterMovement);
+
+		if (Interface)
+		{
+			SendClientAdjustmentOG(Interface);
+		}
 	}
 
 	__forceinline bool IsNetReady(UNetConnection* Connection, bool bSaturate) {

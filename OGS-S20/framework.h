@@ -141,6 +141,12 @@ static inline T* StaticLoadObject(const std::string& Name)
 	return Object;
 }
 
+template <typename _It>
+static _It* GetInterface(UObject* Object)
+{
+	return ((_It * (*)(UObject*, UClass*)) (Sarah::Offsets::ImageBase + 0xD80568))(Object, _It::StaticClass());
+}
+
 template<typename T>
 T* GetDefaultObject()
 {

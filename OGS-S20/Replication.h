@@ -662,6 +662,7 @@ namespace Replication {
 
 	__forceinline void SendClientAdjustment(APlayerController* PlayerController)
 	{
+		void (*SendClientAdjustmentOG)(INetworkPredictionInterface*) = decltype(SendClientAdjustmentOG)(ImageBase + 0x83435F0);
 		auto& ServerFrameInfo = *(FServerFrameInfo*)(__int64(PlayerController) + 0x7a4);
 
 		if (ServerFrameInfo.LastProcessedInputFrame != -1 && ServerFrameInfo.LastProcessedInputFrame != ServerFrameInfo.LastSentLocalFrame)

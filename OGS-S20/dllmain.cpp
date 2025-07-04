@@ -1,8 +1,9 @@
 #include "framework.h"
 #include "GameMode.h"
 #include "PC.h"
-#include "Inventory.h"
 #include "Abilities.h"
+#include "Inventory.h"
+#include "Building.h"
 
 #include "Misc.h"
 #include "Net.h"
@@ -34,6 +35,7 @@ void Hook() {
     PC::Hook();
     Abilities::Hook();
     Inventory::Hook();
+    Building::Hook();
 
     Misc::Hook();
     Net::Hook();

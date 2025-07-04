@@ -81,6 +81,9 @@
     <ClInclude Include="SDK\SDK\TacticalSprintRuntime_classes.hpp">
       <Filter>SDK\SDK</Filter>
     </ClInclude>
+    <ClInclude Include="Building.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

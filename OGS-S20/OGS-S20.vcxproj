@@ -142,6 +142,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Abilities.h" />
+    <ClInclude Include="Building.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameMode.h" />
     <ClInclude Include="Globals.h" />

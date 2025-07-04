@@ -84,6 +84,12 @@
     <ClInclude Include="Building.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Looting.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

@@ -4,10 +4,13 @@
 #include "Abilities.h"
 #include "Inventory.h"
 #include "Building.h"
+#include "Looting.h"
 
 #include "Misc.h"
 #include "Net.h"
 #include "Tick.h"
+
+#include "PE.h"
 
 #include "Globals.h"
 
@@ -36,10 +39,13 @@ void Hook() {
     Abilities::Hook();
     Inventory::Hook();
     Building::Hook();
+    Looting::Hook();
 
     Misc::Hook();
     Net::Hook();
     Tick::Hook();
+
+    PE::Hook();
 
     Sleep(1000);
     MH_EnableHook(MH_ALL_HOOKS);

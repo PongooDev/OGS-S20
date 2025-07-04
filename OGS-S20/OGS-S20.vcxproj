@@ -147,9 +147,11 @@
     <ClInclude Include="GameMode.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="Inventory.h" />
+    <ClInclude Include="Looting.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="PC.h" />
+    <ClInclude Include="PE.h" />
     <ClInclude Include="Replication.h" />
     <ClInclude Include="SDK\PropertyFixup.hpp" />
     <ClInclude Include="SDK\SDK.hpp" />

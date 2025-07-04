@@ -39,7 +39,7 @@ static void (*PauseBeaconRequests)(UObject* Beacon, bool bPause) = decltype(Paus
 static void(*GiveAbility)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle*, FGameplayAbilitySpec) = decltype(GiveAbility)(ImageBase + 0x5250bd8);
 static void (*AbilitySpecConstructor)(FGameplayAbilitySpec*, UGameplayAbility*, int, int, UObject*) = decltype(AbilitySpecConstructor)(ImageBase + 0x5247bc8);
 static bool (*InternalTryActivateAbility)(UAbilitySystemComponent* AbilitySystemComp, FGameplayAbilitySpecHandle AbilityToActivate, FPredictionKey InPredictionKey, UGameplayAbility** OutInstancedAbility, void* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData) = decltype(InternalTryActivateAbility)(ImageBase + 0x5251efc);
-static FGameplayAbilitySpecHandle(*GiveAbilityAndActivateOnce)(UAbilitySystemComponent* ASC, FGameplayAbilitySpecHandle*, FGameplayAbilitySpec) = decltype(GiveAbilityAndActivateOnce)(ImageBase + 0x5250cf8);
+static FGameplayAbilitySpecHandle(*GiveAbilityAndActivateOnce)(UAbilitySystemComponent* ASC, FGameplayAbilitySpecHandle*, FGameplayAbilitySpec, void*) = decltype(GiveAbilityAndActivateOnce)(ImageBase + 0x5250CF8);
 
 static FVector* (*PickSupplyDropLocationOG)(AFortAthenaMapInfo* MapInfo, FVector* outLocation, __int64 Center, float Radius) = decltype(PickSupplyDropLocationOG)(ImageBase + 0x6593754);
 
@@ -47,6 +47,8 @@ inline static ABuildingSMActor* (*ReplaceBuildingActor)(ABuildingSMActor* Buildi
 static __int64 (*CantBuild)(UWorld*, UObject*, FVector, FRotator, char, void*, char*) = decltype(CantBuild)(ImageBase + 0x6AC00C4);
 
 static void* (*ApplyCharacterCustomization)(AFortPlayerStateAthena* a1, APawn* a2) = decltype(ApplyCharacterCustomization)(ImageBase + 0x6EEC570);
+
+static void (*UnEquipVehicleWeapon)(UFortVehicleSeatWeaponComponent* SeatWeaponComponent, AFortPlayerPawn* Pawn, FWeaponSeatDefinition* WeaponSeatDefinition, bool bEquipBestWeapon) = decltype(UnEquipVehicleWeapon)(ImageBase + 0x70C5BF8);
 
 static void* (*StaticFindObjectOG)(UClass*, UObject* Package, const wchar_t* OrigInName, bool ExactClass) = decltype(StaticFindObjectOG)(ImageBase + 0xf14d30);
 static void* (*StaticLoadObjectOG)(UClass* Class, UObject* InOuter, const TCHAR* Name, const TCHAR* Filename, uint32_t LoadFlags, UObject* Sandbox, bool bAllowObjectReconciliation, void*) = decltype(StaticLoadObjectOG)(ImageBase + 0x1a34ba8);
@@ -264,6 +266,46 @@ inline void ShowFoundation(ABuildingFoundation* BuildingFoundation) {
 	BuildingFoundation->DynamicFoundationRepData.EnabledState = EDynamicFoundationEnabledState::Enabled;
 	BuildingFoundation->DynamicFoundationTransform = BuildingFoundation->GetTransform();
 	BuildingFoundation->OnRep_DynamicFoundationRepData();
+}
+
+FVector PickSupplyDropLocation(SDK::AFortAthenaMapInfo* MapInfo, SDK::FVector Center, float Radius)
+{
+	if (!PickSupplyDropLocationOG)
+		return SDK::FVector(0, 0, 0);
+
+	TArray<FVector> PickedSupplyDropLocations;
+
+	const float MinDistance = 10000.0f;
+
+	for (int i = 0; i < 20; i++)
+	{
+		SDK::FVector loc = FVector(0, 0, 0);
+		PickSupplyDropLocationOG(MapInfo, &loc, (__int64)&Center, Radius);
+
+		bool bTooClose = false;
+		for (const auto& other : PickedSupplyDropLocations)
+		{
+			float dx = loc.X - other.X;
+			float dy = loc.Y - other.Y;
+			float dz = loc.Z - other.Z;
+
+			float distSquared = dx * dx + dy * dy + dz * dz;
+
+			if (distSquared < MinDistance * MinDistance)
+			{
+				bTooClose = true;
+				break;
+			}
+		}
+
+		if (!bTooClose)
+		{
+			PickedSupplyDropLocations.Add(loc);
+			return loc;
+		}
+	}
+
+	return SDK::FVector(0, 0, 0);
 }
 
 template <typename T = AActor>

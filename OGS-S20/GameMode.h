@@ -2,6 +2,7 @@
 #include "framework.h"
 #include "Inventory.h"
 #include "Abilities.h"
+#include "Looting.h"
 #include "Globals.h"
 
 namespace GameMode {
@@ -187,6 +188,9 @@ namespace GameMode {
 			}
 
 			if (!Globals::bEventEnabled) {
+				Looting::SpawnLlamas();
+				Looting::DestroyFloorLootSpawners();
+
 				Log("Setup World!");
 			}
 

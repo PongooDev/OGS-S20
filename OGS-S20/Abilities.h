@@ -14,6 +14,25 @@ namespace Abilities {
 				FGameplayAbilitySpec Spec{};
 				AbilitySpecConstructor(&Spec, (UGameplayAbility*)AbilitySet->GameplayAbilities[i].Get()->DefaultObject, 1, -1, nullptr);
 				GiveAbility(PlayerState->AbilitySystemComponent, &Spec.Handle, Spec);
+				//Log("Given Ability: " + AbilitySet->GameplayAbilities[i].Get()->GetName());
+			}
+		}
+	}
+
+	inline void InitTacticalSprintForPlayer(AFortPlayerController* PC)
+	{
+		auto PlayerState = (AFortPlayerStateAthena*)PC->PlayerState;
+		static auto AbilitySet = StaticLoadObject<UFortAbilitySet>("/TacticalSprint/Gameplay/AS_TacticalSprint.AS_TacticalSprint");
+
+		if (PlayerState && AbilitySet)
+		{
+			for (size_t i = 0; i < AbilitySet->GameplayAbilities.Num(); i++)
+			{
+				std::string Name = AbilitySet->GameplayAbilities[i].Get()->GetName();
+				FGameplayAbilitySpec Spec{};
+				AbilitySpecConstructor(&Spec, (UGameplayAbility*)AbilitySet->GameplayAbilities[i].Get()->DefaultObject, 1, -1, nullptr);
+				GiveAbility(PlayerState->AbilitySystemComponent, &Spec.Handle, Spec);
+				Log("Given TacticalSprint Ability: " + Name);
 			}
 		}
 	}

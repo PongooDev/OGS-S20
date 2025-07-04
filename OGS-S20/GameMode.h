@@ -176,6 +176,21 @@ namespace GameMode {
 
 			Log("Listening: 7777");
 			SetConsoleTitleA("OGS 20.40 | Listening: 7777");
+
+			/*UClass* AsteroidClass = StaticLoadObject<UClass>("/ArmadilloPlaylist/Blueprints/ShooterGameplay/BP_BGA_Armadillo_Asteroid.BP_BGA_Armadillo_Asteroid_C");
+			if (AsteroidClass) {
+				Log("Found it!");
+				TArray<AActor*> Asteroids;
+				UGameplayStatics::GetAllActorsOfClass(UWorld::GetWorld(), ABuildingFoundation::StaticClass(), &Asteroids);
+
+				for (AActor* Asteroid : Asteroids) {
+					Log("Killed an Asteriod!");
+					Asteroid->K2_DestroyActor();
+				}
+			}
+			else {
+				Log("Didnt find asteroid class!");
+			}*/
 		}
 
 		if (GameState->PlayersLeft > 0)
@@ -221,10 +236,16 @@ namespace GameMode {
 			UFortComponent_Energy* EnergyComp = (UFortComponent_Energy*)Pawn->AddComponentByClass(EnergyCompClass, false, FTransform(), false);
 
 			SprintComp->CurrentBoundPlayerPawn = (AFortPlayerPawn*)Pawn;
-			SprintComp->SetIsSprinting(true);
-
 			SprintComp2->CurrentBoundPlayerPawn = (AFortPlayerPawn*)Pawn;
-			SprintComp2->SetIsSprinting(true);
+			EnergyComp->bAutoActivate = true;
+			
+			SprintComp->Activate(true);
+			SprintComp2->Activate(true);
+			EnergyComp->Activate(true);
+
+			Abilities::InitTacticalSprintForPlayer(PC);
+
+			Log("Setup Tactical Sprint!");
 		}
 		else {
 			Log("SprintCompClass or EnergyCompClass does not exist!");

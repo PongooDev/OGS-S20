@@ -148,6 +148,25 @@ static inline T* StaticLoadObject(const std::string& Name)
 	return Object;
 }
 
+template <typename _Ot = void*>
+__forceinline static void ExecHook(UFunction* _Fn, void* _Detour, _Ot& _Orig = _NpFH)
+{
+	if (!_Fn)
+		return;
+	if (!is_same_v<_Ot, void*>)
+		_Orig = (_Ot)_Fn->ExecFunction;
+
+	_Fn->ExecFunction = reinterpret_cast<UFunction::FNativeFuncPtr>(_Detour);
+}
+
+
+template <typename _Ot = void*>
+__forceinline static void ExecHook(const char* _Name, void* _Detour, _Ot& _Orig = _NpFH)
+{
+	UFunction* _Fn = FindObject<UFunction>(_Name);
+	ExecHook(_Fn, _Detour, _Orig);
+}
+
 template <typename _It>
 static _It* GetInterface(UObject* Object)
 {

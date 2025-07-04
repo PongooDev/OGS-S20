@@ -89,9 +89,9 @@ namespace Abilities {
 
 	void Hook()
 	{
-		HookVTable(UAbilitySystemComponent::GetDefaultObj(), 0x108, InternalServerTryActivateAbility, nullptr);
-		HookVTable(UFortAbilitySystemComponent::GetDefaultObj(), 0x108, InternalServerTryActivateAbility, nullptr);
-		HookVTable(UFortAbilitySystemComponentAthena::GetDefaultObj(), 0x108, InternalServerTryActivateAbility, nullptr);
+		HookVTable(UAbilitySystemComponent::GetDefaultObj(), 0x10B, InternalServerTryActivateAbility, nullptr);
+		HookVTable(UFortAbilitySystemComponent::GetDefaultObj(), 0x10B, InternalServerTryActivateAbility, nullptr);
+		HookVTable(UFortAbilitySystemComponentAthena::GetDefaultObj(), 0x10B, InternalServerTryActivateAbility, nullptr);
 
 		Log("Abilities Hooked!");
 	}

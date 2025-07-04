@@ -1,7 +1,6 @@
 #pragma once
 #include "framework.h"
 #include "Inventory.h"
-#include "Replication.h"
 
 namespace PC {
 	void (*ServerAcknowledgePossessionOG)(AFortPlayerControllerAthena* PC, APawn* Pawn);

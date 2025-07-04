@@ -5,6 +5,7 @@ namespace Globals {
 	bool bSTWEnabled = false;
 
 	bool bEventEnabled = false;
+	bool bArenaEnabled = false;
 	bool bZeroBuild = false;
 
 	bool bBotsEnabled = true;

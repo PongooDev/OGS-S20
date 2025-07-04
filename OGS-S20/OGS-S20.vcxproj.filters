@@ -19,6 +19,9 @@
     <Filter Include="SDK\SDK">
       <UniqueIdentifier>{9e92035b-7d83-4b37-a00c-1382b3f6353b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{3c9f6340-d05a-47f5-955c-2a0ec1dbe7bd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">

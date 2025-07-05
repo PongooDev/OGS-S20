@@ -10,6 +10,7 @@
 #include "Net.h"
 #include "Tick.h"
 
+#include "Bots.h"
 #include "PE.h"
 
 #include "Globals.h"
@@ -45,6 +46,7 @@ void Hook() {
     Net::Hook();
     Tick::Hook();
 
+    Bots::Hook();
     PE::Hook();
 
     Sleep(1000);

@@ -149,11 +149,11 @@ static inline T* StaticLoadObject(const std::string& Name)
 }
 
 template <typename _Ot = void*>
-__forceinline static void ExecHook(UFunction* _Fn, void* _Detour, _Ot& _Orig = _NpFH)
+__forceinline static void ExecHook(UFunction* _Fn, void* _Detour, _Ot& _Orig = nullptr)
 {
 	if (!_Fn)
 		return;
-	if (!is_same_v<_Ot, void*>)
+	if (!std::is_same_v<_Ot, void*>)
 		_Orig = (_Ot)_Fn->ExecFunction;
 
 	_Fn->ExecFunction = reinterpret_cast<UFunction::FNativeFuncPtr>(_Detour);
@@ -161,11 +161,68 @@ __forceinline static void ExecHook(UFunction* _Fn, void* _Detour, _Ot& _Orig = _
 
 
 template <typename _Ot = void*>
-__forceinline static void ExecHook(const char* _Name, void* _Detour, _Ot& _Orig = _NpFH)
+__forceinline static void ExecHook(const char* _Name, void* _Detour, _Ot& _Orig = nullptr)
 {
-	UFunction* _Fn = FindObject<UFunction>(_Name);
+	UFunction* _Fn = UObject::FindObject<UFunction>(_Name);
 	ExecHook(_Fn, _Detour, _Orig);
 }
+
+class FOutputDevice
+{
+public:
+	bool bSuppressEventTag;
+	bool bAutoEmitLineTerminator;
+	uint8_t _Padding1[0x6];
+};
+
+class FFrame : public FOutputDevice
+{
+public:
+	void** VTable;
+	UFunction* Node;
+	UObject* Object;
+	uint8* Code;
+	uint8* Locals;
+	void* MostRecentProperty;
+	uint8_t* MostRecentPropertyAddress;
+	uint8_t _Padding1[0x40];
+	FField* PropertyChainForCompiledIn;
+
+public:
+	void StepCompiledIn(void* const Result, bool ForceExplicitProp = false)
+	{
+		if (Code && !ForceExplicitProp)
+		{
+			((void (*)(FFrame*, UObject*, void* const))(ImageBase + 0xF6D050))(this, Object, Result);
+		}
+		else
+		{
+			FField* _Prop = PropertyChainForCompiledIn;
+			PropertyChainForCompiledIn = _Prop->Next;
+			((void (*)(FFrame*, void* const, FField*))(ImageBase + 0x10A04C0))(this, Result, _Prop);
+		}
+	}
+
+	template <typename T>
+	T& StepCompiledInRef()
+	{
+		T TempVal{};
+		MostRecentPropertyAddress = nullptr;
+
+		if (Code)
+		{
+			((void (*)(FFrame*, UObject*, void* const))(ImageBase + 0xF6D050))(this, Object, &TempVal);
+		}
+		else
+		{
+			FField* _Prop = PropertyChainForCompiledIn;
+			PropertyChainForCompiledIn = _Prop->Next;
+			((void (*)(FFrame*, void* const, FField*))(ImageBase + 0x10A04C0))(this, &TempVal, _Prop);
+		}
+
+		return MostRecentPropertyAddress ? *(T*)MostRecentPropertyAddress : TempVal;
+	}
+};
 
 template <typename _It>
 static _It* GetInterface(UObject* Object)

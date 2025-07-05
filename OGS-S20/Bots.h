@@ -84,7 +84,8 @@ namespace Bots {
 							UCustomCharacterPart* CharacterPart = StaticLoadObject<UCustomCharacterPart>(PartStr.ToString());
 							if (CharacterPart)
 							{
-								PlayerState->CharacterData.Parts[(uintptr_t)CharacterPart->CharacterPartType] = CharacterPart;
+								//PlayerState->CharacterData.Parts[(uintptr_t)CharacterPart->CharacterPartType] = CharacterPart;
+								Pawn->ServerChoosePart(CharacterPart->CharacterPartType, CharacterPart); //try this??
 							}
 							PartStr.Free();
 						}

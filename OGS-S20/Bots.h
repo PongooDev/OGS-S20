@@ -22,6 +22,7 @@ namespace Bots {
 	inline void (*OnPawnAISpawnedOG)(AActor* Controller, AFortPlayerPawnAthena* Pawn);
 	void OnPawnAISpawned(AActor* Controller, AFortPlayerPawnAthena* Pawn)
 	{
+		Log("OnPawnAISpawned!");
 		AFortGameModeAthena* GameMode = (AFortGameModeAthena*)UWorld::GetWorld()->AuthorityGameMode;
 		return OnPawnAISpawnedOG(Controller, Pawn);
 	}
@@ -45,41 +46,6 @@ namespace Bots {
 		if (!PC)
 			return;
 
-		auto PlayerState = Cast<AFortPlayerStateAthena>(PC->PlayerState);
-		if (PlayerState)
-		{
-			if (DamageCauser != nullptr)
-			{
-				auto KillerPC = Cast<AFortPlayerControllerAthena>(InstigatedBy);
-				if (!KillerPC)
-					return;
-				auto KillerPlayerState = Cast<AFortPlayerStateAthena>(KillerPC->PlayerState);
-				if (KillerPC && KillerPlayerState)
-				{
-					PlayerState->DeathInfo.bInitialized = true;
-					PlayerState->DeathInfo.DeathCause = EDeathCause::Unspecified;
-					PlayerState->DeathInfo.DeathClassSlot = (uint8)PlayerState->DeathInfo.DeathCause;
-					PlayerState->DeathInfo.DeathLocation = PC->PlayerBotPawn->K2_GetActorLocation();
-					PlayerState->DeathInfo.Downer = KillerPlayerState;
-					PlayerState->DeathInfo.FinisherOrDowner = KillerPlayerState;
-					PlayerState->OnRep_DeathInfo();
-					KillerPC->ClientReceiveKillNotification(KillerPlayerState, PlayerState);
-					if (PC->IsA(AFortAthenaAIBotController::StaticClass()))
-					{
-						((AFortPlayerStateAthena*)KillerPlayerState)->ClientReportKill(PlayerState);
-						((AFortPlayerStateAthena*)KillerPlayerState)->KillScore++;
-						for (auto Member : ((AFortPlayerStateAthena*)KillerPlayerState)->PlayerTeam->TeamMembers)
-						{
-							((AFortPlayerStateAthena*)Member->PlayerState)->TeamKillScore++;
-							((AFortPlayerStateAthena*)Member->PlayerState)->OnRep_TeamKillScore();
-							((AFortPlayerStateAthena*)Member->PlayerState)->ClientReportTeamKill(((AFortPlayerStateAthena*)Member->PlayerState)->TeamKillScore);
-						}
-						((AFortPlayerStateAthena*)KillerPlayerState)->OnRep_Kills();
-					}
-				}
-			}
-		}
-
 		return OnPossessedPawnDiedOG(PC, DamagedActor, Damage, InstigatedBy, DamageCauser, HitLocation, HitComp, BoneName, Momentum);
 	}
 
@@ -91,7 +57,7 @@ namespace Bots {
 
 		MH_CreateHook((LPVOID)(ImageBase + 0x70A86B0), InventoryBaseOnSpawned, (LPVOID*)&InventoryBaseOnSpawnedOG);
 
-		MH_CreateHook((LPVOID)(ImageBase + 0x631C8C8), OnPossessedPawnDied, (LPVOID*)&OnPossessedPawnDiedOG);
+		//MH_CreateHook((LPVOID)(ImageBase + 0x631C8C8), OnPossessedPawnDied, (LPVOID*)&OnPossessedPawnDiedOG);
 
 		Log("Bots Hooked!");
 	}

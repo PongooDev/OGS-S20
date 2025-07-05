@@ -1,6 +1,7 @@
 #pragma once
 #include "framework.h"
 #include "Inventory.h"
+#include "BotSpawner.h"
 
 namespace PC {
 	void (*ServerAcknowledgePossessionOG)(AFortPlayerControllerAthena* PC, APawn* Pawn);
@@ -189,7 +190,7 @@ namespace PC {
 
 		auto GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
 		auto Math = (UKismetMathLibrary*)UKismetMathLibrary::StaticClass()->DefaultObject;
-		auto Gamemode = (AFortGameModeAthena*)UWorld::GetWorld()->AuthorityGameMode;
+		auto GameMode = (AFortGameModeAthena*)UWorld::GetWorld()->AuthorityGameMode;
 		auto Statics = (UGameplayStatics*)UGameplayStatics::StaticClass()->DefaultObject;
 
 		std::string Command = Msg.ToString();
@@ -219,6 +220,23 @@ namespace PC {
 
 			PC->Pawn->K2_TeleportTo(TeleportLoc, PC->Pawn->K2_GetActorRotation());
 			Log("Teleported: X: " + args[1] + " Y: " + args[2] + " Z: " + args[3]);
+		}
+		else if (Command == "StartEarlyBus") {
+			if (GameState->GamePhase == EAthenaGamePhase::Warmup
+				&& (GameMode->NumPlayers + GameMode->NumBots) >= Globals::MinPlayersForEarlyStart
+				&& GameState->WarmupCountdownEndTime > UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + 10.f) {
+
+				auto TS = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
+				auto DR = 10.f;
+
+				GameState->WarmupCountdownEndTime = TS + DR;
+				GameMode->WarmupCountdownDuration = DR;
+				GameState->WarmupCountdownStartTime = TS;
+				GameMode->WarmupEarlyCountdownDuration = DR;
+			}
+		}
+		else if (Command == "SpawnGuards") {
+			BotSpawner::SpawnGuards();
 		}
 	}
 

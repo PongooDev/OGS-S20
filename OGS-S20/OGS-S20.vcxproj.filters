@@ -22,6 +22,9 @@
     <Filter Include="Resources">
       <UniqueIdentifier>{3c9f6340-d05a-47f5-955c-2a0ec1dbe7bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\AISpawnerLocations">
+      <UniqueIdentifier>{b830fcad-0bdd-4f71-9009-dd5b12044883}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -91,6 +94,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Bots.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BossesSpawnLocs.h">
+      <Filter>Resources\AISpawnerLocations</Filter>
+    </ClInclude>
+    <ClInclude Include="GuardSpawnLocs.h">
+      <Filter>Resources\AISpawnerLocations</Filter>
+    </ClInclude>
+    <ClInclude Include="NpcSpawnLocs.h">
+      <Filter>Resources\AISpawnerLocations</Filter>
+    </ClInclude>
+    <ClInclude Include="BotSpawner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

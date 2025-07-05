@@ -4,6 +4,7 @@
 #include "Abilities.h"
 #include "Looting.h"
 #include "Bots.h"
+#include "BotSpawner.h"
 #include "Globals.h"
 
 namespace GameMode {
@@ -213,13 +214,6 @@ namespace GameMode {
 			for (size_t i = 0; i < GameMode->BattleBusCosmetics.Num(); i++)
 			{
 				GameMode->BattleBusCosmetics[i] = GameState->DefaultBattleBus;
-			}
-
-			if (!Globals::bEventEnabled) {
-				Looting::SpawnLlamas();
-				Looting::DestroyFloorLootSpawners();
-
-				Log("Setup World!");
 			}
 
 			if (Globals::bArenaEnabled)

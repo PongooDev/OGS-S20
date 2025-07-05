@@ -309,7 +309,6 @@ namespace Looting {
 
         if (SearchLootTierGroup == Loot_AthenaFloorLoot || SearchLootTierGroup == Loot_AthenaFloorLoot_Warmup)
         {
-            Log("FloorLoot!");
             PickupSourceTypeFlags = EFortPickupSourceTypeFlag::FloorLoot;
         }
 

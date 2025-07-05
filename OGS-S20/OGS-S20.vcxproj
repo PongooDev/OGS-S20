@@ -142,15 +142,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Abilities.h" />
+    <ClInclude Include="BossesSpawnLocs.h" />
     <ClInclude Include="Bots.h" />
+    <ClInclude Include="BotSpawner.h" />
     <ClInclude Include="Building.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameMode.h" />
     <ClInclude Include="Globals.h" />
+    <ClInclude Include="GuardSpawnLocs.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="Looting.h" />
     <ClInclude Include="Misc.h" />
     <ClInclude Include="Net.h" />
+    <ClInclude Include="NpcSpawnLocs.h" />
     <ClInclude Include="PC.h" />
     <ClInclude Include="PE.h" />
     <ClInclude Include="Replication.h" />

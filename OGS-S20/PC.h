@@ -223,7 +223,6 @@ namespace PC {
 		}
 		else if (Command == "StartEarlyBus") {
 			if (GameState->GamePhase == EAthenaGamePhase::Warmup
-				&& (GameMode->NumPlayers + GameMode->NumBots) >= Globals::MinPlayersForEarlyStart
 				&& GameState->WarmupCountdownEndTime > UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + 10.f) {
 
 				auto TS = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());

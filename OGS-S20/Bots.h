@@ -30,7 +30,13 @@ namespace Bots {
 		AFortAthenaAIBotController* PC = (AFortAthenaAIBotController*)Pawn->Controller;
 		auto PlayerState = (AFortPlayerStateAthena*)Pawn->PlayerState;
 
-		PC->RunBehaviorTree(PC->BehaviorTree);
+		if (PC->BehaviorTree) {
+			Log("BehaviorTree Name: " + PC->BehaviorTree->GetName());
+			PC->RunBehaviorTree(PC->BehaviorTree);
+		}
+		else {
+			Log("No BehaviorTree!");
+		}
 
 		for (auto SkillSet : PC->BotSkillSetClasses)
 		{
@@ -88,8 +94,8 @@ namespace Bots {
 								Pawn->ServerChoosePart(CharacterPart->CharacterPartType, CharacterPart); //try this??
 							}
 
-							PartStr.Free();
 							Log("PartStr: " + PartStr.ToString()); //we need the string ofc
+							PartStr.Free();
 						}
 					}
 

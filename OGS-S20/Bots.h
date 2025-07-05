@@ -87,9 +87,12 @@ namespace Bots {
 								//PlayerState->CharacterData.Parts[(uintptr_t)CharacterPart->CharacterPartType] = CharacterPart;
 								Pawn->ServerChoosePart(CharacterPart->CharacterPartType, CharacterPart); //try this??
 							}
+
 							PartStr.Free();
+							Log("PartStr: " + PartStr.ToString()); //we need the string ofc
 						}
 					}
+
 					SpecStr.Free();
 				}
 			}

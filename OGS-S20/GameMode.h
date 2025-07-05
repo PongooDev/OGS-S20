@@ -3,6 +3,7 @@
 #include "Inventory.h"
 #include "Abilities.h"
 #include "Looting.h"
+#include "Bots.h"
 #include "Globals.h"
 
 namespace GameMode {
@@ -102,6 +103,33 @@ namespace GameMode {
 			}
 			GameState->OnRep_AdditionalPlaylistLevelsStreamed();
 			GameState->OnFinishedStreamingAdditionalPlaylistLevel();
+
+			if (Globals::bBotsEnabled && !Globals::bEventEnabled) {
+				if (!GameMode->SpawningPolicyManager)
+				{
+					GameMode->SpawningPolicyManager = SpawnActor<AFortAthenaSpawningPolicyManager>({}, {});
+				}
+				GameMode->SpawningPolicyManager->GameModeAthena = GameMode;
+				GameMode->SpawningPolicyManager->GameStateAthena = GameState;
+
+				GameMode->AIDirector = SpawnActor<AAthenaAIDirector>({});
+				//GameMode->AIDirector->Activate();
+
+				if (!GameMode->AIGoalManager)
+				{
+					GameMode->AIGoalManager = SpawnActor<AFortAIGoalManager>({});
+				}
+
+				UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(UWorld::GetWorld(), AFortPlayerStartWarmup::StaticClass(), &PlayerStarts);
+				Bots::CIDs = GetAllObjectsOfClass<UAthenaCharacterItemDefinition>();
+				Bots::Pickaxes = GetAllObjectsOfClass<UAthenaPickaxeItemDefinition>();
+				Bots::Backpacks = GetAllObjectsOfClass<UAthenaBackpackItemDefinition>();
+				Bots::Gliders = GetAllObjectsOfClass<UAthenaGliderItemDefinition>();
+				Bots::Contrails = GetAllObjectsOfClass<UAthenaSkyDiveContrailItemDefinition>();
+				Bots::Dances = GetAllObjectsOfClass<UAthenaDanceItemDefinition>();
+
+				Log("Initialised Bots!");
+			}
 
 			Log("Setup Playlist!");
 		}

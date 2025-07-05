@@ -178,6 +178,50 @@ namespace PC {
 		return MovingEmoteStoppedOG(Pawn);
 	}
 
+	void ServerReturnToMainMenu(AFortPlayerControllerAthena* PC)
+	{
+		PC->ClientReturnToMainMenu(L"");
+	}
+
+	void ServerCheat(AFortPlayerControllerAthena* PC, FString& Msg) {
+		if (Globals::bIsProdServer)
+			return;
+
+		auto GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
+		auto Math = (UKismetMathLibrary*)UKismetMathLibrary::StaticClass()->DefaultObject;
+		auto Gamemode = (AFortGameModeAthena*)UWorld::GetWorld()->AuthorityGameMode;
+		auto Statics = (UGameplayStatics*)UGameplayStatics::StaticClass()->DefaultObject;
+
+		std::string Command = Msg.ToString();
+		Log(Command);
+
+		if (Command == "GodMode") {
+			if (!PC->MyFortPawn->bIsInvulnerable) {
+				PC->MyFortPawn->bIsInvulnerable = true;
+			}
+			else {
+				PC->MyFortPawn->bIsInvulnerable = false;
+			}
+		}
+		else if (Command == "DumpLoc") {
+			FVector Loc = PC->Pawn->K2_GetActorLocation();
+			Log("X: " + std::to_string(Loc.X));
+			Log("Y: " + std::to_string(Loc.Y));
+			Log("Z: " + std::to_string(Loc.Z));
+		}
+		else if (Command.contains("Teleport ")) {
+			std::vector<std::string> args = TextManipUtils::SplitWhitespace(Command);
+			FVector TeleportLoc = FVector();
+
+			TeleportLoc.X = std::stoi(args[1]);
+			TeleportLoc.Y = std::stoi(args[2]);
+			TeleportLoc.Z = std::stoi(args[3]);
+
+			PC->Pawn->K2_TeleportTo(TeleportLoc, PC->Pawn->K2_GetActorRotation());
+			Log("Teleported: X: " + args[1] + " Y: " + args[2] + " Z: " + args[3]);
+		}
+	}
+
 	void Hook() {
 		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x125, ServerAcknowledgePossession, (LPVOID*)&ServerAcknowledgePossessionOG);
 
@@ -190,6 +234,10 @@ namespace PC {
 
 		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x1ED, ServerPlayEmoteItem, nullptr);
 		MH_CreateHook((LPVOID)(ImageBase + 0x21F1BE4), MovingEmoteStopped, (LPVOID*)&MovingEmoteStoppedOG);
+
+		//HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), , ServerReturnToMainMenu, nullptr); (we gotta find this)
+
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x1EB, ServerCheat, nullptr);
 
 		Log("PC Hooked!");
 	}

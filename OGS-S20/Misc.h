@@ -29,6 +29,8 @@ namespace Misc {
         MH_CreateHook((LPVOID)(ImageBase + 0x83f36d4), KickPlayer, (LPVOID*)&KickPlayerOG); // Kickplayer
         MH_CreateHook((LPVOID)(ImageBase + 0x16BBFE0), DispatchRequest, (LPVOID*)&DispatchRequestOG); // dont have the offset (found 25/06/25)
 
+        //MH_CreateHook((LPVOID)(ImageBase + ), True, nullptr); // CanCreateContext (HIGH PRIORITY WE GOTTA FIND THIS ASAP)
+
         MH_CreateHook((LPVOID)(ImageBase + 0x4834b50), nullFunc, nullptr);
         MH_CreateHook((LPVOID)(ImageBase + 0xd4fc70), nullFunc, nullptr);
         MH_CreateHook((LPVOID)(ImageBase + 0xdbd0b4), nullFunc, nullptr);

@@ -55,6 +55,20 @@ static void* (*StaticLoadObjectOG)(UClass* Class, UObject* InOuter, const TCHAR*
 
 static TArray<AActor*> PlayerStarts;
 
+// text manipulation utils
+namespace TextManipUtils {
+	// Found this from stack overflow :fire:
+	std::vector<std::string> SplitWhitespace(std::string const& input) {
+		std::istringstream buffer(input);
+		std::vector<std::string> ret;
+
+		std::copy(std::istream_iterator<std::string>(buffer),
+			std::istream_iterator<std::string>(),
+			std::back_inserter(ret));
+		return ret;
+	}
+}
+
 void Log(const std::string& msg)
 {
 	static bool firstCall = true;

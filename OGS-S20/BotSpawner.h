@@ -24,9 +24,6 @@ namespace BotSpawner {
 
 			((UAthenaAISystem*)UWorld::GetWorld()->AISystem)->AISpawner->RequestSpawn(IO_Compound_List, Transform);
 			AmountGuardsSpawned++;
-			Log("X: " + std::to_string(Transform.Translation.X));
-			Log("Y: " + std::to_string(Transform.Translation.Y));
-			Log("Z: " + std::to_string(Transform.Translation.Z));
 		}
 
 		Log("Spawned " + std::to_string(AmountGuardsSpawned) + " Guards!");

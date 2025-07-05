@@ -157,6 +157,7 @@
     <ClInclude Include="NpcSpawnLocs.h" />
     <ClInclude Include="PC.h" />
     <ClInclude Include="PE.h" />
+    <ClInclude Include="Quests.h" />
     <ClInclude Include="Replication.h" />
     <ClInclude Include="SDK\PropertyFixup.hpp" />
     <ClInclude Include="SDK\SDK.hpp" />

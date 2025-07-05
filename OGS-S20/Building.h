@@ -1,6 +1,7 @@
 #pragma once
 #include "framework.h"
 #include "Inventory.h"
+#include "Quests.h"
 
 namespace Building {
 	inline void ServerCreateBuildingActor(AFortPlayerControllerAthena* PC, FCreateBuildingActorData CreateBuildingData)
@@ -158,12 +159,12 @@ namespace Building {
 			{
 				if (Damage == 100.f && GameState->GamePhase != EAthenaGamePhase::Warmup)
 				{
-					// Weak spots in a row
-					//UFortAccoladeItemDefinition* AccoladeDef = StaticLoadObject<UFortAccoladeItemDefinition>("/Game/Athena/Items/Accolades/");
+					UFortAccoladeItemDefinition* AccoladeDef = StaticLoadObject<UFortAccoladeItemDefinition>("/Game/Athena/Items/Accolades/AccoladeId_066_WeakSpotsInARow.AccoladeId_066_WeakSpotsInARow");
 
 					NumWeakSpots[InstigatedBy]++;
 					if (NumWeakSpots[InstigatedBy] == 2) {
-						// Give Accolade weak spots
+						Log("Accolade!");
+						Quests::GiveAccolade(InstigatedBy, AccoladeDef); // Doesent work?!
 						NumWeakSpots[InstigatedBy] = 0;
 					}
 				}

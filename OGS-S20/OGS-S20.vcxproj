@@ -141,9 +141,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Abilities.h" />
+    <ClInclude Include="AbilitySystemComponent.h" />
     <ClInclude Include="BossesSpawnLocs.h" />
-    <ClInclude Include="Bots.h" />
+    <ClInclude Include="FortAthenaAIBotController.h" />
     <ClInclude Include="BotSpawner.h" />
     <ClInclude Include="Building.h" />
     <ClInclude Include="framework.h" />
@@ -155,7 +155,7 @@
     <ClInclude Include="Misc.h" />
     <ClInclude Include="Net.h" />
     <ClInclude Include="NpcSpawnLocs.h" />
-    <ClInclude Include="PC.h" />
+    <ClInclude Include="Controller.h" />
     <ClInclude Include="PE.h" />
     <ClInclude Include="Quests.h" />
     <ClInclude Include="Replication.h" />

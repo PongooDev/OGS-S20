@@ -29,7 +29,9 @@ namespace Misc {
         MH_CreateHook((LPVOID)(ImageBase + 0x83f36d4), KickPlayer, (LPVOID*)&KickPlayerOG); // Kickplayer
         MH_CreateHook((LPVOID)(ImageBase + 0x16BBFE0), DispatchRequest, (LPVOID*)&DispatchRequestOG); // dont have the offset (found 25/06/25)
 
-        //MH_CreateHook((LPVOID)(ImageBase + ), True, nullptr); // CanCreateContext (HIGH PRIORITY WE GOTTA FIND THIS ASAP)
+        HookVTable(AActor::GetDefaultObj(), 0x22, True, nullptr);
+        HookVTable(AAthenaAIDirector::GetDefaultObj(), 0x22, True, nullptr);
+        HookVTable(AAthenaNavMesh::GetDefaultObj(), 0x22, True, nullptr);
 
         MH_CreateHook((LPVOID)(ImageBase + 0x4834b50), nullFunc, nullptr);
         MH_CreateHook((LPVOID)(ImageBase + 0xd4fc70), nullFunc, nullptr);

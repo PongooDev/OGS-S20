@@ -1,13 +1,23 @@
 #pragma once
 #include "framework.h"
 
-namespace Bots {
+namespace FortAthenaAIBotController {
 	static std::vector<UAthenaCharacterItemDefinition*> CIDs{};
 	static std::vector<UAthenaPickaxeItemDefinition*> Pickaxes{};
 	static std::vector<UAthenaBackpackItemDefinition*> Backpacks{};
 	static std::vector<UAthenaGliderItemDefinition*> Gliders{};
 	static std::vector<UAthenaSkyDiveContrailItemDefinition*> Contrails{};
 	inline std::vector<UAthenaDanceItemDefinition*> Dances{};
+
+	void (*CreateAndConfigureNavigationSystemOG)(UAthenaNavSystemConfig* ModuleConfig, UWorld* World);
+	void CreateAndConfigureNavigationSystem(UAthenaNavSystemConfig* ModuleConfig, UWorld* World)
+	{
+		Log("CreateAndConfigureNavigationSystem For World: " + World->GetName() + " For NavConfig: " + ModuleConfig->GetName());
+		ModuleConfig->bPrioritizeNavigationAroundSpawners = true;
+		ModuleConfig->bAutoSpawnMissingNavData = true;
+		ModuleConfig->bSpawnNavDataInNavBoundsLevel = true;
+		return CreateAndConfigureNavigationSystemOG(ModuleConfig, World);
+	}
 
 	// Pathfinding
 	inline void (*InitializeForWorldOG)(UNavigationSystemV1* NavSystem, UWorld* World, EFNavigationSystemRunMode Mode);
@@ -31,8 +41,12 @@ namespace Bots {
 		auto PlayerState = (AFortPlayerStateAthena*)Pawn->PlayerState;
 
 		if (PC->BehaviorTree) {
-			Log("BehaviorTree Name: " + PC->BehaviorTree->GetName());
-			PC->RunBehaviorTree(PC->BehaviorTree);
+			if (PC->RunBehaviorTree(PC->BehaviorTree)) {
+				Log("Successfully Ran BehaviorTree: " + PC->BehaviorTree->GetName());
+			}
+			else {
+				Log("Could not Run BehaviorTree: " + PC->BehaviorTree->GetName());
+			}
 		}
 		else {
 			Log("No BehaviorTree!");
@@ -108,11 +122,9 @@ namespace Bots {
 		if (!PC->Inventory)
 			PC->Inventory = SpawnActor<AFortInventory>({}, {}, PC);
 
-		auto BlackboardComp = ((AFortAthenaAIBotController*)Pawn->Controller)->Blackboard;
-		static auto name1 = UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_Global_GamePhaseStep");
-		static auto name1b = UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_Global_GamePhase");
-		BlackboardComp->SetValueAsEnum(name1, 7);
-		BlackboardComp->SetValueAsEnum(name1b, (uint8)EAthenaGamePhase::SafeZones);
+		UBlackboardComponent* BlackboardComp = PC->Blackboard;
+		BlackboardComp->SetValueAsEnum(UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_Global_GamePhaseStep"), 7);
+		BlackboardComp->SetValueAsEnum(UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_Global_GamePhase"), (uint8)EAthenaGamePhase::SafeZones);
 
 		UFortWeaponMeleeItemDefinition* PickDef = StaticLoadObject<UFortWeaponMeleeItemDefinition>("/Game/Athena/Items/Weapons/WID_Harvest_Pickaxe_Athena_C_T01.WID_Harvest_Pickaxe_Athena_C_T01");
 		if (PickDef) {
@@ -152,6 +164,8 @@ namespace Bots {
 	}
 
 	void Hook() {
+		MH_CreateHook((LPVOID)(ImageBase + 0x19B0D00), CreateAndConfigureNavigationSystem, (LPVOID*)&CreateAndConfigureNavigationSystemOG);
+
 		// Dont think this is right vtable offset for this but it has the athenanavsystem and i think thats all we need
 		HookVTable(UAthenaNavSystem::GetDefaultObj(), 88, InitializeForWorld, (LPVOID*)&InitializeForWorldOG);
 
@@ -160,6 +174,9 @@ namespace Bots {
 		MH_CreateHook((LPVOID)(ImageBase + 0x70A86B0), InventoryBaseOnSpawned, (LPVOID*)&InventoryBaseOnSpawnedOG);
 
 		//MH_CreateHook((LPVOID)(ImageBase + 0x631C8C8), OnPossessedPawnDied, (LPVOID*)&OnPossessedPawnDiedOG);
+
+		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogAthenaAIServiceBots VeryVerbose", nullptr);
+		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogAthenaBots VeryVerbose", nullptr);
 
 		Log("Bots Hooked!");
 	}

@@ -1,9 +1,9 @@
 #pragma once
 #include "framework.h"
 #include "Inventory.h"
-#include "Abilities.h"
+#include "AbilitySystemComponent.h"
 #include "Looting.h"
-#include "Bots.h"
+#include "FortAthenaAIBotController.h"
 #include "BotSpawner.h"
 #include "Globals.h"
 
@@ -122,12 +122,12 @@ namespace GameMode {
 				}
 
 				UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(UWorld::GetWorld(), AFortPlayerStartWarmup::StaticClass(), &PlayerStarts);
-				Bots::CIDs = GetAllObjectsOfClass<UAthenaCharacterItemDefinition>();
-				Bots::Pickaxes = GetAllObjectsOfClass<UAthenaPickaxeItemDefinition>();
-				Bots::Backpacks = GetAllObjectsOfClass<UAthenaBackpackItemDefinition>();
-				Bots::Gliders = GetAllObjectsOfClass<UAthenaGliderItemDefinition>();
-				Bots::Contrails = GetAllObjectsOfClass<UAthenaSkyDiveContrailItemDefinition>();
-				Bots::Dances = GetAllObjectsOfClass<UAthenaDanceItemDefinition>();
+				FortAthenaAIBotController::CIDs = GetAllObjectsOfClass<UAthenaCharacterItemDefinition>();
+				FortAthenaAIBotController::Pickaxes = GetAllObjectsOfClass<UAthenaPickaxeItemDefinition>();
+				FortAthenaAIBotController::Backpacks = GetAllObjectsOfClass<UAthenaBackpackItemDefinition>();
+				FortAthenaAIBotController::Gliders = GetAllObjectsOfClass<UAthenaGliderItemDefinition>();
+				FortAthenaAIBotController::Contrails = GetAllObjectsOfClass<UAthenaSkyDiveContrailItemDefinition>();
+				FortAthenaAIBotController::Dances = GetAllObjectsOfClass<UAthenaDanceItemDefinition>();
 
 				Log("Initialised Bots!");
 			}
@@ -250,7 +250,7 @@ namespace GameMode {
 		auto Transform = StartingLoc->GetTransform();
 		auto Pawn = GameMode->SpawnDefaultPawnAtTransform(Player, Transform);
 
-		Abilities::InitAbilitiesForPlayer(PC);
+		AbilitySystemComponent::InitAbilitiesForPlayer(PC);
 
 		Pawn->NetUpdateFrequency = 100.f;
 		Pawn->MinNetUpdateFrequency = 100.f;
@@ -273,7 +273,7 @@ namespace GameMode {
 			SprintComp2->Activate(true);
 			EnergyComp->Activate(true);
 
-			Abilities::InitTacticalSprintForPlayer(PC);
+			AbilitySystemComponent::InitTacticalSprintForPlayer(PC);
 
 			Log("Setup Tactical Sprint!");
 		}

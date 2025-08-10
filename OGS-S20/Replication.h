@@ -654,10 +654,11 @@ namespace Replication {
 	__forceinline bool IsLevelInitializedForActor(const UNetDriver* NetDriver, const AActor* InActor, UNetConnection* InConnection)
 	{
 		bool (*ClientHasInitializedLevelFor)(const UNetConnection*, const AActor*) = decltype(ClientHasInitializedLevelFor)(ImageBase + 0x8473B58);
+		return ClientHasInitializedLevelFor(InConnection, InActor);
 
-		const bool bCorrectWorld = NetDriver->WorldPackage != nullptr && (GetClientWorldPackageName(InConnection) == NetDriver->WorldPackage->Name) && ClientHasInitializedLevelFor(InConnection, InActor);
+		/*const bool bCorrectWorld = NetDriver->WorldPackage != nullptr && (GetClientWorldPackageName(InConnection) == NetDriver->WorldPackage->Name) && ClientHasInitializedLevelFor(InConnection, InActor);
 		const bool bIsConnectionPC = (InActor == InConnection->PlayerController);
-		return bCorrectWorld || bIsConnectionPC;
+		return bCorrectWorld || bIsConnectionPC;*/
 	}
 
 	__forceinline void SendClientAdjustment(APlayerController* PlayerController)

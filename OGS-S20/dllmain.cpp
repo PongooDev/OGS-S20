@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "GameMode.h"
-#include "PC.h"
-#include "Abilities.h"
+#include "Controller.h"
+#include "AbilitySystemComponent.h"
 #include "Inventory.h"
 #include "Building.h"
 #include "Looting.h"
@@ -10,7 +10,7 @@
 #include "Net.h"
 #include "Tick.h"
 
-#include "Bots.h"
+#include "FortAthenaAIBotController.h"
 #include "PE.h"
 
 #include "Globals.h"
@@ -36,8 +36,8 @@ void LoadWorld() {
 
 void Hook() {
     GameMode::Hook();
-    PC::Hook();
-    Abilities::Hook();
+    Controller::Hook();
+    AbilitySystemComponent::Hook();
     Inventory::Hook();
     Building::Hook();
     Looting::Hook();
@@ -46,7 +46,7 @@ void Hook() {
     Net::Hook();
     Tick::Hook();
 
-    Bots::Hook();
+    FortAthenaAIBotController::Hook();
     PE::Hook();
 
     Sleep(1000);

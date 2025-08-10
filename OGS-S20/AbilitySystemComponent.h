@@ -1,7 +1,7 @@
 #pragma once
 #include "framework.h"
 
-namespace Abilities {
+namespace AbilitySystemComponent {
 	inline void InitAbilitiesForPlayer(AFortPlayerController* PC)
 	{
 		auto PlayerState = (AFortPlayerStateAthena*)PC->PlayerState;

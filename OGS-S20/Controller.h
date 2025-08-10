@@ -3,7 +3,7 @@
 #include "Inventory.h"
 #include "BotSpawner.h"
 
-namespace PC {
+namespace Controller {
 	void (*ServerAcknowledgePossessionOG)(AFortPlayerControllerAthena* PC, APawn* Pawn);
 	inline void ServerAcknowledgePossession(AFortPlayerControllerAthena* PC, APawn* Pawn)
 	{

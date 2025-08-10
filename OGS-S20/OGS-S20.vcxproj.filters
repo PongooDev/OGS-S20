@@ -25,6 +25,9 @@
     <Filter Include="Resources\AISpawnerLocations">
       <UniqueIdentifier>{b830fcad-0bdd-4f71-9009-dd5b12044883}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Hooks">
+      <UniqueIdentifier>{f5b53557-7158-47bb-9247-83b7d72e088b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -57,44 +60,11 @@
     <ClInclude Include="Globals.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameMode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Inventory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Abilities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PC.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Misc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Net.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Tick.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Replication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SDK\SDK\TacticalSprintRuntime_classes.hpp">
       <Filter>SDK\SDK</Filter>
-    </ClInclude>
-    <ClInclude Include="Building.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PE.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Looting.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Bots.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="BossesSpawnLocs.h">
       <Filter>Resources\AISpawnerLocations</Filter>
@@ -108,8 +78,41 @@
     <ClInclude Include="BotSpawner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Tick.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
     <ClInclude Include="Quests.h">
-      <Filter>Header Files</Filter>
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="PE.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Controller.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Net.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Looting.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Inventory.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMode.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Building.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="FortAthenaAIBotController.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="AbilitySystemComponent.h">
+      <Filter>Hooks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

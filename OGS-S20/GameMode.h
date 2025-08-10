@@ -16,7 +16,13 @@ namespace GameMode {
 	inline bool ReadyToStartMatch(AFortGameModeAthena* GameMode) {
 		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
 
+		float CurrentTime = UGameplayStatics::GetDefaultObj()->GetTimeSeconds(UWorld::GetWorld());
+		float WarmupTime = 60.f;
+
 		static bool SetupPlaylist = false;
+		static bool bInitialized = false;
+		static bool Listening = false;
+
 		if (!SetupPlaylist) {
 			SetupPlaylist = true;
 			UFortPlaylistAthena* Playlist;
@@ -64,13 +70,10 @@ namespace GameMode {
 			GameMode->GameSession->bRequiresPushToTalk = false;
 			GameMode->GameSession->SessionName = UKismetStringLibrary::Conv_StringToName(FString(L"GameSession"));
 
-			auto TS = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
-			auto DR = 90.f;
-
-			GameState->WarmupCountdownEndTime = TS + DR;
-			GameMode->WarmupCountdownDuration = DR;
-			GameState->WarmupCountdownStartTime = TS;
-			GameMode->WarmupEarlyCountdownDuration = DR;
+			GameState->WarmupCountdownEndTime = CurrentTime + WarmupTime;
+			GameMode->WarmupCountdownDuration = WarmupTime;
+			GameState->WarmupCountdownStartTime = CurrentTime;
+			GameMode->WarmupEarlyCountdownDuration = WarmupTime;
 
 			GameState->CurrentPlaylistId = Playlist->PlaylistId;
 			GameState->OnRep_CurrentPlaylistId();
@@ -80,22 +83,91 @@ namespace GameMode {
 			GameState->AirCraftBehavior = Playlist->AirCraftBehavior;
 			GameState->OnRep_Aircraft();
 
+			Log("Setup Playlist!");
+		}
+
+		if (!GameState->MapInfo) { // cant listen without map being fully loaded
+			return false;
+		}
+
+		if (!bInitialized) {
+			bInitialized = true;
+
 			GameState->DefaultParachuteDeployTraceForGroundDistance = 10000;
 
-			for (auto& Level : Playlist->AdditionalLevels)
+			GameMode->AISettings = GameState->CurrentPlaylistInfo.BasePlaylist->AISettings.Get();
+			GameMode->AISettings->AIServices[1] = UAthenaAIServicePlayerBots::StaticClass();
+
+			if (!GameMode->SpawningPolicyManager)
+			{
+				GameMode->SpawningPolicyManager = SpawnActor<AFortAthenaSpawningPolicyManager>({}, {});
+			}
+			GameMode->SpawningPolicyManager->GameModeAthena = GameMode;
+			GameMode->SpawningPolicyManager->GameStateAthena = GameState;
+
+			GameMode->AIDirector = SpawnActor<AAthenaAIDirector>({});
+			if (GameMode->AIDirector) {
+				GameMode->AIDirector->Activate();
+			}
+			else {
+				Log("No AIDirector!");
+			}
+
+			if (!GameMode->AIGoalManager)
+			{
+				GameMode->AIGoalManager = SpawnActor<AFortAIGoalManager>({});
+			}
+
+			UAISystem::GetDefaultObj()->AILoggingVerbose();
+
+			for (size_t i = 0; i < UObject::GObjects->Num(); i++)
+			{
+				UObject* Obj = UObject::GObjects->GetByIndex(i);
+				if (Obj && Obj->IsA(UAthenaCharacterItemDefinition::StaticClass()))
+				{
+					std::string SkinsData = ((UAthenaCharacterItemDefinition*)Obj)->Name.ToString();
+
+					if (SkinsData.contains("Athena_Commando") || SkinsData.contains("CID_Character") || !SkinsData.contains("CID_NPC") || !SkinsData.contains("CID_VIP") || !SkinsData.contains("CID_TBD"))
+					{
+						Characters.push_back((UAthenaCharacterItemDefinition*)Obj);
+					}
+				}
+				if (Obj && Obj->IsA(UAthenaBackpackItemDefinition::StaticClass()))
+				{
+					Backpacks.push_back((UAthenaBackpackItemDefinition*)Obj);
+				}
+				if (Obj && Obj->IsA(UAthenaPickaxeItemDefinition::StaticClass()))
+				{
+					Pickaxes.push_back((UAthenaPickaxeItemDefinition*)Obj);
+				}
+				if (Obj && Obj->IsA(UAthenaDanceItemDefinition::StaticClass()))
+				{
+					std::string EmoteData = ((UAthenaDanceItemDefinition*)Obj)->Name.ToString();
+
+					if (EmoteData.contains("EID") || !EmoteData.contains("Sync") || !EmoteData.contains("Owned"))
+					{
+						Dances.push_back((UAthenaDanceItemDefinition*)Obj);
+					}
+
+				}
+				if (Obj && Obj->IsA(UAthenaGliderItemDefinition::StaticClass()))
+				{
+					Gliders.push_back((UAthenaGliderItemDefinition*)Obj);
+				}
+			}
+
+			for (auto& Level : GameState->CurrentPlaylistInfo.BasePlaylist->AdditionalLevels)
 			{
 				bool Success = false;
-				Log("Level: " + Level.Get()->Name.ToString());
 				ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(UWorld::GetWorld(), Level, FVector(), FRotator(), &Success, FString(), nullptr);
 				FAdditionalLevelStreamed level{};
 				level.bIsServerOnly = false;
 				level.LevelName = Level.ObjectID.AssetPathName;
 				if (Success) GameState->AdditionalPlaylistLevelsStreamed.Add(level);
 			}
-			for (auto& Level : Playlist->AdditionalLevelsServerOnly)
+			for (auto& Level : GameState->CurrentPlaylistInfo.BasePlaylist->AdditionalLevelsServerOnly)
 			{
 				bool Success = false;
-				Log("Server Level: " + Level.Get()->Name.ToString());
 				ULevelStreamingDynamic::LoadLevelInstanceBySoftObjectPtr(UWorld::GetWorld(), Level, FVector(), FRotator(), &Success, FString(), nullptr);
 				FAdditionalLevelStreamed level{};
 				level.bIsServerOnly = true;
@@ -105,41 +177,24 @@ namespace GameMode {
 			GameState->OnRep_AdditionalPlaylistLevelsStreamed();
 			GameState->OnFinishedStreamingAdditionalPlaylistLevel();
 
-			if (Globals::bBotsEnabled && !Globals::bEventEnabled) {
-				if (!GameMode->SpawningPolicyManager)
-				{
-					GameMode->SpawningPolicyManager = SpawnActor<AFortAthenaSpawningPolicyManager>({}, {});
-				}
-				GameMode->SpawningPolicyManager->GameModeAthena = GameMode;
-				GameMode->SpawningPolicyManager->GameStateAthena = GameState;
+			UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(UWorld::GetWorld(), AFortPlayerStartWarmup::StaticClass(), &PlayerStarts);
 
-				GameMode->AIDirector = SpawnActor<AAthenaAIDirector>({});
-				//GameMode->AIDirector->Activate();
+			GameState->DefaultBattleBus = StaticLoadObject<UAthenaBattleBusItemDefinition>("/Game/Athena/Items/Cosmetics/BattleBuses/BBID_BirthdayBus4th.BBID_BirthdayBus4th");
 
-				if (!GameMode->AIGoalManager)
-				{
-					GameMode->AIGoalManager = SpawnActor<AFortAIGoalManager>({});
-				}
-
-				UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(UWorld::GetWorld(), AFortPlayerStartWarmup::StaticClass(), &PlayerStarts);
-				FortAthenaAIBotController::CIDs = GetAllObjectsOfClass<UAthenaCharacterItemDefinition>();
-				FortAthenaAIBotController::Pickaxes = GetAllObjectsOfClass<UAthenaPickaxeItemDefinition>();
-				FortAthenaAIBotController::Backpacks = GetAllObjectsOfClass<UAthenaBackpackItemDefinition>();
-				FortAthenaAIBotController::Gliders = GetAllObjectsOfClass<UAthenaGliderItemDefinition>();
-				FortAthenaAIBotController::Contrails = GetAllObjectsOfClass<UAthenaSkyDiveContrailItemDefinition>();
-				FortAthenaAIBotController::Dances = GetAllObjectsOfClass<UAthenaDanceItemDefinition>();
-
-				Log("Initialised Bots!");
+			for (size_t i = 0; i < GameMode->BattleBusCosmetics.Num(); i++)
+			{
+				GameMode->BattleBusCosmetics[i] = GameState->DefaultBattleBus;
 			}
 
-			Log("Setup Playlist!");
+			if (Globals::bArenaEnabled)
+			{
+				GameState->EventTournamentRound = EEventTournamentRound::Arena;
+				GameState->OnRep_EventTournamentRound();
+			}
+
+			Log("Initialized Game!");
 		}
 
-		if (!GameState->MapInfo) { // cant listen without map being fully loaded
-			return false;
-		}
-
-		static bool Listening = false;
 		if (!Listening) {
 			Listening = true;
 
@@ -173,8 +228,13 @@ namespace GameMode {
 
 			GameMode->bWorldIsReady = true;
 
-			UCurveTable* AthenaGameDataTable = GameState->AthenaGameDataTable;
+			Log("Listening: 7777");
+			SetConsoleTitleA("OGS 20.40 | Listening: 7777");
+		}
 
+		if (GameState->PlayersLeft > 0)
+		{
+			UCurveTable* AthenaGameDataTable = GameState->AthenaGameDataTable;
 			if (AthenaGameDataTable)
 			{
 				static FName DefaultSafeZoneDamageName = FName(UKismetStringLibrary::Conv_StringToName(FString(L"Default.SafeZone.Damage")));
@@ -185,10 +245,6 @@ namespace GameMode {
 						continue;
 
 					FSimpleCurve* Row = (FSimpleCurve*)RowPtr;
-
-					if (!Row)
-						continue;
-
 					for (auto& Key : Row->Keys)
 					{
 						FSimpleCurveKey* KeyPtr = &Key;
@@ -202,39 +258,18 @@ namespace GameMode {
 					Row->Keys.Add(FSimpleCurveKey(1.f, 0.01f));
 				}
 			}
-
-			Log("Listening: 7777");
-			SetConsoleTitleA("OGS 20.40 | Listening: 7777");
-
-			UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(UWorld::GetWorld(), AFortPlayerStartWarmup::StaticClass(), &PlayerStarts);
-
-			GameState->DefaultBattleBus = StaticLoadObject<UAthenaBattleBusItemDefinition>("/Game/Athena/Items/Cosmetics/BattleBuses/BBID_BirthdayBus4th.BBID_BirthdayBus4th");
-
-			for (size_t i = 0; i < GameMode->BattleBusCosmetics.Num(); i++)
-			{
-				GameMode->BattleBusCosmetics[i] = GameState->DefaultBattleBus;
+			else {
+				Log("No AthenaGameDataTable!");
 			}
 
-			if (Globals::bArenaEnabled)
-			{
-				GameState->EventTournamentRound = EEventTournamentRound::Arena;
-				GameState->OnRep_EventTournamentRound();
-			}
-		}
-
-		if (GameState->PlayersLeft > 0)
-		{
 			return true;
 		}
 		else
 		{
-			auto TS = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
-			auto DR = 90.f;
-
-			GameState->WarmupCountdownEndTime = TS + DR;
-			GameMode->WarmupCountdownDuration = DR;
-			GameState->WarmupCountdownStartTime = TS;
-			GameMode->WarmupEarlyCountdownDuration = DR;
+			GameState->WarmupCountdownEndTime = CurrentTime + WarmupTime;
+			GameMode->WarmupCountdownDuration = WarmupTime;
+			GameState->WarmupCountdownStartTime = CurrentTime;
+			GameMode->WarmupEarlyCountdownDuration = WarmupTime;
 		}
 
 		return false;
@@ -255,30 +290,6 @@ namespace GameMode {
 		Pawn->MinNetUpdateFrequency = 100.f;
 		Pawn->bAlwaysRelevant = true;
 		Pawn->bReplicateMovement = true;
-
-		auto SprintCompClass = StaticLoadObject<UClass>("/TacticalSprint/Gameplay/TacticalSprintControllerComponent.TacticalSprintControllerComponent_C");
-		auto EnergyCompClass = StaticLoadObject<UClass>("/TacticalSprint/Gameplay/TacticalSprintEnergyComponent.TacticalSprintEnergyComponent_C");
-
-		if (SprintCompClass && EnergyCompClass) {
-			UFortPlayerControllerComponent_TacticalSprint* SprintComp = (UFortPlayerControllerComponent_TacticalSprint*)PC->AddComponentByClass(SprintCompClass, false, FTransform(), false);
-			UFortPlayerControllerComponent_TacticalSprint* SprintComp2 = (UFortPlayerControllerComponent_TacticalSprint*)Pawn->AddComponentByClass(SprintCompClass, false, FTransform(), false);
-			UFortComponent_Energy* EnergyComp = (UFortComponent_Energy*)Pawn->AddComponentByClass(EnergyCompClass, false, FTransform(), false);
-
-			SprintComp->CurrentBoundPlayerPawn = (AFortPlayerPawn*)Pawn;
-			SprintComp2->CurrentBoundPlayerPawn = (AFortPlayerPawn*)Pawn;
-			EnergyComp->bAutoActivate = true;
-			
-			SprintComp->Activate(true);
-			SprintComp2->Activate(true);
-			EnergyComp->Activate(true);
-
-			AbilitySystemComponent::InitTacticalSprintForPlayer(PC);
-
-			Log("Setup Tactical Sprint!");
-		}
-		else {
-			Log("SprintCompClass or EnergyCompClass does not exist!");
-		}
 
 		PlayerState->SeasonLevelUIDisplay = PC->XPComponent->CurrentLevel;
 		PlayerState->OnRep_SeasonLevelUIDisplay();
@@ -344,94 +355,41 @@ namespace GameMode {
 		//return (AFortPlayerPawnAthena*)GameMode->SpawnDefaultPawnAtTransform(Player, Transform);
 	}
 
-	static inline void (*StartNewSafeZonePhaseOG)(AFortGameModeAthena* GameMode, int32 a2);
-	static void StartNewSafeZonePhase(AFortGameModeAthena* GameMode, int32 a2) {
-		auto GameState = AFortGameStateAthena::GetDefaultObj();
+	static inline void (*StartNewSafeZonePhaseOG)(AFortGameModeAthena* GameMode, int32 ZoneIndex);
+	static void StartNewSafeZonePhase(AFortGameModeAthena* GameMode, int32 ZoneIndex) {
+		AFortGameStateAthena* GameState = (AFortGameStateAthena*)GameMode->GameState;
 
 		FFortSafeZoneDefinition* SafeZoneDefinition = &GameState->MapInfo->SafeZoneDefinition;
+		Log("SafeZonePhase: " + std::to_string(GameMode->SafeZonePhase));
 
-		static bool bFirstCall = false;
-
-		auto Duration = 30.f;
-		auto HoldDuration = 10.f;
-		static auto DPS = 1.f;
-		static int ZoneIndex = 0;
-
-		switch (ZoneIndex) {
-		case 0:
-			Duration = 105.f;
-			HoldDuration = 30.f;
-			break;
-		case 1:
-			Duration = 120.f;
-			HoldDuration = 110.f;
-			DPS = 2.f;
-			break;
-		case 2:
-			Duration = 90.f;
-			HoldDuration = 110.f;
-			DPS = 3.f;
-			break;
-		case 3:
-			Duration = 95.f;
-			HoldDuration = 95.f;
-			DPS = 4.f;
-			break;
-		case 4:
-			Duration = 90.f;
-			HoldDuration = 90.f;
-			DPS = 5.f;
-			break;
-		case 5:
-			Duration = 50.f;
-			HoldDuration = 70.f;
-			break;
-		case 6:
-			Duration = 50.f;
-			HoldDuration = 70.f;
-			DPS = 10.f;
-			break;
-		case 7:
-			Duration = 50.f;
-			HoldDuration = 70.f;
-			break;
-		case 8:
-			Duration = 35.f;
-			HoldDuration = 60.f;
-			DPS = 10.f;
-			break;
-		case 9:
-			Duration = 20.f;
-			HoldDuration = 60.f;
-			break;
-		case 10:
-			Duration = 55.f;
-			HoldDuration = 60.f;
-			break;
-		case 11:
-			Duration = 50.f;
-			HoldDuration = 60.f;
-			break;
-		case 12:
-			Duration = 80.f;
-			HoldDuration = 60.f;
-			break;
-		default:
-			Duration = 15.f;
-			HoldDuration = 45.f;
-			break;
+		static UCurveTable* AthenaGameData = StaticLoadObject<UCurveTable>(UKismetStringLibrary::Conv_NameToString(GameState->CurrentPlaylistInfo.BasePlaylist->GameData.ObjectID.AssetPathName).ToString());
+		if (!AthenaGameData) {
+			AthenaGameData = StaticLoadObject<UCurveTable>("/Game/Athena/Balance/DataTables/AthenaGameData.AthenaGameData");
+		}
+		float CurrentWaitTime = 30.f;
+		EEvaluateCurveTableResult WaitTimeResult;
+		UDataTableFunctionLibrary::EvaluateCurveTableRow(AthenaGameData, UKismetStringLibrary::Conv_StringToName(L"Default.SafeZone.WaitTime"), (GameMode->SafeZonePhase + 1), &WaitTimeResult, &CurrentWaitTime, FString());
+		if (WaitTimeResult == EEvaluateCurveTableResult::RowNotFound) {
+			Log("Not Found WaitTime Row!");
+		}
+		else {
+			GameMode->SafeZoneIndicator->SafeZoneStartShrinkTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + CurrentWaitTime;
 		}
 
-		GameMode->SafeZoneIndicator->SafeZoneStartShrinkTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + HoldDuration;
-		GameMode->SafeZoneIndicator->SafeZoneFinishShrinkTime = GameMode->SafeZoneIndicator->SafeZoneStartShrinkTime + Duration;
-		GameState->SafeZoneDamage = DPS;
-		ZoneIndex++;
+		float CurrentShrinkTime = 30.f;
+		EEvaluateCurveTableResult ShrinkTimeResult;
+		UDataTableFunctionLibrary::EvaluateCurveTableRow(AthenaGameData, UKismetStringLibrary::Conv_StringToName(L"Default.SafeZone.ShrinkTime"), (GameMode->SafeZonePhase + 1), &ShrinkTimeResult, &CurrentShrinkTime, FString());
+		if (ShrinkTimeResult == EEvaluateCurveTableResult::RowNotFound) {
+			Log("Not Found ShrinkTime Row!");
+		}
+		else {
+			GameMode->SafeZoneIndicator->SafeZoneFinishShrinkTime = GameMode->SafeZoneIndicator->SafeZoneStartShrinkTime + CurrentShrinkTime;
+		}
 
-		GameState->OnRep_SafeZoneDamage();
 		GameState->OnRep_SafeZoneIndicator();
 		GameState->OnRep_SafeZonePhase();
 
-		StartNewSafeZonePhaseOG(GameMode, a2);
+		StartNewSafeZonePhaseOG(GameMode, ZoneIndex);
 	}
 
 	void Hook() {

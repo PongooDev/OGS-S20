@@ -2,39 +2,51 @@
 #include "framework.h"
 
 namespace AbilitySystemComponent {
-	inline void InitAbilitiesForPlayer(AFortPlayerController* PC)
-	{
+	inline void GiveAbility(UFortAbilitySystemComponent* AbilitySystemComponent, UGameplayAbility* Ability) {
+		FGameplayAbilitySpec Spec{};
+		AbilitySpecConstructor(&Spec, Ability, 1, -1, nullptr);
+		GiveAbilityOG(AbilitySystemComponent, &Spec.Handle, Spec);
+		//Log("Given Ability: " + AbilitySet->GameplayAbilities[i].Get()->GetName());
+	}
+
+	inline void GrantAbilitySet(AFortPlayerController* PC, UFortAbilitySet* AbilitySet) {
 		auto PlayerState = (AFortPlayerStateAthena*)PC->PlayerState;
-		static auto AbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer");
+
+		TScriptInterface<IAbilitySystemInterface> Interface{};
+		Interface.ObjectPointer = PlayerState;
+		Interface.InterfacePointer = GetInterface<IAbilitySystemInterface>(PlayerState);
 
 		if (PlayerState && AbilitySet)
 		{
 			for (size_t i = 0; i < AbilitySet->GameplayAbilities.Num(); i++)
 			{
-				FGameplayAbilitySpec Spec{};
-				AbilitySpecConstructor(&Spec, (UGameplayAbility*)AbilitySet->GameplayAbilities[i].Get()->DefaultObject, 1, -1, nullptr);
-				GiveAbility(PlayerState->AbilitySystemComponent, &Spec.Handle, Spec);
-				//Log("Given Ability: " + AbilitySet->GameplayAbilities[i].Get()->GetName());
+				GiveAbility(PlayerState->AbilitySystemComponent, (UGameplayAbility*)AbilitySet->GameplayAbilities[i].Get()->DefaultObject);
 			}
+
+			for (auto& GameplayEffect : AbilitySet->PassiveGameplayEffects) {
+				PlayerState->AbilitySystemComponent->BP_ApplyGameplayEffectToSelf(GameplayEffect.GameplayEffect.Get(), GameplayEffect.Level, PlayerState->AbilitySystemComponent->MakeEffectContext());
+			}
+			UFortKismetLibrary::EquipFortAbilitySet(Interface, AbilitySet, nullptr);
 		}
 	}
 
-	inline void InitTacticalSprintForPlayer(AFortPlayerController* PC)
+	inline void InitAbilitiesForPlayer(AFortPlayerController* PC)
 	{
 		auto PlayerState = (AFortPlayerStateAthena*)PC->PlayerState;
-		static auto AbilitySet = StaticLoadObject<UFortAbilitySet>("/TacticalSprint/Gameplay/AS_TacticalSprint.AS_TacticalSprint");
-
-		if (PlayerState && AbilitySet)
-		{
-			for (size_t i = 0; i < AbilitySet->GameplayAbilities.Num(); i++)
-			{
-				std::string Name = AbilitySet->GameplayAbilities[i].Get()->GetName();
-				FGameplayAbilitySpec Spec{};
-				AbilitySpecConstructor(&Spec, (UGameplayAbility*)AbilitySet->GameplayAbilities[i].Get()->DefaultObject, 1, -1, nullptr);
-				GiveAbility(PlayerState->AbilitySystemComponent, &Spec.Handle, Spec);
-				Log("Given TacticalSprint Ability: " + Name);
-			}
+		if (!PlayerState) {
+			return;
 		}
+
+		static UFortAbilitySet* AbilitySet = StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer");
+		static UFortAbilitySet* TacticalSprintAbilitySet = StaticLoadObject<UFortAbilitySet>("/TacticalSprint/Gameplay/AS_TacticalSprint.AS_TacticalSprint");
+		static UFortAbilitySet* AscenderAbilitySet = StaticLoadObject<UFortAbilitySet>("/Ascender/Gameplay/Ascender/AS_Ascender.AS_Ascender");
+
+		GrantAbilitySet(PC, AbilitySet);
+		GrantAbilitySet(PC, TacticalSprintAbilitySet);
+		GrantAbilitySet(PC, AscenderAbilitySet);
+
+		static UBlueprintGeneratedClass* GrantTacticalSprintAbility = StaticLoadObject<UBlueprintGeneratedClass>("/TacticalSprint/Gameplay/GA_Athena_GrantTacticalSprint.GA_Athena_GrantTacticalSprint_C");
+		GiveAbility(PlayerState->AbilitySystemComponent, (UGameplayAbility*)GrantTacticalSprintAbility->DefaultObject);
 	}
 
 	inline FGameplayAbilitySpec* FindAbilitySpecFromHandle(UFortAbilitySystemComponentAthena* ASC, FGameplayAbilitySpecHandle& Handle)

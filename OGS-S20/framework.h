@@ -39,7 +39,7 @@ static void (*SetWorld)(void*, void*) = decltype(SetWorld)(ImageBase + 0x17ada40
 static bool (*InitHost)(UObject* Beacon) = decltype(InitHost)(ImageBase + 0x567d4a4);
 static void (*PauseBeaconRequests)(UObject* Beacon, bool bPause) = decltype(PauseBeaconRequests)(ImageBase + 0x6d00a04);
 
-static void(*GiveAbility)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle*, FGameplayAbilitySpec) = decltype(GiveAbility)(ImageBase + 0x5250bd8);
+static void(*GiveAbilityOG)(UAbilitySystemComponent*, FGameplayAbilitySpecHandle*, FGameplayAbilitySpec) = decltype(GiveAbilityOG)(ImageBase + 0x5250bd8);
 static void (*AbilitySpecConstructor)(FGameplayAbilitySpec*, UGameplayAbility*, int, int, UObject*) = decltype(AbilitySpecConstructor)(ImageBase + 0x5247bc8);
 static bool (*InternalTryActivateAbility)(UAbilitySystemComponent* AbilitySystemComp, FGameplayAbilitySpecHandle AbilityToActivate, FPredictionKey InPredictionKey, UGameplayAbility** OutInstancedAbility, void* OnGameplayAbilityEndedDelegate, const FGameplayEventData* TriggerEventData) = decltype(InternalTryActivateAbility)(ImageBase + 0x5251efc);
 static FGameplayAbilitySpecHandle(*GiveAbilityAndActivateOnce)(UAbilitySystemComponent* ASC, FGameplayAbilitySpecHandle*, FGameplayAbilitySpec, void*) = decltype(GiveAbilityAndActivateOnce)(ImageBase + 0x5250CF8);
@@ -57,6 +57,13 @@ static void* (*StaticFindObjectOG)(UClass*, UObject* Package, const wchar_t* Ori
 static void* (*StaticLoadObjectOG)(UClass* Class, UObject* InOuter, const TCHAR* Name, const TCHAR* Filename, uint32_t LoadFlags, UObject* Sandbox, bool bAllowObjectReconciliation, void*) = decltype(StaticLoadObjectOG)(ImageBase + 0x1a34ba8);
 
 static TArray<AActor*> PlayerStarts;
+
+static std::vector<UAthenaCharacterItemDefinition*> Characters{};
+static std::vector<UAthenaPickaxeItemDefinition*> Pickaxes{};
+static std::vector<UAthenaBackpackItemDefinition*> Backpacks{};
+static std::vector<UAthenaGliderItemDefinition*> Gliders{};
+static std::vector<UAthenaSkyDiveContrailItemDefinition*> Contrails{};
+inline std::vector<UAthenaDanceItemDefinition*> Dances{};
 
 // text manipulation utils
 namespace TextManipUtils {

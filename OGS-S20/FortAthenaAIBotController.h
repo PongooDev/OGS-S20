@@ -2,13 +2,6 @@
 #include "framework.h"
 
 namespace FortAthenaAIBotController {
-	static std::vector<UAthenaCharacterItemDefinition*> CIDs{};
-	static std::vector<UAthenaPickaxeItemDefinition*> Pickaxes{};
-	static std::vector<UAthenaBackpackItemDefinition*> Backpacks{};
-	static std::vector<UAthenaGliderItemDefinition*> Gliders{};
-	static std::vector<UAthenaSkyDiveContrailItemDefinition*> Contrails{};
-	inline std::vector<UAthenaDanceItemDefinition*> Dances{};
-
 	void (*CreateAndConfigureNavigationSystemOG)(UAthenaNavSystemConfig* ModuleConfig, UWorld* World);
 	void CreateAndConfigureNavigationSystem(UAthenaNavSystemConfig* ModuleConfig, UWorld* World)
 	{

@@ -87,44 +87,6 @@ namespace Controller {
 		}
 	}
 
-	// Yeah ill move this shit at some point, the gs is not so clean atm so at some point ill do a big cleanup
-	AFortAthenaVehicle* (*ServerOnExitVehicleOG)(AFortPlayerPawn* PlayerPawn, ETryExitVehicleBehavior ExitForceBehavior, const bool bDestroyVehicleWhenForced);
-	AFortAthenaVehicle* ServerOnExitVehicle(AFortPlayerPawn* Pawn, ETryExitVehicleBehavior ExitForceBehavior, const bool bDestroyVehicleWhenForced)
-	{
-		AFortAthenaVehicle* Vehicle = Pawn->BP_GetVehicle();
-
-		if (!Vehicle)
-			return ServerOnExitVehicleOG(Pawn, ExitForceBehavior, bDestroyVehicleWhenForced);
-
-		UFortVehicleSeatWeaponComponent* SeatWeaponComponent = (UFortVehicleSeatWeaponComponent*)Vehicle->GetComponentByClass(UFortVehicleSeatWeaponComponent::StaticClass());
-
-		int32 VehicleSeatIndex = Pawn->GetVehicleSeatIndex();
-
-		if (!SeatWeaponComponent || !SeatWeaponComponent->WeaponSeatDefinitions.IsValidIndex(VehicleSeatIndex))
-			return ServerOnExitVehicleOG(Pawn, ExitForceBehavior, bDestroyVehicleWhenForced);
-
-		FWeaponSeatDefinition* WeaponSeatDefinition = &SeatWeaponComponent->WeaponSeatDefinitions[VehicleSeatIndex];
-
-		if (!WeaponSeatDefinition)
-			return ServerOnExitVehicleOG(Pawn, ExitForceBehavior, bDestroyVehicleWhenForced);
-
-		UnEquipVehicleWeapon(SeatWeaponComponent, Pawn, WeaponSeatDefinition, false);
-		AFortPlayerController* PC = (AFortPlayerController*)Pawn->Controller;
-		if (!PC)
-			return ServerOnExitVehicleOG(Pawn, ExitForceBehavior, bDestroyVehicleWhenForced);
-
-		// idfk why this dont work
-		for (auto Item : PC->WorldInventory->Inventory.ReplicatedEntries) {
-			if (Item.ItemDefinition->IsA(UAthenaPickaxeItemDefinition::StaticClass()))
-			{
-				PC->ServerExecuteInventoryItem(Item.ItemGuid);
-				break;
-			}
-		}
-
-		return ServerOnExitVehicleOG(Pawn, ExitForceBehavior, bDestroyVehicleWhenForced);
-	}
-
 	void ServerPlayEmoteItem(AFortPlayerControllerAthena* PC, UFortMontageItemDefinitionBase* EmoteAsset, float EmoteRandomNumber) {
 		Log("ServerPlayEmoteItem Called!");
 
@@ -276,8 +238,6 @@ namespace Controller {
 
 		// TODO: Move vehicle specific stuff into its own header file and remove it from serverattemptinteract
 		MH_CreateHook((LPVOID)(ImageBase + 0x68EA5A8), ServerAttemptInteract, (LPVOID*)&ServerAttemptInteractOG);
-
-		MH_CreateHook((LPVOID)(ImageBase + 0x6E6C820), ServerOnExitVehicle, (LPVOID*)&ServerOnExitVehicleOG);
 
 		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x1ED, ServerPlayEmoteItem, nullptr);
 		MH_CreateHook((LPVOID)(ImageBase + 0x21F1BE4), MovingEmoteStopped, (LPVOID*)&MovingEmoteStoppedOG);

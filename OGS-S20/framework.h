@@ -31,6 +31,9 @@ using namespace SDK;
 
 static auto ImageBase = InSDKUtils::GetImageBase();
 
+static void* (*GetWorldContextFromObject)(UEngine*, UWorld*) = decltype(GetWorldContextFromObject)(ImageBase + 0xF1D080);
+
+static UNetDriver* (*CreateNetDriver)(UEngine*, void*, FName) = decltype(CreateNetDriver)(ImageBase + 0x17B0EA0);
 static bool (*InitListen)(void*, void*, FURL&, bool, FString&) = decltype(InitListen)(ImageBase + 0x567d81c);
 static void (*SetWorld)(void*, void*) = decltype(SetWorld)(ImageBase + 0x17ada40);
 static bool (*InitHost)(UObject* Beacon) = decltype(InitHost)(ImageBase + 0x567d4a4);
@@ -311,9 +314,9 @@ T* Actors(UClass* Class = T::StaticClass(), FVector Loc = {}, FRotator Rot = {},
 	return SpawnActor<T>(Loc, Rot, Owner, Class);
 }
 
-AFortPickupAthena* SpawnPickup(UFortItemDefinition* ItemDef, int OverrideCount, int LoadedAmmo, FVector Loc, EFortPickupSourceTypeFlag SourceType, EFortPickupSpawnSource Source, AFortPawn* Pawn = nullptr)
+AFortPickup* SpawnPickup(UFortItemDefinition* ItemDef, int OverrideCount, int LoadedAmmo, FVector Loc, EFortPickupSourceTypeFlag SourceType, EFortPickupSpawnSource Source, bool bShouldCombine = false, AFortPawn* Pawn = nullptr)
 {
-	auto SpawnedPickup = Actors<AFortPickupAthena>(AFortPickupAthena::StaticClass(), Loc);
+	auto SpawnedPickup = Actors<AFortPickup>(AFortPickup::StaticClass(), Loc);
 	SpawnedPickup->bRandomRotation = true;
 
 	auto& PickupEntry = SpawnedPickup->PrimaryPickupItemEntry;
@@ -324,7 +327,7 @@ AFortPickupAthena* SpawnPickup(UFortItemDefinition* ItemDef, int OverrideCount, 
 	SpawnedPickup->OnRep_PrimaryPickupItemEntry();
 	SpawnedPickup->PawnWhoDroppedPickup = Pawn;
 
-	SpawnedPickup->TossPickup(Loc, Pawn, -1, true, false, SourceType, Source);
+	SpawnedPickup->TossPickup(Loc, Pawn, -1, true, bShouldCombine, SourceType, Source);
 
 	SpawnedPickup->SetReplicateMovement(true);
 	SpawnedPickup->MovementComponent = (UProjectileMovementComponent*)GetDefaultObject<UGameplayStatics>()->SpawnObject(UProjectileMovementComponent::StaticClass(), SpawnedPickup);
@@ -338,7 +341,7 @@ AFortPickupAthena* SpawnPickup(UFortItemDefinition* ItemDef, int OverrideCount, 
 	return SpawnedPickup;
 }
 
-static AFortPickupAthena* SpawnPickup(FFortItemEntry ItemEntry, FVector Location, EFortPickupSourceTypeFlag PickupSource = EFortPickupSourceTypeFlag::Other, EFortPickupSpawnSource SpawnSource = EFortPickupSpawnSource::Unset)
+static AFortPickup* SpawnPickup(FFortItemEntry ItemEntry, FVector Location, EFortPickupSourceTypeFlag PickupSource = EFortPickupSourceTypeFlag::Other, EFortPickupSpawnSource SpawnSource = EFortPickupSpawnSource::Unset)
 {
 	auto Pickup = SpawnPickup(ItemEntry.ItemDefinition, ItemEntry.Count, ItemEntry.LoadedAmmo, Location, PickupSource, SpawnSource);
 	return Pickup;

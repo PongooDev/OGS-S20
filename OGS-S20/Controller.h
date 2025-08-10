@@ -34,7 +34,7 @@ namespace Controller {
 				if (((UFortWorldItemDefinition*)PC->WorldInventory->Inventory.ReplicatedEntries[i].ItemDefinition)->bCanBeDropped)
 				{
 					int Count = PC->WorldInventory->Inventory.ReplicatedEntries[i].Count;
-					Inventory::RemoveItem(PC, PC->WorldInventory->Inventory.ReplicatedEntries[i].ItemGuid, Count);
+					Inventory::RemoveItem(PC, PC->WorldInventory->Inventory.ReplicatedEntries[i].ItemDefinition, Count);
 				}
 			}
 		}
@@ -239,6 +239,36 @@ namespace Controller {
 		}
 	}
 
+	static void ServerExecuteInventoryItem(AFortPlayerControllerAthena* PC, FGuid Guid)
+	{
+		if (!PC || !PC->MyFortPawn)
+			return;
+
+		FFortItemEntry* ItemEntry = Inventory::FindItemEntryByGuid(PC, Guid);
+		if (!ItemEntry || !ItemEntry->ItemDefinition) {
+			return;
+		}
+
+		if (ItemEntry->ItemDefinition->IsA(UFortGadgetItemDefinition::StaticClass())) {
+			UFortGadgetItemDefinition* Gadget = (UFortGadgetItemDefinition*)ItemEntry->ItemDefinition;
+			PC->MyFortPawn->EquipWeaponDefinition(Gadget->GetWeaponItemDefinition(), ItemEntry->ItemGuid, ItemEntry->TrackerGuid, false);
+			return;
+		}
+
+		PC->MyFortPawn->EquipWeaponDefinition((UFortWeaponItemDefinition*)ItemEntry->ItemDefinition, ItemEntry->ItemGuid, ItemEntry->TrackerGuid, false);
+		return;
+	}
+
+	void ServerAttemptInventoryDrop(AFortPlayerControllerAthena* PC, FGuid ItemGuid, int Count, bool bTrash)
+	{
+		FFortItemEntry* Entry = Inventory::FindItemEntryByGuid(PC, ItemGuid);
+		if (Entry) {
+			AFortPlayerPawn* Pawn = (AFortPlayerPawn*)PC->Pawn;
+			SpawnPickup(Entry->ItemDefinition, Count, Entry->LoadedAmmo, PC->Pawn->K2_GetActorLocation(), EFortPickupSourceTypeFlag::Player, EFortPickupSpawnSource::Unset, Pawn);
+			Inventory::RemoveItem(PC, Entry->ItemDefinition, Count);
+		}
+	}
+
 	void Hook() {
 		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x125, ServerAcknowledgePossession, (LPVOID*)&ServerAcknowledgePossessionOG);
 
@@ -255,6 +285,10 @@ namespace Controller {
 		//HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), , ServerReturnToMainMenu, nullptr); (we gotta find this)
 
 		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x1EB, ServerCheat, nullptr);
+
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x231, ServerExecuteInventoryItem, nullptr);
+
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x23F, ServerAttemptInventoryDrop, nullptr);
 
 		Log("PC Hooked!");
 	}

@@ -145,7 +145,8 @@
     <ClInclude Include="BossesSpawnLocs.h" />
     <ClInclude Include="FortAthenaAIBotController.h" />
     <ClInclude Include="BotSpawner.h" />
-    <ClInclude Include="Building.h" />
+    <ClInclude Include="BuildingActor.h" />
+    <ClInclude Include="FortWeapon.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GameMode.h" />
     <ClInclude Include="Globals.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="Net.h" />
     <ClInclude Include="NpcSpawnLocs.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="Pawn.h" />
     <ClInclude Include="PE.h" />
     <ClInclude Include="Quests.h" />
     <ClInclude Include="Replication.h" />

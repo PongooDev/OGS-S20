@@ -65,7 +65,7 @@ namespace GameMode {
 			GameMode->GameSession->SessionName = UKismetStringLibrary::Conv_StringToName(FString(L"GameSession"));
 
 			auto TS = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
-			auto DR = 120.f;
+			auto DR = 90.f;
 
 			GameState->WarmupCountdownEndTime = TS + DR;
 			GameMode->WarmupCountdownDuration = DR;
@@ -143,14 +143,13 @@ namespace GameMode {
 		if (!Listening) {
 			Listening = true;
 
-			auto Beacon = SpawnActor<AFortOnlineBeaconHost>({});
-			Beacon->ListenPort = 7777;
-			InitHost(Beacon);
-			PauseBeaconRequests(Beacon, false);
+			FName NetDriverName = UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(L"GameNetDriver");
+			void* WorldContext = GetWorldContextFromObject(UEngine::GetEngine(), UWorld::GetWorld());
+			UNetDriver* NetDriver = CreateNetDriver(UEngine::GetEngine(), WorldContext, NetDriverName);
 
-			UWorld::GetWorld()->NetDriver = Beacon->NetDriver;
-			UWorld::GetWorld()->NetDriver->World = UWorld::GetWorld();
-			UWorld::GetWorld()->NetDriver->NetDriverName = UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(L"GameNetDriver");
+			NetDriver->NetDriverName = NetDriverName;
+			NetDriver->World = UWorld::GetWorld();
+			UWorld::GetWorld()->NetDriver = NetDriver;
 
 			FString Error;
 			FURL url = FURL();
@@ -230,7 +229,7 @@ namespace GameMode {
 		else
 		{
 			auto TS = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
-			auto DR = 120.f;
+			auto DR = 90.f;
 
 			GameState->WarmupCountdownEndTime = TS + DR;
 			GameMode->WarmupCountdownDuration = DR;

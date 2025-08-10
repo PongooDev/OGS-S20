@@ -99,19 +99,25 @@
     <ClInclude Include="Looting.h">
       <Filter>Hooks</Filter>
     </ClInclude>
-    <ClInclude Include="Inventory.h">
-      <Filter>Hooks</Filter>
-    </ClInclude>
     <ClInclude Include="GameMode.h">
       <Filter>Hooks</Filter>
     </ClInclude>
-    <ClInclude Include="Building.h">
+    <ClInclude Include="BuildingActor.h">
       <Filter>Hooks</Filter>
     </ClInclude>
     <ClInclude Include="FortAthenaAIBotController.h">
       <Filter>Hooks</Filter>
     </ClInclude>
     <ClInclude Include="AbilitySystemComponent.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="Inventory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Pawn.h">
+      <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="FortWeapon.h">
       <Filter>Hooks</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,10 +1,11 @@
 #include "framework.h"
 #include "GameMode.h"
 #include "Controller.h"
+#include "Pawn.h"
 #include "AbilitySystemComponent.h"
-#include "Inventory.h"
-#include "Building.h"
+#include "BuildingActor.h"
 #include "Looting.h"
+#include "FortWeapon.h"
 
 #include "Misc.h"
 #include "Net.h"
@@ -37,10 +38,11 @@ void LoadWorld() {
 void Hook() {
     GameMode::Hook();
     Controller::Hook();
+    Pawn::Hook();
     AbilitySystemComponent::Hook();
-    Inventory::Hook();
-    Building::Hook();
+    BuildingActor::Hook();
     Looting::Hook();
+    FortWeapon::Hook();
 
     Misc::Hook();
     Net::Hook();
@@ -87,6 +89,7 @@ DWORD Main(LPVOID) {
 
     WaitForLogin();
     UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortUIDirector", nullptr);
+    UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogSpecialRelevancyHealthComponent", nullptr);
 
     Hook();
 

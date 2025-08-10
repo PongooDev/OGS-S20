@@ -16,10 +16,10 @@ namespace Tick {
 		AFortGameModeAthena* GameMode = (AFortGameModeAthena*)UWorld::GetWorld()->AuthorityGameMode;
 		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
 
-		if (GameMode->NumPlayers > 0) {
-			Replication::ServerReplicateActors(Driver, DeltaTime);
-			//ServerReplicateActors(Driver->ReplicationDriver);
+		Replication::ServerReplicateActors(Driver, DeltaTime);
+		//ServerReplicateActors(Driver->ReplicationDriver);
 
+		if (Driver->ClientConnections.Num() != 0) {
 			if (GameState->GamePhase == EAthenaGamePhase::Warmup
 				&& (GameMode->NumPlayers + GameMode->NumBots) >= Globals::MinPlayersForEarlyStart
 				&& GameState->WarmupCountdownEndTime > UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + 10.f) {

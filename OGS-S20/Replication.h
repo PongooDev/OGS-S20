@@ -654,11 +654,10 @@ namespace Replication {
 	__forceinline bool IsLevelInitializedForActor(const UNetDriver* NetDriver, const AActor* InActor, UNetConnection* InConnection)
 	{
 		bool (*ClientHasInitializedLevelFor)(const UNetConnection*, const AActor*) = decltype(ClientHasInitializedLevelFor)(ImageBase + 0x8473B58);
-		return ClientHasInitializedLevelFor(InConnection, InActor);
 
-		/*const bool bCorrectWorld = NetDriver->WorldPackage != nullptr && (GetClientWorldPackageName(InConnection) == NetDriver->WorldPackage->Name) && ClientHasInitializedLevelFor(InConnection, InActor);
+		const bool bCorrectWorld = NetDriver->WorldPackage != nullptr && (GetClientWorldPackageName(InConnection) == NetDriver->WorldPackage->Name) && ClientHasInitializedLevelFor(InConnection, InActor);
 		const bool bIsConnectionPC = (InActor == InConnection->PlayerController);
-		return bCorrectWorld || bIsConnectionPC;*/
+		return bCorrectWorld || bIsConnectionPC;
 	}
 
 	__forceinline void SendClientAdjustment(APlayerController* PlayerController)
@@ -882,10 +881,10 @@ namespace Replication {
 			}
 		}
 
-		if (Driver->ClientConnections.Num() == 0)
+		/*if (Driver->ClientConnections.Num() == 0)
 		{
 			return 0;
-		}
+		}*/
 
 		GetReplicationFrame(Driver)++;
 
@@ -925,6 +924,9 @@ namespace Replication {
 			for (FNetworkObjectInfo* ActorInfo : ConsiderList) {
 				if (!ActorInfo || !ActorInfo->Actor) continue;
 				AActor* Actor = ActorInfo->Actor;
+				if (Actor->bActorIsBeingDestroyed) {
+					continue;
+				}
 
 				if (IsConnectionInDormantSet(ActorInfo->DormantConnections, Conn))
 					continue;
@@ -940,6 +942,7 @@ namespace Replication {
 				}
 
 				if (Channel) {
+					//Log("Actor: " + Actor->GetName());
 					ReplicateActorIfReady(Driver, Conn, Channel, ActorInfo);
 					Actor->ForceNetUpdate();
 				}

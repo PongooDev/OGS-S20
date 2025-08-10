@@ -86,6 +86,7 @@ DWORD Main(LPVOID) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
     WaitForLogin();
+    UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogFortUIDirector", nullptr);
 
     Hook();
 

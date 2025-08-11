@@ -53,6 +53,9 @@ static void* (*ApplyCharacterCustomization)(AFortPlayerStateAthena* a1, APawn* a
 
 static void (*UnEquipVehicleWeapon)(UFortVehicleSeatWeaponComponent* SeatWeaponComponent, AFortPlayerPawn* Pawn, FWeaponSeatDefinition* WeaponSeatDefinition, bool bEquipBestWeapon) = decltype(UnEquipVehicleWeapon)(ImageBase + 0x70C5BF8);
 
+static void(*RemoveFromAlivePlayers)(AFortGameModeAthena*, AFortPlayerControllerAthena*, APlayerState*, AFortPlayerPawn*, UFortWeaponItemDefinition*, uint8_t DeathCause, char) = decltype(RemoveFromAlivePlayers)(ImageBase + 0x660B8BC);
+static void (*AddToAlivePlayers)(AFortGameModeAthena* GameMode, AFortPlayerControllerAthena* Player) = decltype(AddToAlivePlayers)(ImageBase + 0x65F7590);
+
 static void* (*StaticFindObjectOG)(UClass*, UObject* Package, const wchar_t* OrigInName, bool ExactClass) = decltype(StaticFindObjectOG)(ImageBase + 0xf14d30);
 static void* (*StaticLoadObjectOG)(UClass* Class, UObject* InOuter, const TCHAR* Name, const TCHAR* Filename, uint32_t LoadFlags, UObject* Sandbox, bool bAllowObjectReconciliation, void*) = decltype(StaticLoadObjectOG)(ImageBase + 0x1a34ba8);
 

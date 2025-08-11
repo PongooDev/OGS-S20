@@ -361,6 +361,86 @@ namespace Controller {
 		BuildingActorToRepair->RepairBuilding(PC, (int)RepairCost);
 	}
 
+	inline void (*ClientOnPawnDiedOG)(AFortPlayerControllerAthena* PC, FFortPlayerDeathReport DeathReport);
+	inline void ClientOnPawnDied(AFortPlayerControllerAthena* PC, FFortPlayerDeathReport DeathReport) {
+		auto GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
+		auto GameMode = (AFortGameModeAthena*)UWorld::GetWorld()->AuthorityGameMode;
+
+		AFortPlayerStateAthena* PlayerState = (AFortPlayerStateAthena*)PC->PlayerState;
+		if (!PlayerState) {
+			return;
+		}
+		Log(PlayerState->GetPlayerName().ToString() + " Died!");
+
+		AFortPlayerPawnAthena* KillerPawn = (AFortPlayerPawnAthena*)DeathReport.KillerPawn;
+		AFortPlayerStateAthena* KillerState = (AFortPlayerStateAthena*)DeathReport.KillerPlayerState;
+
+		FVector DeathLocation = PC->Pawn->K2_GetActorLocation();
+		PlayerState->PawnDeathLocation = DeathLocation;
+
+		FDeathInfo& DeathInfo = PlayerState->DeathInfo;
+		DeathInfo.bDBNO = false;
+		DeathInfo.bInitialized = true;
+		DeathInfo.DeathCause = PlayerState->ToDeathCause(DeathInfo.DeathTags, DeathInfo.bDBNO);
+		DeathInfo.DeathLocation = PC->Pawn->K2_GetActorLocation();
+		DeathInfo.DeathTags = DeathReport.Tags;
+		DeathInfo.Distance = (KillerPawn ? KillerPawn->GetDistanceTo(PC->Pawn) : ((AFortPlayerPawnAthena*)PC->Pawn)->LastFallDistance);
+		DeathInfo.Downer = KillerState;
+		PlayerState->DeathInfo.FinisherOrDowner = DeathReport.KillerPlayerState ? DeathReport.KillerPlayerState : PC->PlayerState;
+
+		// Dont think these tags are correct whatsoever but whatever
+		DeathInfo.FinisherOrDownerTags = DeathReport.Tags;
+		DeathInfo.VictimTags = DeathReport.Tags;
+		PlayerState->OnRep_DeathInfo();
+		RemoveFromAlivePlayers(GameMode, PC, PlayerState, KillerPawn, DeathReport.KillerWeapon, (uint8)PlayerState->DeathInfo.DeathCause, 0);
+		PC->bMarkedAlive = false;
+
+		if (!GameState->IsRespawningAllowed(PlayerState))
+		{
+			if (PC && PC->WorldInventory)
+			{
+				for (size_t i = 0; i < PC->WorldInventory->Inventory.ReplicatedEntries.Num(); i++)
+				{
+					if (((UFortWorldItemDefinition*)PC->WorldInventory->Inventory.ReplicatedEntries[i].ItemDefinition)->bCanBeDropped)
+					{
+						SpawnPickup(PC->WorldInventory->Inventory.ItemInstances[i]->ItemEntry.ItemDefinition, PC->WorldInventory->Inventory.ItemInstances[i]->ItemEntry.Count, PC->WorldInventory->Inventory.ItemInstances[i]->ItemEntry.LoadedAmmo, DeathLocation, EFortPickupSourceTypeFlag::Player, EFortPickupSpawnSource::PlayerElimination, PC->MyFortPawn);
+					}
+				}
+			}
+
+			FAthenaRewardResult Result;
+			UFortPlayerControllerAthenaXPComponent* XPComponent = PC->XPComponent;
+			Result.TotalBookXpGained = XPComponent->TotalXpEarned;
+			Result.TotalSeasonXpGained = XPComponent->TotalXpEarned;
+
+			PC->ClientSendEndBattleRoyaleMatchForPlayer(true, Result);
+
+			FAthenaMatchStats Stats;
+			FAthenaMatchTeamStats TeamStats;
+
+			if (PlayerState)
+			{
+				PlayerState->Place = GameMode->AliveBots.Num() + GameMode->AlivePlayers.Num();
+				PlayerState->OnRep_Place();
+			}
+
+			for (size_t i = 0; i < 20; i++)
+			{
+				Stats.Stats[i] = 0;
+			}
+
+			Stats.Stats[3] = PlayerState->KillScore;
+
+			TeamStats.Place = PlayerState->Place;
+			TeamStats.TotalPlayers = GameState->TotalPlayers;
+
+			PC->ClientSendMatchStatsForPlayer(Stats);
+			PC->ClientSendTeamStatsForPlayer(TeamStats);
+		}
+
+		return ClientOnPawnDiedOG(PC, DeathReport);
+	}
+
 	void Hook() {
 		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x125, ServerAcknowledgePossession, (LPVOID*)&ServerAcknowledgePossessionOG);
 
@@ -372,7 +452,7 @@ namespace Controller {
 		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x1ED, ServerPlayEmoteItem, nullptr);
 		MH_CreateHook((LPVOID)(ImageBase + 0x21F1BE4), MovingEmoteStopped, (LPVOID*)&MovingEmoteStoppedOG);
 
-		//HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), , ServerReturnToMainMenu, nullptr); (we gotta find this)
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x292, ServerReturnToMainMenu, nullptr);
 
 		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x1EB, ServerCheat, nullptr);
 
@@ -389,6 +469,8 @@ namespace Controller {
 		HookVTable(AAthena_PlayerController_C::GetDefaultObj(), 0x256, ServerEditBuildingActor, nullptr);
 
 		HookVTable(AAthena_PlayerController_C::GetDefaultObj(), 0x250, ServerRepairBuildingActor, nullptr);
+
+		MH_CreateHook((LPVOID)(ImageBase + 0x73B8A4C), ClientOnPawnDied, (LPVOID*)&ClientOnPawnDiedOG);
 
 		Log("PC Hooked!");
 	}

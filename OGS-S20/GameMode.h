@@ -284,8 +284,6 @@ namespace GameMode {
 		auto Transform = StartingLoc->GetTransform();
 		auto Pawn = GameMode->SpawnDefaultPawnAtTransform(Player, Transform);
 
-		AbilitySystemComponent::InitAbilitiesForPlayer(PC);
-
 		Pawn->NetUpdateFrequency = 100.f;
 		Pawn->MinNetUpdateFrequency = 100.f;
 		Pawn->bAlwaysRelevant = true;
@@ -300,20 +298,6 @@ namespace GameMode {
 
 		UFortKismetLibrary::UpdatePlayerCustomCharacterPartsVisualization(PlayerState);
 		PlayerState->OnRep_CharacterData();
-
-		PlayerState->SquadId = PlayerState->TeamIndex - 3;
-		PlayerState->OnRep_SquadId();
-
-		FGameMemberInfo Member;
-		Member.MostRecentArrayReplicationKey = -1;
-		Member.ReplicationID = -1;
-		Member.ReplicationKey = -1;
-		Member.TeamIndex = PlayerState->TeamIndex;
-		Member.SquadId = PlayerState->SquadId;
-		Member.MemberUniqueId = PlayerState->UniqueId;
-
-		GameState->GameMemberInfoArray.Members.Add(Member);
-		GameState->GameMemberInfoArray.MarkItemDirty(Member);
 
 		UAthenaPickaxeItemDefinition* PickDef;
 		FFortAthenaLoadout& CosmecticLoadoutPC = PC->CosmeticLoadoutPC;
@@ -334,13 +318,6 @@ namespace GameMode {
 				Inventory::GiveItem(PC, GameMode->StartingItems[i].Item, GameMode->StartingItems[i].Count, 0);
 			}
 		}
-
-		GameState->OnRep_SafeZoneDamage();
-		GameState->OnRep_SafeZoneIndicator();
-		GameState->OnRep_SafeZonePhase();
-
-		Pawn->OnRep_ReplicateMovement();
-		Pawn->OnRep_ReplicatedMovement();
 
 		Pawn->OnRep_PlayerState();
 		Pawn->OnRep_Controller();

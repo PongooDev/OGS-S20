@@ -4,7 +4,6 @@
 #include "Replication.h"
 
 namespace Tick {
-	bool bHasSetupWorld = false;
 	void (*ServerReplicateActors)(void*) = decltype(ServerReplicateActors)(UReplicationGraph::GetDefaultObj()->VTable[0x66]);
 
 	inline void (*TickFlushOG)(UNetDriver*, float);
@@ -31,19 +30,6 @@ namespace Tick {
 				GameMode->WarmupCountdownDuration = DR;
 				GameState->WarmupCountdownStartTime = TS;
 				GameMode->WarmupEarlyCountdownDuration = DR;
-			}
-
-			if (!bHasSetupWorld && GameState->GamePhase >= EAthenaGamePhase::Warmup) {
-				bHasSetupWorld = true;
-
-				Looting::SpawnLlamas();
-				Looting::DestroyFloorLootSpawners();
-				
-				BotSpawner::SpawnBosses();
-				BotSpawner::SpawnGuards();
-				BotSpawner::SpawnNpcs();
-
-				Log("Setup World!");
 			}
 		}
 

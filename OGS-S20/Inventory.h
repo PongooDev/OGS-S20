@@ -182,6 +182,7 @@ namespace Inventory {
 			{
 				if (GetQuickBars(InstancesPtr->operator[](i)->ItemEntry.ItemDefinition) == EFortQuickBars::Primary)
 				{
+					if (InstancesPtr->operator[](i)->ItemEntry.ItemDefinition->Name.ToString().contains("VictoryCrown")) continue;
 					ItemNumber++;
 
 					if (ItemNumber >= 5)

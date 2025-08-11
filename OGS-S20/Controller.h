@@ -12,6 +12,63 @@ namespace Controller {
 		return ServerAcknowledgePossessionOG(PC, Pawn);
 	}
 
+	void (*ServerReadyToStartMatchOG)(AFortPlayerControllerAthena* PC);
+	void ServerReadyToStartMatch(AFortPlayerControllerAthena* PC) {
+		if (!PC) {
+			Log("ServerReadyToStartMatch: No PC!");
+			return;
+		}
+
+		AFortGameModeAthena* GameMode = (AFortGameModeAthena*)UWorld::GetWorld()->AuthorityGameMode;
+		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
+
+		AFortPlayerStateAthena* PlayerState = (AFortPlayerStateAthena*)PC->PlayerState;
+
+		static bool bSetupWorld = false;
+		if (!bSetupWorld)
+		{
+			bSetupWorld = true;
+
+			Looting::SpawnLlamas();
+			Looting::DestroyFloorLootSpawners();
+
+			BotSpawner::SpawnBosses();
+			BotSpawner::SpawnGuards();
+			BotSpawner::SpawnNpcs();
+
+			Log("Setup World!");
+		}
+
+		AbilitySystemComponent::InitAbilitiesForPlayer(PC);
+
+		PlayerState->SquadId = PlayerState->TeamIndex - 3;
+		PlayerState->OnRep_SquadId();
+
+		FGameMemberInfo Member;
+		Member.MostRecentArrayReplicationKey = -1;
+		Member.ReplicationID = -1;
+		Member.ReplicationKey = -1;
+		Member.TeamIndex = PlayerState->TeamIndex;
+		Member.SquadId = PlayerState->SquadId;
+		Member.MemberUniqueId = PlayerState->UniqueId;
+
+		GameState->GameMemberInfoArray.Members.Add(Member);
+		GameState->GameMemberInfoArray.MarkItemDirty(Member);
+
+		static auto Bars = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
+		if (Bars) {
+			Inventory::GiveItem(PC, Bars, UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(0, 5000), 0);
+		}
+
+		UAthenaGadgetItemDefinition* VictoryCrown = StaticLoadObject<UAthenaGadgetItemDefinition>("/VictoryCrownsGameplay/Items/AGID_VictoryCrown.AGID_VictoryCrown");
+		if (VictoryCrown) {
+			Inventory::GiveItem(PC, VictoryCrown, 1, 0);
+			AbilitySystemComponent::GrantAbilitySet(PC, StaticLoadObject<UFortAbilitySet>("/VictoryCrownsGameplay/Items/AS_VictoryCrown.AS_VictoryCrown"));
+		}
+
+		return ServerReadyToStartMatchOG(PC);
+	}
+
 	inline void ServerAttemptAircraftJump(UFortControllerComponent_Aircraft* Comp, FRotator Rotation)
 	{
 		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
@@ -33,17 +90,14 @@ namespace Controller {
 			{
 				if (((UFortWorldItemDefinition*)PC->WorldInventory->Inventory.ReplicatedEntries[i].ItemDefinition)->bCanBeDropped)
 				{
+					std::string Name = PC->WorldInventory->Inventory.ReplicatedEntries[i].ItemDefinition->Name.ToString();
+					if (Name.contains("VictoryCrown") || Name.contains("Wads")) continue;
+
 					int Count = PC->WorldInventory->Inventory.ReplicatedEntries[i].Count;
 					Inventory::RemoveItem(PC, PC->WorldInventory->Inventory.ReplicatedEntries[i].ItemDefinition, Count);
 				}
 			}
 		}
-
-		PC->MyFortPawn->OnRep_IsInsideSafeZone();
-
-		GameState->OnRep_SafeZoneDamage();
-		GameState->OnRep_SafeZoneIndicator();
-		GameState->OnRep_SafeZonePhase();
 	}
 
 	inline void (*ServerAttemptInteractOG)(UFortControllerComponent_Interaction* Comp, AActor* ReceivingActor, UPrimitiveComponent* InteractComponent, ETInteractionType InteractType, UObject* OptionalData, EInteractionBeingAttempted InteractionBeingAttempted);
@@ -69,6 +123,7 @@ namespace Controller {
 			if (Vehicle)
 			{
 				auto SeatIdx = PC->MyFortPawn->GetVehicleSeatIndex();
+				Log(std::to_string(SeatIdx));
 				auto WeaponComp = (UFortVehicleSeatWeaponComponent*)Vehicle->GetComponentByClass(UFortVehicleSeatWeaponComponent::StaticClass());
 				if (WeaponComp)
 				{
@@ -441,8 +496,81 @@ namespace Controller {
 		return ClientOnPawnDiedOG(PC, DeathReport);
 	}
 
+	inline void (*ServerAttemptExitVehicleOG)(AFortPlayerController* PC);
+	inline void ServerAttemptExitVehicle(AFortPlayerControllerZone* PC)
+	{
+		Log("ServerAttemptExitVehicle Called!");
+		if (!PC) {
+			Log("PC: " + PC->GetName());
+			return ServerAttemptExitVehicleOG(PC);
+		}
+
+		auto Pawn = (AFortPlayerPawn*)PC->Pawn;
+
+		ServerAttemptExitVehicleOG(PC);
+
+		if (!Pawn->CurrentWeapon || !Pawn->CurrentWeapon->IsA(AFortWeaponRangedForVehicle::StaticClass()))
+			return;
+
+		Log(Pawn->CurrentWeapon->GetWeaponData()->GetName());
+		Inventory::RemoveItem((AFortPlayerController*)Pawn->Controller, Pawn->CurrentWeapon->GetWeaponData(), 1);
+
+		UFortWorldItemDefinition* ItemDef = ((AFortPlayerControllerAthena*)PC)->SwappingItemDefinition;
+		if (!ItemDef)
+			return;
+
+		FFortItemEntry* ItemEntry = Inventory::FindItemEntryByDef(PC, ItemDef);
+		if (!ItemEntry)
+			return;
+
+		Log(ItemEntry->ItemDefinition->GetName());
+		PC->MyFortPawn->EquipWeaponDefinition((UFortWeaponItemDefinition*)ItemDef, ItemEntry->ItemGuid, ItemEntry->TrackerGuid, false);
+	}
+
+	inline void (*ServerRequestSeatChangeOG)(AFortPlayerController* PC, int32 TargetSeatIndex);
+	inline void ServerRequestSeatChange(AFortPlayerControllerZone* PC, int32 TargetSeatIndex)
+	{
+		Log("ServerRequestSeatChange Called!");
+		if (!PC)
+			return;
+
+		Log(std::to_string(TargetSeatIndex));
+		auto Pawn = (AFortPlayerPawn*)PC->Pawn;
+
+		ServerRequestSeatChangeOG(PC, TargetSeatIndex);
+
+		if (Pawn->CurrentWeapon && Pawn->CurrentWeapon->IsA(AFortWeaponRangedForVehicle::StaticClass())) {
+			Inventory::RemoveItem((AFortPlayerController*)Pawn->Controller, Pawn->CurrentWeapon->GetWeaponData(), 1);
+		}
+
+		auto Vehicle = PC->MyFortPawn->BP_GetVehicle();
+		if (Vehicle)
+		{
+			auto WeaponComp = (UFortVehicleSeatWeaponComponent*)Vehicle->GetComponentByClass(UFortVehicleSeatWeaponComponent::StaticClass());
+			if (WeaponComp)
+			{
+				auto SeatIdx = PC->MyFortPawn->GetVehicleSeatIndex();
+				if (!WeaponComp->WeaponSeatDefinitions.IsValidIndex(SeatIdx)) {
+					return;
+				}
+				Inventory::GiveItem(PC, WeaponComp->WeaponSeatDefinitions[SeatIdx].VehicleWeapon, 1, 9999);
+				for (size_t i = 0; i < PC->WorldInventory->Inventory.ReplicatedEntries.Num(); i++)
+				{
+					if (PC->WorldInventory->Inventory.ReplicatedEntries[i].ItemDefinition == WeaponComp->WeaponSeatDefinitions[SeatIdx].VehicleWeapon)
+					{
+						FFortItemEntry ItemEntry = PC->WorldInventory->Inventory.ReplicatedEntries[i];
+						PC->MyFortPawn->EquipWeaponDefinition((UFortWeaponItemDefinition*)ItemEntry.ItemDefinition, ItemEntry.ItemGuid, ItemEntry.TrackerGuid, false);
+						break;
+					}
+				}
+			}
+		}
+	}
+
 	void Hook() {
 		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x125, ServerAcknowledgePossession, (LPVOID*)&ServerAcknowledgePossessionOG);
+
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x296, ServerReadyToStartMatch, (LPVOID*)&ServerReadyToStartMatchOG);
 
 		HookVTable(UFortControllerComponent_Aircraft::GetDefaultObj(), 0x9F, ServerAttemptAircraftJump, nullptr);
 
@@ -471,6 +599,10 @@ namespace Controller {
 		HookVTable(AAthena_PlayerController_C::GetDefaultObj(), 0x250, ServerRepairBuildingActor, nullptr);
 
 		MH_CreateHook((LPVOID)(ImageBase + 0x73B8A4C), ClientOnPawnDied, (LPVOID*)&ClientOnPawnDiedOG);
+
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x471, ServerAttemptExitVehicle, (PVOID*)&ServerAttemptExitVehicleOG);
+
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x45D, ServerRequestSeatChange, (PVOID*)&ServerRequestSeatChangeOG);
 
 		Log("PC Hooked!");
 	}

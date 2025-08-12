@@ -281,8 +281,9 @@ namespace Controller {
 		FFortItemEntry* Entry = Inventory::FindItemEntryByGuid(PC, ItemGuid);
 		if (Entry) {
 			AFortPlayerPawn* Pawn = (AFortPlayerPawn*)PC->Pawn;
-			SpawnPickup(Entry->ItemDefinition, Count, Entry->LoadedAmmo, PC->Pawn->K2_GetActorLocation(), EFortPickupSourceTypeFlag::Player, EFortPickupSpawnSource::Unset, Pawn);
+			AFortPickup* Pickup = SpawnPickup(Entry->ItemDefinition, Count, Entry->LoadedAmmo, PC->Pawn->K2_GetActorLocation(), EFortPickupSourceTypeFlag::Player, EFortPickupSpawnSource::Unset, Pawn);
 			Inventory::RemoveItem(PC, Entry->ItemDefinition, Count);
+			Pickup->PawnWhoDroppedPickup = Pawn;
 		}
 	}
 

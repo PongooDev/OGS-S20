@@ -185,6 +185,49 @@ namespace Pawn {
 		return;
 	}
 
+	void (*OnCapsuleBeginOverlapOG)(AFortPlayerPawn* Pawn, UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, FHitResult SweepResult);
+	void OnCapsuleBeginOverlap(AFortPlayerPawn* Pawn, UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, FHitResult SweepResult)
+	{
+		if (!OtherActor) {
+			return;
+		}
+
+		if (OtherActor->IsA(AFortPickup::StaticClass()))
+		{
+			auto PC = (AFortPlayerControllerAthena*)Pawn->GetOwner();
+			if (PC->PlayerState->bIsABot) return OnCapsuleBeginOverlapOG(Pawn, OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
+			AFortPickup* Pickup = (AFortPickup*)OtherActor;
+
+			if (Pickup->PawnWhoDroppedPickup == Pawn)
+				return OnCapsuleBeginOverlapOG(Pawn, OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
+			UFortWorldItemDefinition* Def = (UFortWorldItemDefinition*)Pickup->PrimaryPickupItemEntry.ItemDefinition;
+
+			if (!Def) {
+				return OnCapsuleBeginOverlapOG(Pawn, OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+			}
+
+			FFortItemEntry* ItemEntry = Inventory::FindItemEntryByDef(PC, Def);
+			auto Count = ItemEntry ? ItemEntry->Count : 0;
+
+			if (Def->IsStackable()) {
+				if (Def->IsA(UFortAmmoItemDefinition::StaticClass()) || Def->IsA(UFortResourceItemDefinition::StaticClass()) || Def->IsA(UFortTrapItemDefinition::StaticClass())) {
+					if (Count < Inventory::GetMaxStack(Def)) {
+						Pawn->ServerHandlePickup(Pickup, 0.30f, FVector(), true);
+					}
+				}
+				else if (ItemEntry) {
+					if (Count < Inventory::GetMaxStack(Def)) {
+						Pawn->ServerHandlePickup(Pickup, 0.30f, FVector(), true);
+					}
+				}
+			}
+		}
+
+		return OnCapsuleBeginOverlapOG(Pawn, OverlappedComp, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+	}
+
 	void Hook() {
 		HookVTable(APlayerPawn_Athena_C::GetDefaultObj(), 0x22B, ServerHandlePickup, nullptr);
 

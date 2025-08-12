@@ -289,7 +289,6 @@ namespace Controller {
 
 	void (*ServerCreateBuildingActorOG)(AFortPlayerControllerAthena* PC, FCreateBuildingActorData& CreateBuildingData);
 	void ServerCreateBuildingActor(AFortPlayerControllerAthena* PC, FCreateBuildingActorData& CreateBuildingData) {
-		//Log("ServerCreateBuildingActor Called!");
 		if (!PC) {
 			Log("No PC!");
 			return;
@@ -324,7 +323,6 @@ namespace Controller {
 	void (*ServerBeginEditingBuildingActorOG)(AFortPlayerControllerAthena* PC, ABuildingSMActor* BuildingActorToEdit);
 	void ServerBeginEditingBuildingActor(AFortPlayerControllerAthena* PC, ABuildingSMActor* BuildingActorToEdit)
 	{
-		//Log("ServerBeginEditingBuildingActor Called!");
 		if (!BuildingActorToEdit || !BuildingActorToEdit->bPlayerPlaced || !PC->MyFortPawn)
 			return;
 

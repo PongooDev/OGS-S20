@@ -159,6 +159,7 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Pawn.h" />
     <ClInclude Include="PE.h" />
+    <ClInclude Include="PossibleLoot.h" />
     <ClInclude Include="Quests.h" />
     <ClInclude Include="Replication.h" />
     <ClInclude Include="SDK\PropertyFixup.hpp" />

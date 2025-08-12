@@ -28,6 +28,9 @@
     <Filter Include="Hooks">
       <UniqueIdentifier>{f5b53557-7158-47bb-9247-83b7d72e088b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\Looting">
+      <UniqueIdentifier>{9d198127-aee7-4ece-bc0a-7a3cea9bcd68}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -119,6 +122,9 @@
     </ClInclude>
     <ClInclude Include="FortWeapon.h">
       <Filter>Hooks</Filter>
+    </ClInclude>
+    <ClInclude Include="PossibleLoot.h">
+      <Filter>Resources\Looting</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

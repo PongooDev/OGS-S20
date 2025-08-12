@@ -1,7 +1,7 @@
 #pragma once
 #include "framework.h"
+#include "PossibleLoot.h"
 
-// Everything here exept spawnllamas needs to be rewritten
 namespace Looting {
     void SpawnLlamas()
     {
@@ -45,246 +45,184 @@ namespace Looting {
         }
     }
 
-    static FFortLootTierData* GetLootTierData(std::vector<FFortLootTierData*>& LootTierData)
-    {
-        float TotalWeight = 0;
-
-        for (auto Item : LootTierData)
-            TotalWeight += Item->Weight;
-
-        float RandomNumber = UKismetMathLibrary::RandomFloatInRange(0, TotalWeight);
-
-        FFortLootTierData* SelectedItem = nullptr;
-
-        for (auto Item : LootTierData)
-        {
-            if (RandomNumber <= Item->Weight)
-            {
-                SelectedItem = Item;
-                break;
-            }
-
-            RandomNumber -= Item->Weight;
-        }
-
-        return SelectedItem;
-    }
-
-    static FFortLootPackageData* GetLootPackage(std::vector<FFortLootPackageData*>& LootPackages)
-    {
-        float TotalWeight = 0;
-
-        for (auto Item : LootPackages)
-        {
-            auto* ItemDef = Item->ItemDefinition.Get();
-            bool bIsWeapon = ItemDef && ItemDef->IsA(UFortWeaponItemDefinition::StaticClass());
-
-            if (Item->Weight > 0 || bIsWeapon)
-                TotalWeight += (Item->Weight > 0 ? Item->Weight : 1.0f); // Give minimum 1 weight to weapons
-        }
-
-        float RandomNumber = UKismetMathLibrary::RandomFloatInRange(0, TotalWeight);
-
-        for (auto Item : LootPackages)
-        {
-            auto* ItemDef = Item->ItemDefinition.Get();
-            bool bIsWeapon = ItemDef && ItemDef->IsA(UFortWeaponItemDefinition::StaticClass());
-
-            float EffectiveWeight = (Item->Weight > 0 ? Item->Weight : (bIsWeapon ? 1.0f : 0.0f));
-            if (EffectiveWeight == 0)
-                continue;
-
-            if (RandomNumber <= EffectiveWeight)
-                return Item;
-
-            RandomNumber -= EffectiveWeight;
-        }
-
-        return nullptr;
-    }
-
-    int GetClipSize(UFortItemDefinition* ItemDef) {
-        if (auto RangedDef = Cast<UFortWeaponRangedItemDefinition>(ItemDef)) {
-            auto DataTable = RangedDef->WeaponStatHandle.DataTable;
-            auto RowName = RangedDef->WeaponStatHandle.RowName;
-
-            if (DataTable && RowName.ComparisonIndex) {
-                auto& RowMap = *(TMap<FName, FFortRangedWeaponStats*>*)(__int64(DataTable) + 0x30);
-
-                for (auto& Pair : RowMap) {
-                    FName CurrentRowName = Pair.Key();
-                    FFortRangedWeaponStats* PackageData = Pair.Value();
-
-                    if (CurrentRowName == RowName && PackageData) {
-                        return PackageData->ClipSize;
-                    }
-                }
-            }
-        }
-
-        return 0;
-    }
-
     std::vector<FFortItemEntry> PickLootDrops(FName TierGroupName, int recursive = 0)
     {
+        static auto Bars = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
+        static auto Wood = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/WoodItemData.WoodItemData");
+        static auto Metal = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
+        static auto Stone = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
+
+        static UFortWeaponRangedItemDefinition* FishingRod = StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Consumables/FloppingRabbit/WID_Athena_FloppingRabbit.WID_Athena_FloppingRabbit");
+        static UFortWeaponRangedItemDefinition* ProFishingRod = StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Consumables/FloppingRabbit/WID_Athena_FloppingRabbit_HighTier.WID_Athena_FloppingRabbit_HighTier");
+
+        static UFortWeaponRangedItemDefinition* OffRoadTires = StaticLoadObject<UFortWeaponRangedItemDefinition>("/ValetMods/Mods/TiresOffRoad/Thrown/ID_ValetMod_Tires_OffRoad_Thrown.ID_ValetMod_Tires_OffRoad_Thrown");
+        static UFortWeaponRangedItemDefinition* CowCatcher = StaticLoadObject<UFortWeaponRangedItemDefinition>("/CowCatcherMod/Mods/CowCatcher/ID_ValetMod_CowCatcher.ID_ValetMod_CowCatcher");
+
         std::vector<FFortItemEntry> LootDrops;
-        if (recursive >= 5)
-            return LootDrops;
-
-        static std::vector<UDataTable*> LTDTables;
-        static std::vector<UDataTable*> LPTables;
-        static bool First = false;
-
-        if (!First)
-        {
-            First = true;
-
-            auto GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
-
-            UDataTable* MainLTD = StaticLoadObject<UDataTable>(UKismetStringLibrary::Conv_NameToString(GameState->CurrentPlaylistInfo.BasePlaylist->LootTierData.ObjectID.AssetPathName).ToString());;
-            UDataTable* MainLP = StaticLoadObject<UDataTable>(UKismetStringLibrary::Conv_NameToString(GameState->CurrentPlaylistInfo.BasePlaylist->LootPackages.ObjectID.AssetPathName).ToString());
-            Log(MainLTD->GetFullName());
-            Log(MainLP->GetFullName());
-
-            if (!MainLTD)
-                MainLTD = UObject::FindObject<UDataTable>("AthenaLootTierData_Client");
-
-            if (!MainLP)
-                MainLP = UObject::FindObject<UDataTable>("AthenaLootPackages_Client");
-
-            LTDTables.push_back(MainLTD);
-            LPTables.push_back(MainLP);
-        }
-
-        std::vector<FFortLootTierData*> TierGroupLTDs;
-
-        for (int p = 0; p < LTDTables.size(); p++)
-        {
-            auto LTD = LTDTables[p];
-            auto& LTDRowMap = LTD->RowMap;
-
-            auto LTDRowMapNum = LTDRowMap.Elements.Num();
-
-            for (int i = 0; i < LTDRowMapNum; i++)
-            {
-                auto& CurrentLTD = LTDRowMap.Elements[i];
-                auto TierData = (FFortLootTierData*)CurrentLTD.Value();
-
-                if (TierGroupName == TierData->TierGroup && TierData->Weight != 0)
-                {
-                    TierGroupLTDs.push_back(TierData);
+        if (TierGroupName.ToString().contains("Ammo")) {
+            for (int i = 0; i < 2; i++) {
+                LootDrops.push_back(PossibleLoot::GetRandomAmmo());
+            }
+            if (TierGroupName.ToString().contains("Large")) {
+                LootDrops.push_back(PossibleLoot::GetRandomAmmo());
+                LootDrops.push_back(PossibleLoot::GetRandomUtility());
+                if (UKismetMathLibrary::RandomBool()) {
+                    LootDrops.push_back(PossibleLoot::GetRandomTrap());
                 }
             }
         }
-
-        FFortLootTierData* ChosenRowLootTierData = GetLootTierData(TierGroupLTDs);
-        if (!ChosenRowLootTierData)
-            return LootDrops;
-
-        int MinimumLootDrops = 0;
-        float NumLootPackageDrops = std::floor(ChosenRowLootTierData->NumLootPackageDrops);
-
-        std::vector<FFortLootPackageData*> TierGroupLPs;
-
-        for (int p = 0; p < LPTables.size(); p++)
-        {
-            auto LP = LPTables[p];
-            if (!LP)
-                continue;
-            auto& LPRowMap = LP->RowMap;
-
-            for (int i = 0; i < LPRowMap.Elements.Num(); i++)
-            {
-                auto& CurrentLP = LPRowMap.Elements[i];
-                auto LootPackage = (FFortLootPackageData*)CurrentLP.Value();
-
-                if (!LootPackage)
-                    continue;
-
-                auto* ItemDef = LootPackage->ItemDefinition.Get();
-                bool bIsWeapon = ItemDef && ItemDef->IsA(UFortWeaponItemDefinition::StaticClass());
-
-                if (LootPackage->LootPackageID == ChosenRowLootTierData->LootPackage && (LootPackage->Weight > 0 || bIsWeapon))
-                {
-                    TierGroupLPs.push_back(LootPackage);
-                }
-            }
-        }
-
-        auto ChosenLootPackageName = ChosenRowLootTierData->LootPackage.ToString();
-        bool bIsWorldList = ChosenLootPackageName.contains("WorldList");
-
-        LootDrops.reserve(NumLootPackageDrops);
-
-        for (float i = 0; i < NumLootPackageDrops; i++)
-        {
-            if (i >= TierGroupLPs.size())
-                break;
-
-            auto TierGroupLP = TierGroupLPs.at(i);
-            auto TierGroupLPStr = TierGroupLP->LootPackageCall.ToString();
-
-            if (TierGroupLPStr.contains(".Empty"))
-            {
-                NumLootPackageDrops++;
-                continue;
+        else if (TierGroupName.ToString().contains("AthenaTreasure")) {
+            int TimesToLoop = 1;
+            if (TierGroupName.ToString().contains("IO")) {
+                TimesToLoop = 2;
             }
 
-            std::vector<FFortLootPackageData*> lootPackageCalls;
-
-            if (bIsWorldList)
-            {
-                for (int j = 0; j < TierGroupLPs.size(); j++)
+            for (int i = 0; i < TimesToLoop; i++) {
                 {
-                    auto& CurrentLP = TierGroupLPs.at(j);
-                    auto* ItemDef = CurrentLP->ItemDefinition.Get();
-                    bool bIsWeapon = ItemDef && ItemDef->IsA(UFortWeaponItemDefinition::StaticClass());
+                    FFortItemEntry Weapon = PossibleLoot::GetRandomWeapon();
+                    if (Weapon.ItemDefinition) {
+                        LootDrops.push_back(Weapon);
 
-                    if (CurrentLP->Weight > 0 || bIsWeapon)
-                        lootPackageCalls.push_back(CurrentLP);
-                }
-            }
-            else
-            {
-                for (int p = 0; p < LPTables.size(); p++)
-                {
-                    auto LPRowMap = LPTables[p]->RowMap;
+                        UFortAmmoItemDefinition* Ammo = (UFortAmmoItemDefinition*)((UFortWeaponRangedItemDefinition*)Weapon.ItemDefinition)->GetAmmoWorldItemDefinition_BP();
+                        if (Ammo) {
+                            FFortItemEntry ItemEntry{};
+                            ItemEntry.ItemDefinition = Ammo;
+                            ItemEntry.LoadedAmmo = 0;
+                            ItemEntry.Count = Ammo->DropCount;
 
-                    for (int j = 0; j < LPRowMap.Elements.Num(); j++)
-                    {
-                        auto& CurrentLP = LPRowMap.Elements[j];
-                        auto LootPackage = (FFortLootPackageData*)CurrentLP.Value();
-                        auto* ItemDef = LootPackage->ItemDefinition.Get();
-                        bool bIsWeapon = ItemDef && ItemDef->IsA(UFortWeaponItemDefinition::StaticClass());
-
-                        if (LootPackage->LootPackageID.ToString() == TierGroupLPStr && (LootPackage->Weight > 0 || bIsWeapon))
-                        {
-                            lootPackageCalls.push_back(LootPackage);
+                            LootDrops.push_back(ItemEntry);
                         }
                     }
                 }
+
+                if (UKismetMathLibrary::RandomBool()) {
+                    if (UKismetMathLibrary::RandomBool()) {
+                        LootDrops.push_back(PossibleLoot::GetRandomUtility());
+                    }
+                    else {
+                        LootDrops.push_back(PossibleLoot::GetRandomTrap());
+                    }
+                }
+                if (UKismetMathLibrary::RandomBool()) {
+                    LootDrops.push_back(PossibleLoot::GetRandomAmmo());
+                }
+
+                {
+                    UFortItemDefinition* Mats = (rand() % 40 > 20) ? ((rand() % 20 > 10) ? Wood : Stone) : Metal;
+
+                    FFortItemEntry ItemEntry{};
+                    ItemEntry.ItemDefinition = Mats;
+                    ItemEntry.LoadedAmmo = 0;
+                    ItemEntry.Count = 30;
+
+                    LootDrops.push_back(ItemEntry);
+                }
             }
 
-            if (lootPackageCalls.empty())
             {
-                NumLootPackageDrops++;
-                continue;
+                FFortItemEntry ItemEntry{};
+                ItemEntry.ItemDefinition = Bars;
+                ItemEntry.LoadedAmmo = 0;
+                ItemEntry.Count = UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(1, 30);
+
+                LootDrops.push_back(ItemEntry);
             }
+        }
+        else if (TierGroupName.ToString().contains("RodBox")) {
+            if (UKismetMathLibrary::RandomBool()) {
+                FFortItemEntry ItemEntry{};
+                ItemEntry.ItemDefinition = FishingRod;
+                ItemEntry.LoadedAmmo = 0;
+                ItemEntry.Count = 1;
 
-            FFortLootPackageData* LootPackageCall = GetLootPackage(lootPackageCalls);
-            if (!LootPackageCall)
-                continue;
+                LootDrops.push_back(ItemEntry);
+            }
+            else {
+                FFortItemEntry ItemEntry{};
+                ItemEntry.ItemDefinition = ProFishingRod;
+                ItemEntry.LoadedAmmo = 0;
+                ItemEntry.Count = 1;
 
-            auto ItemDef = LootPackageCall->ItemDefinition.Get();
-            if (!ItemDef)
-                continue;
+                LootDrops.push_back(ItemEntry);
+            }
+        }
+        else if (TierGroupName.ToString().contains("CoolerBox")) {
+            LootDrops.push_back(PossibleLoot::GetRandomEnvironmental());
 
-            FFortItemEntry LootDropEntry{};
-            LootDropEntry.ItemDefinition = ItemDef;
-            LootDropEntry.LoadedAmmo = GetClipSize(Cast<UFortWeaponItemDefinition>(ItemDef));
-            LootDropEntry.Count = LootPackageCall->Count;
+            if (UKismetMathLibrary::RandomBool()) {
+                FFortItemEntry ItemEntry{};
+                ItemEntry.ItemDefinition = CowCatcher;
+                ItemEntry.LoadedAmmo = 0;
+                ItemEntry.Count = 1;
 
-            LootDrops.push_back(LootDropEntry);
+                LootDrops.push_back(ItemEntry);
+            }
+            else {
+                FFortItemEntry ItemEntry{};
+                ItemEntry.ItemDefinition = OffRoadTires;
+                ItemEntry.LoadedAmmo = 0;
+                ItemEntry.Count = 1;
+
+                LootDrops.push_back(ItemEntry);
+            }
+        }
+        else if (TierGroupName.ToString().contains("FoodBox_Produce")) {
+            LootDrops.push_back(PossibleLoot::GetRandomEnvironmental());
+        }
+        else if (TierGroupName.ToString().contains("AthenaIceBox")) {
+            LootDrops.push_back(PossibleLoot::GetRandomEnvironmental());
+            LootDrops.push_back(PossibleLoot::GetRandomEnvironmental());
+        }
+        else if (TierGroupName.ToString().contains("AthenaWadStash")) {
+            FFortItemEntry ItemEntry{};
+            ItemEntry.ItemDefinition = Bars;
+            ItemEntry.LoadedAmmo = 0;
+            ItemEntry.Count = UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(1, 60);
+
+            LootDrops.push_back(ItemEntry);
+        }
+        else if (TierGroupName.ToString().contains("FloorLoot")) {
+            if (UKismetMathLibrary::RandomBool()) {
+                FFortItemEntry Weapon = PossibleLoot::GetRandomWeapon();
+                if (Weapon.ItemDefinition) {
+                    LootDrops.push_back(Weapon);
+
+                    UFortAmmoItemDefinition* Ammo = (UFortAmmoItemDefinition*)((UFortWeaponRangedItemDefinition*)Weapon.ItemDefinition)->GetAmmoWorldItemDefinition_BP();
+                    if (Ammo) {
+                        FFortItemEntry ItemEntry{};
+                        ItemEntry.ItemDefinition = Ammo;
+                        ItemEntry.LoadedAmmo = 0;
+                        ItemEntry.Count = Ammo->DropCount;
+
+                        LootDrops.push_back(ItemEntry);
+                    }
+                }
+            }
+            else {
+                if (UKismetMathLibrary::RandomBool()) {
+                    LootDrops.push_back(PossibleLoot::GetRandomAmmo());
+                }
+                else {
+                    if (UKismetMathLibrary::RandomBool()) {
+                        LootDrops.push_back(PossibleLoot::GetRandomUtility());
+                    }
+                    else {
+                        LootDrops.push_back(PossibleLoot::GetRandomTrap());
+                    }
+                }
+            }
+        }
+        else {
+            Log("TierGroupName: " + TierGroupName.ToString());
+
+            {
+                FFortItemEntry ItemEntry{};
+                ItemEntry.ItemDefinition = Bars;
+                ItemEntry.LoadedAmmo = 0;
+                ItemEntry.Count = UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(1, 30);
+
+                LootDrops.push_back(ItemEntry);
+            }
         }
 
         return LootDrops;
@@ -339,17 +277,8 @@ namespace Looting {
                 SpawnPickup(LootDrop.ItemDefinition, LootDrop.Count, LootDrop.LoadedAmmo, CorrectLocation, PickupSourceTypeFlags, SpawnSource);
             }
 
-            static auto Wood = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/WoodItemData.WoodItemData");
-            static auto Metal = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/MetalItemData.MetalItemData");
-            static auto Stone = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/StoneItemData.StoneItemData");
-
-            UFortItemDefinition* Mats = (rand() % 40 > 20) ? ((rand() % 20 > 10) ? Wood : Stone) : Metal;
-
-            SpawnPickup(Mats, 30, 0, CorrectLocation, PickupSourceTypeFlags, SpawnSource);
-
             return true;
         }
-
         else
         {
             auto LootDrops = PickLootDrops(SearchLootTierGroup);
@@ -361,27 +290,7 @@ namespace Looting {
                 if (LootDrop.Count > 0)
                 {
                     SpawnPickup(LootDrop.ItemDefinition, LootDrop.Count, LootDrop.LoadedAmmo, CorrectLocation, PickupSourceTypeFlags, SpawnSource);
-
-                    if (SearchLootTierGroup == Loot_AthenaFloorLoot || SearchLootTierGroup == Loot_AthenaFloorLoot_Warmup)
-                    {
-                        if (LootDrop.ItemDefinition->GetName() == "WID_Athena_HappyGhost")
-                        {
-                            return 0;
-                        }
-
-                        if (LootDrop.ItemDefinition->IsA(UFortWeaponRangedItemDefinition::StaticClass()))
-                        {
-                            auto* RangedDef = (UFortWeaponRangedItemDefinition*)LootDrop.ItemDefinition;
-                            auto* AmmoDef = (UFortAmmoItemDefinition*)RangedDef->GetAmmoWorldItemDefinition_BP();
-
-                            if (AmmoDef && LootDrop.ItemDefinition != AmmoDef && AmmoDef->DropCount > 0)
-                            {
-                                SpawnPickup(AmmoDef, AmmoDef->DropCount, 0, CorrectLocation, PickupSourceTypeFlags, SpawnSource);
-                            }
-                        }
-                    }
                 }
-
             }
         }
 

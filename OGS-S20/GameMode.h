@@ -281,7 +281,8 @@ namespace GameMode {
 		AFortPlayerStateAthena* PlayerState = (AFortPlayerStateAthena*)PC->PlayerState;
 		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
 
-		auto Transform = StartingLoc->GetTransform();
+		AActor* StartSpot = GameMode->FindPlayerStart(Player, L"");
+		auto Transform = StartSpot->GetTransform();
 		auto Pawn = GameMode->SpawnDefaultPawnAtTransform(Player, Transform);
 
 		Pawn->NetUpdateFrequency = 100.f;

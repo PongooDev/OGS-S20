@@ -14,6 +14,32 @@ namespace Inventory {
 		}
 	}
 
+	FFortItemEntry* FindItemEntryByGuid(AFortPlayerController* PC, FGuid Guid)
+	{
+		for (auto& Entry : PC->WorldInventory->Inventory.ReplicatedEntries)
+		{
+			if (CompareGuids(Entry.ItemGuid, Guid))
+			{
+				return &Entry;
+			}
+		}
+		return nullptr;
+	}
+
+	FFortItemEntry* FindItemEntryByDef(AFortPlayerController* PC, UFortItemDefinition* ItemDef)
+	{
+		if (!PC || !PC->WorldInventory || !ItemDef)
+			return nullptr;
+		for (int i = 0; i < PC->WorldInventory->Inventory.ReplicatedEntries.Num(); ++i)
+		{
+			if (PC->WorldInventory->Inventory.ReplicatedEntries[i].ItemDefinition == ItemDef)
+			{
+				return &PC->WorldInventory->Inventory.ReplicatedEntries[i];
+			}
+		}
+		return nullptr;
+	}
+
 	void Update(AFortPlayerController* PC, FFortItemEntry* ItemEntry = nullptr)
 	{
 		PC->HandleWorldInventoryLocalUpdate();
@@ -33,11 +59,6 @@ namespace Inventory {
 				if (Def == ItemEntry.ItemDefinition) {
 					ItemEntry.Count += Count;
 
-					FFortItemEntryStateValue Value{};
-					Value.IntValue = true;
-					Value.StateType = EFortItemEntryState::ShouldShowItemToast;
-					ItemEntry.StateValues.Add(Value);
-
 					PC->WorldInventory->Inventory.MarkItemDirty(ItemEntry);
 					Update(PC);
 					break;
@@ -45,15 +66,18 @@ namespace Inventory {
 			}
 			return;
 		}
+
 		UFortWorldItem* Item = Cast<UFortWorldItem>(Def->CreateTemporaryItemInstanceBP(Count, 0));
 		Item->SetOwningControllerForTemporaryItem(PC);
 		Item->OwnerInventory = PC->WorldInventory;
 		Item->ItemEntry.LoadedAmmo = LoadedAmmo;
 
-		FFortItemEntryStateValue Value{};
-		Value.IntValue = true;
-		Value.StateType = EFortItemEntryState::ShouldShowItemToast;
-		Item->ItemEntry.StateValues.Add(Value);
+		if (Item && Item->ItemEntry.ItemDefinition) {
+			FFortItemEntryStateValue Value{};
+			Value.IntValue = true;
+			Value.StateType = EFortItemEntryState::ShouldShowItemToast;
+			Item->ItemEntry.StateValues.Add(Value);
+		}
 
 		PC->WorldInventory->Inventory.ReplicatedEntries.Add(Item->ItemEntry);
 		PC->WorldInventory->Inventory.ItemInstances.Add(Item);
@@ -108,32 +132,6 @@ namespace Inventory {
 			}
 		}
 		Update(PC);
-	}
-
-	FFortItemEntry* FindItemEntryByGuid(AFortPlayerController* PC, FGuid Guid)
-	{
-		for (auto& Entry : PC->WorldInventory->Inventory.ReplicatedEntries)
-		{
-			if (CompareGuids(Entry.ItemGuid, Guid))
-			{
-				return &Entry;
-			}
-		}
-		return nullptr;
-	}
-
-	FFortItemEntry* FindItemEntryByDef(AFortPlayerController* PC, UFortItemDefinition* ItemDef)
-	{
-		if (!PC || !PC->WorldInventory || !ItemDef)
-			return nullptr;
-		for (int i = 0; i < PC->WorldInventory->Inventory.ReplicatedEntries.Num(); ++i)
-		{
-			if (PC->WorldInventory->Inventory.ReplicatedEntries[i].ItemDefinition == ItemDef)
-			{
-				return &PC->WorldInventory->Inventory.ReplicatedEntries[i];
-			}
-		}
-		return nullptr;
 	}
 
 	UFortWorldItem* FindItemInstanceByDef(AFortInventory* inv, UFortItemDefinition* ItemDefinition)

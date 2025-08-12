@@ -271,6 +271,17 @@ namespace Controller {
 			PC->MyFortPawn->EquipWeaponDefinition(Gadget->GetWeaponItemDefinition(), ItemEntry->ItemGuid, ItemEntry->TrackerGuid, false);
 			return;
 		}
+		else if (ItemEntry->ItemDefinition->IsA(UFortDecoItemDefinition::StaticClass())) {
+			auto DecoItemDefinition = (UFortDecoItemDefinition*)ItemEntry->ItemDefinition;
+			PC->MyFortPawn->PickUpActor(nullptr, DecoItemDefinition);
+			PC->MyFortPawn->CurrentWeapon->ItemEntryGuid = Guid;
+			static auto FortDecoTool_ContextTrapStaticClass = StaticLoadObject<UClass>("/Script/FortniteGame.FortDecoTool_ContextTrap");
+			if (PC->MyFortPawn->CurrentWeapon->IsA(FortDecoTool_ContextTrapStaticClass))
+			{
+				reinterpret_cast<AFortDecoTool_ContextTrap*>(PC->MyFortPawn->CurrentWeapon)->ContextTrapItemDefinition = (UFortContextTrapItemDefinition*)ItemEntry->ItemDefinition;
+			}
+			return;
+		}
 
 		PC->MyFortPawn->EquipWeaponDefinition((UFortWeaponItemDefinition*)ItemEntry->ItemDefinition, ItemEntry->ItemGuid, ItemEntry->TrackerGuid, false);
 		return;

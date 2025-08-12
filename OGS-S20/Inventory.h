@@ -32,6 +32,12 @@ namespace Inventory {
 			for (FFortItemEntry& ItemEntry : PC->WorldInventory->Inventory.ReplicatedEntries) {
 				if (Def == ItemEntry.ItemDefinition) {
 					ItemEntry.Count += Count;
+
+					FFortItemEntryStateValue Value{};
+					Value.IntValue = true;
+					Value.StateType = EFortItemEntryState::ShouldShowItemToast;
+					ItemEntry.StateValues.Add(Value);
+
 					PC->WorldInventory->Inventory.MarkItemDirty(ItemEntry);
 					Update(PC);
 					break;
@@ -43,6 +49,11 @@ namespace Inventory {
 		Item->SetOwningControllerForTemporaryItem(PC);
 		Item->OwnerInventory = PC->WorldInventory;
 		Item->ItemEntry.LoadedAmmo = LoadedAmmo;
+
+		FFortItemEntryStateValue Value{};
+		Value.IntValue = true;
+		Value.StateType = EFortItemEntryState::ShouldShowItemToast;
+		Item->ItemEntry.StateValues.Add(Value);
 
 		PC->WorldInventory->Inventory.ReplicatedEntries.Add(Item->ItemEntry);
 		PC->WorldInventory->Inventory.ItemInstances.Add(Item);

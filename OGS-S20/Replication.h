@@ -494,6 +494,11 @@ namespace Replication {
 
 		TArray<AActor*> ActorsToRemove;
 
+		if (GetNetworkObjectList(Driver).ActiveNetworkObjects.Num() == 0) {
+			Log("The fuck?!");
+			return;
+		}
+
 		for (const TSharedPtr<FNetworkObjectInfo>& ObjectInfo : GetNetworkObjectList(Driver).ActiveNetworkObjects)
 		{
 			FNetworkObjectInfo* ActorInfo = ObjectInfo.Get();

@@ -443,10 +443,6 @@ namespace Controller {
 		DeathInfo.Distance = (KillerPawn ? KillerPawn->GetDistanceTo(PC->Pawn) : ((AFortPlayerPawnAthena*)PC->Pawn)->LastFallDistance);
 		DeathInfo.Downer = KillerState;
 		PlayerState->DeathInfo.FinisherOrDowner = DeathReport.KillerPlayerState ? DeathReport.KillerPlayerState : PC->PlayerState;
-
-		// Dont think these tags are correct whatsoever but whatever
-		DeathInfo.FinisherOrDownerTags = DeathReport.Tags;
-		DeathInfo.VictimTags = DeathReport.Tags;
 		PlayerState->OnRep_DeathInfo();
 		RemoveFromAlivePlayers(GameMode, PC, PlayerState, KillerPawn, DeathReport.KillerWeapon, (uint8)PlayerState->DeathInfo.DeathCause, 0);
 		PC->bMarkedAlive = false;

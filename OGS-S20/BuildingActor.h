@@ -15,6 +15,7 @@ namespace BuildingActor {
 		if (!PC->Pawn) {
 			return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 		}
+		AFortPlayerPawnAthena* Pawn = (AFortPlayerPawnAthena*)PC->Pawn;
 
 		int MaterialCount = (Damage / (UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(4, 8)));
 
@@ -24,32 +25,9 @@ namespace BuildingActor {
 		if (!ResourceItemDefinition) {
 			return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 		}
-		FFortItemEntry* ItemEntry = Inventory::FindItemEntryByDef(PC, ResourceItemDefinition);
-		if (!ItemEntry) {
-			Inventory::GiveItem(PC, ResourceItemDefinition, MaterialCount, 0);
-		}
-		else {
-			int MaxStackSize = Inventory::GetMaxStack(ItemEntry->ItemDefinition);
-			int Count = ItemEntry->Count;
 
-			if (Count >= MaxStackSize)
-			{
-				SpawnPickup(ItemEntry->ItemDefinition, MaterialCount, ItemEntry->LoadedAmmo, PC->MyFortPawn->K2_GetActorLocation(), EFortPickupSourceTypeFlag::Player, EFortPickupSpawnSource::Unset, true, PC->MyFortPawn);
-			}
-			else
-			{
-				int Space = MaxStackSize - Count;
-				int AddToStack = UKismetMathLibrary::GetDefaultObj()->Min(Space, MaterialCount);
-				int LeftOver = MaterialCount - AddToStack;
-
-				Inventory::GiveItem(PC, ResourceItemDefinition, AddToStack, 0, true);
-
-				// Doesent work (low priority issue)
-				if (LeftOver > 0) {
-					SpawnPickup(ItemEntry->ItemDefinition, LeftOver, ItemEntry->LoadedAmmo, PC->K2_GetActorLocation(), EFortPickupSourceTypeFlag::Player, EFortPickupSpawnSource::Unset, true, PC->MyFortPawn);
-				}
-			}
-		}
+		AFortPickup* Pickup = SpawnPickup(ResourceItemDefinition, MaterialCount, 0, PC->K2_GetActorLocation(), EFortPickupSourceTypeFlag::Player, EFortPickupSpawnSource::Unset, true, PC->MyFortPawn);
+		Pawn->ServerHandlePickup(Pickup, 0.3f, FVector(), false);
 
 		return OnDamageServerOG(This, Damage, DamageTags, Momentum, HitInfo, InstigatedBy, DamageCauser, EffectContext);
 	}

@@ -414,37 +414,6 @@ namespace Replication {
 			}
 		}
 
-		/*for (auto& Conn : Driver->ClientConnections)
-		{
-			if (!Conn || !Conn->Driver) continue;
-
-			auto Owner = Conn->OwningActor;
-			if (Owner && GetElapsedTime(Conn->Driver) - Conn->LastReceiveTime < 1.5)
-			{
-				auto OutViewTarget = Owner;
-				if (auto Controller = Conn->PlayerController)
-					if (auto ViewTarget = GetViewTarget(Controller))
-						OutViewTarget = ViewTarget;
-
-				Conn->ViewTarget = OutViewTarget;
-
-				for (auto& Child : Conn->Children)
-				{
-					if (Child && Child->PlayerController)
-						Child->ViewTarget = GetViewTarget(Child->PlayerController);
-					else if (Child)
-						Child->ViewTarget = nullptr;
-				}
-			}
-			else
-			{
-				if (Conn) Conn->ViewTarget = nullptr;
-				for (auto& Child : Conn->Children)
-					if (Child)
-						Child->ViewTarget = nullptr;
-			}
-		}*/
-
 		return bFoundReadyConnection ? NumClientsToTick : 0;
 	}
 
@@ -576,7 +545,10 @@ namespace Replication {
 
 				const float NextUpdateDelta = ActorInfo->OptimalNetUpdateDelta;
 
-				float RandDelay = 0.0f;
+				float RandDelay = UKismetMathLibrary::RandomFloatInRange(0.3, 1.0);
+				if (Actor->IsA(AController::StaticClass())) {
+					RandDelay = UKismetMathLibrary::RandomFloatInRange(0.1, 0.3);
+				}
 
 				ActorInfo->NextUpdateTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + RandDelay + NextUpdateDelta;
 
@@ -888,6 +860,7 @@ namespace Replication {
 			else {
 				Log("NetDriver World does not exist!");
 			}
+			return 0;
 		}
 
 		/*if (Driver->ClientConnections.Num() == 0)
@@ -896,6 +869,16 @@ namespace Replication {
 		}*/
 
 		GetReplicationFrame(Driver)++;
+
+		static float NextReplicationTime = 0.f;
+		float CurrentTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
+
+		if (CurrentTime >= NextReplicationTime) {
+			NextReplicationTime = CurrentTime + UKismetMathLibrary::RandomFloatInRange(0.f, 0.1f);
+		}
+		else {
+			return 0;
+		}
 
 		int32 Updated = 0;
 
@@ -907,7 +890,6 @@ namespace Replication {
 		bool bCPUSaturated = false;
 		float ServerTickTime = Globals::MaxTickRate;
 		ServerTickTime = 1.f / ServerTickTime;
-		bCPUSaturated = DeltaTime > 1.2f * ServerTickTime;
 
 		TArray<FNetworkObjectInfo*> ConsiderList;
 		ConsiderList.Reserve(GetNetworkObjectList(Driver).ActiveNetworkObjects.Num());
@@ -952,7 +934,9 @@ namespace Replication {
 
 				if (Channel) {
 					//Log("Actor: " + Actor->GetName());
-					ReplicateActorIfReady(Driver, Conn, Channel, ActorInfo);
+					if (ReplicateActorIfReady(Driver, Conn, Channel, ActorInfo)) {
+						Updated++;
+					}
 					Actor->ForceNetUpdate();
 				}
 			}

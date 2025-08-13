@@ -496,3 +496,8 @@ TArray<T*> GetAllActorsOfClass() {
 	}
 	return ResultActors;
 }
+
+static float RandomFloatRange(float Min, float Max)
+{
+	return Min + static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (Max - Min);
+}

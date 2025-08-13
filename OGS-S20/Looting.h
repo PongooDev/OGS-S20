@@ -71,15 +71,23 @@ namespace Looting {
                 }
             }
         }
-        else if (TierGroupName.ToString().contains("AthenaTreasure")) {
+        else if (TierGroupName.ToString().contains("AthenaTreasure") || TierGroupName.ToString().contains("FactionChest")) {
             int TimesToLoop = 1;
-            if (TierGroupName.ToString().contains("IO")) {
+            if (TierGroupName.ToString().contains("IO") || TierGroupName.ToString().contains("FactionChest")) {
                 TimesToLoop = 2;
             }
 
             for (int i = 0; i < TimesToLoop; i++) {
                 {
-                    FFortItemEntry Weapon = PossibleLoot::GetRandomWeapon();
+                    FFortItemEntry Weapon;
+
+                    if (TierGroupName.ToString().contains("IO")) {
+                        Weapon = PossibleLoot::GetRandomWeapon(EFortRarity::Rare);
+                    }
+                    else {
+                        Weapon = PossibleLoot::GetRandomWeapon(EFortRarity::Uncommon);
+                    }
+
                     if (Weapon.ItemDefinition) {
                         LootDrops.push_back(Weapon);
 
@@ -87,7 +95,7 @@ namespace Looting {
                         if (Ammo) {
                             FFortItemEntry ItemEntry{};
                             ItemEntry.ItemDefinition = Ammo;
-                            ItemEntry.LoadedAmmo = 0;
+                            ItemEntry.LoadedAmmo = PossibleLoot::GetClipSize(ItemEntry.ItemDefinition);
                             ItemEntry.Count = Ammo->DropCount;
 
                             LootDrops.push_back(ItemEntry);
@@ -103,29 +111,26 @@ namespace Looting {
                         LootDrops.push_back(PossibleLoot::GetRandomTrap());
                     }
                 }
-                if (UKismetMathLibrary::RandomBool()) {
-                    LootDrops.push_back(PossibleLoot::GetRandomAmmo());
-                }
 
+                UFortItemDefinition* Mats = (rand() % 40 > 20) ? ((rand() % 20 > 10) ? Wood : Stone) : Metal;
+
+                FFortItemEntry ItemEntry{};
+                ItemEntry.ItemDefinition = Mats;
+                ItemEntry.LoadedAmmo = 0;
+                ItemEntry.Count = 30;
+
+                LootDrops.push_back(ItemEntry);
+
+                if (Bars)
                 {
-                    UFortItemDefinition* Mats = (rand() % 40 > 20) ? ((rand() % 20 > 10) ? Wood : Stone) : Metal;
-
                     FFortItemEntry ItemEntry{};
-                    ItemEntry.ItemDefinition = Mats;
+                    ItemEntry.ItemDefinition = Bars;
                     ItemEntry.LoadedAmmo = 0;
-                    ItemEntry.Count = 30;
+                    ItemEntry.Count = UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(1, 30);
 
                     LootDrops.push_back(ItemEntry);
                 }
-            }
 
-            {
-                FFortItemEntry ItemEntry{};
-                ItemEntry.ItemDefinition = Bars;
-                ItemEntry.LoadedAmmo = 0;
-                ItemEntry.Count = UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(1, 30);
-
-                LootDrops.push_back(ItemEntry);
             }
         }
         else if (TierGroupName.ToString().contains("RodBox")) {
@@ -181,37 +186,64 @@ namespace Looting {
 
             LootDrops.push_back(ItemEntry);
         }
-        else if (TierGroupName.ToString().contains("FloorLoot")) {
-            if (UKismetMathLibrary::RandomBool()) {
-                FFortItemEntry Weapon = PossibleLoot::GetRandomWeapon();
-                if (Weapon.ItemDefinition) {
-                    LootDrops.push_back(Weapon);
+        else if (TierGroupName.ToString().contains("FloorLoot") && !TierGroupName.ToString().contains("FloorLoot_Warmup")) {
+            float Chance = UKismetMathLibrary::RandomFloat();
 
-                    UFortAmmoItemDefinition* Ammo = (UFortAmmoItemDefinition*)((UFortWeaponRangedItemDefinition*)Weapon.ItemDefinition)->GetAmmoWorldItemDefinition_BP();
-                    if (Ammo) {
-                        FFortItemEntry ItemEntry{};
-                        ItemEntry.ItemDefinition = Ammo;
-                        ItemEntry.LoadedAmmo = 0;
-                        ItemEntry.Count = Ammo->DropCount;
+            if (Chance <= 0.7f) 
+            { 
+                FFortItemEntry Weapon = PossibleLoot::GetRandomWeapon(EFortRarity::Common, EFortRarity::Rare);
+                LootDrops.push_back(Weapon);
 
-                        LootDrops.push_back(ItemEntry);
-                    }
+                UFortAmmoItemDefinition* Ammo = (UFortAmmoItemDefinition*)((UFortWeaponRangedItemDefinition*)Weapon.ItemDefinition)->GetAmmoWorldItemDefinition_BP();
+                if (Ammo) {
+                    FFortItemEntry ItemEntry{};
+                    ItemEntry.ItemDefinition = Ammo;
+                    ItemEntry.LoadedAmmo = PossibleLoot::GetClipSize(ItemEntry.ItemDefinition);
+                    ItemEntry.Count = Ammo->DropCount;
+
+                    LootDrops.push_back(ItemEntry);
                 }
             }
-            else {
-                if (UKismetMathLibrary::RandomBool()) {
+            else 
+            { 
+                float SubChance = UKismetMathLibrary::RandomFloat(); 
+                if (SubChance <= 0.33f) {
                     LootDrops.push_back(PossibleLoot::GetRandomAmmo());
                 }
+                else if (SubChance <= 0.66f) {
+                    LootDrops.push_back(PossibleLoot::GetRandomUtility());
+                }
                 else {
-                    if (UKismetMathLibrary::RandomBool()) {
-                        LootDrops.push_back(PossibleLoot::GetRandomUtility());
-                    }
-                    else {
-                        LootDrops.push_back(PossibleLoot::GetRandomTrap());
-                    }
+                    LootDrops.push_back(PossibleLoot::GetRandomTrap());
                 }
             }
         }
+        else if (TierGroupName.ToString().contains("FloorLoot_Warmup")) 
+        {
+            float Chance = UKismetMathLibrary::RandomFloat();
+
+            if (Chance <= 0.7f)
+            {
+                FFortItemEntry Weapon = PossibleLoot::GetRandomWeapon(EFortRarity::Common, EFortRarity::Rare);
+                LootDrops.push_back(Weapon);
+
+                UFortAmmoItemDefinition* Ammo = (UFortAmmoItemDefinition*)((UFortWeaponRangedItemDefinition*)Weapon.ItemDefinition)->GetAmmoWorldItemDefinition_BP();
+                if (Ammo) {
+                    FFortItemEntry ItemEntry{};
+                    ItemEntry.ItemDefinition = Ammo;
+                    ItemEntry.LoadedAmmo = PossibleLoot::GetClipSize(ItemEntry.ItemDefinition);
+                    ItemEntry.Count = Ammo->DropCount;
+
+                    LootDrops.push_back(ItemEntry);
+                }
+            }
+            else
+            {
+               LootDrops.push_back(PossibleLoot::GetRandomAmmo());  
+            }
+            
+        }
+
         else {
             Log("TierGroupName: " + TierGroupName.ToString());
 
@@ -227,6 +259,7 @@ namespace Looting {
 
         return LootDrops;
     }
+
 
     bool SpawnLoot(ABuildingContainer* BuildingContainer) {
         std::string ClassName = BuildingContainer->Class->GetName();

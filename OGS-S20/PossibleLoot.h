@@ -280,29 +280,37 @@ namespace PossibleLoot {
         return Ammo;
     }
 
-    LootItemInfo GetRandomItemByProbability(TArray<LootItemInfo>& Items) {
-        int32 TotalWeight = 0;
-        for (int32 i = 0; i < Items.Num(); i++) {
-            TotalWeight += Items[i].Probability;
+    LootItemInfo GetRandomItemByProbability(const TArray<LootItemInfo>& Items)
+    {
+        float TotalWeight = 0.0f;
+        for (auto& Item : Items)
+            TotalWeight += Item.Probability;
+
+        float Rand = RandomFloatRange(0.0f, TotalWeight);
+        float Accumulated = 0.0f;
+
+        for (auto& Item : Items)
+        {
+            Accumulated += Item.Probability;
+            if (Rand <= Accumulated)
+                return Item;
         }
 
-        int32 RandomWeight = std::rand() % TotalWeight;
-        int32 CumulativeWeight = 0;
+        return LootItemInfo{};
+    }
 
-        for (int32 i = 0; i < Items.Num(); i++) {
-            CumulativeWeight += Items[i].Probability;
-            if (RandomWeight < CumulativeWeight) {
-                return Items[i];
+    FFortItemEntry GetRandomWeapon(EFortRarity MinRarity = EFortRarity::Common, EFortRarity MaxRarity = EFortRarity::Legendary) {
+        TArray<LootItemInfo> Items = Weapons();
+
+        TArray<LootItemInfo> FilteredItems;
+        for (auto& Item : Items) {
+            int Rarity = static_cast<int>(Item.ItemDefinition->Rarity);
+            if (Rarity >= static_cast<int>(MinRarity) && Rarity <= static_cast<int>(MaxRarity)) {
+                FilteredItems.Add(Item);
             }
         }
 
-        return LootItemInfo();
-    }
-
-	FFortItemEntry GetRandomWeapon() {
-        TArray<LootItemInfo> Items = Weapons();
-
-        LootItemInfo PickedItem = GetRandomItemByProbability(Items);
+        LootItemInfo PickedItem = GetRandomItemByProbability(FilteredItems);
 
         FFortItemEntry ItemEntry{};
         ItemEntry.ItemDefinition = PickedItem.ItemDefinition;
@@ -310,7 +318,7 @@ namespace PossibleLoot {
         ItemEntry.Count = 1;
 
         return ItemEntry;
-	}
+    }
 
     FFortItemEntry GetRandomUtility() {
         TArray<ResourceInfo> Items = Utility();
@@ -361,5 +369,27 @@ namespace PossibleLoot {
         ItemEntry.Count = AmmoItem.Quantity;
 
         return ItemEntry;
+    }
+
+    int GetClipSize(UFortItemDefinition* ItemDef) {
+        if (auto RangedDef = Cast<UFortWeaponRangedItemDefinition>(ItemDef)) {
+            auto DataTable = RangedDef->WeaponStatHandle.DataTable;
+            auto RowName = RangedDef->WeaponStatHandle.RowName;
+
+            if (DataTable && RowName.ComparisonIndex) {
+                auto& RowMap = *(TMap<FName, FFortRangedWeaponStats*>*)(__int64(DataTable) + 0x30);
+
+                for (auto& Pair : RowMap) {
+                    FName CurrentRowName = Pair.Key();
+                    FFortRangedWeaponStats* PackageData = Pair.Value();
+
+                    if (CurrentRowName == RowName && PackageData) {
+                        return PackageData->ClipSize;
+                    }
+                }
+            }
+        }
+
+        return 0;
     }
 }

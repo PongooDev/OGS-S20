@@ -87,9 +87,6 @@ namespace BotSpawner {
 			auto TheOrigin_List = ((UFortAthenaAIBotSpawnerData*)TheOrigin_SpawnerData)->CreateComponentListFromClass(TheOrigin_SpawnerData, UWorld::GetWorld());
 
 			Transform.Translation = Locs[rand() % (Locs.Num())];
-			Log("X: " + std::to_string(Transform.Translation.X));
-			Log("Y: " + std::to_string(Transform.Translation.Y));
-			Log("Z: " + std::to_string(Transform.Translation.Z));
 
 			int32 RequestID = ((UAthenaAISystem*)UWorld::GetWorld()->AISystem)->AISpawner->RequestSpawn(TheOrigin_List, Transform);
 			BotSpawnData.RequestID = RequestID;

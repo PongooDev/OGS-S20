@@ -93,6 +93,12 @@ namespace FortAthenaAIBotController {
 		PC->PathFollowingComponent->OnNavDataRegistered(PC->PathFollowingComponent->MyNavData);
 		PC->PathFollowingComponent->Activate(true);
 
+		if (!PC->BrainComponent || !PC->BrainComponent->IsA(UBrainComponent::StaticClass()))
+		{
+			PC->BrainComponent = (UBrainComponent*)UGameplayStatics::SpawnObject(UBrainComponent::StaticClass(), PC);
+			RegisterComponent(PC->BrainComponent, UWorld::GetWorld(), nullptr);
+		}
+
 		if (PC->BotIDSuffix.ToString() == "DEFAULT")
 		{
 			if (!PC->RunBehaviorTree(PC->BehaviorTree)) {
@@ -395,8 +401,8 @@ namespace FortAthenaAIBotController {
 		AmountTimesCalled++;
 	}
 
-	inline void (*InventoryBaseOnSpawnedOG)(UFortAthenaAISpawnerDataComponent_InventoryBase* a1, APawn* a2);
-	void InventoryBaseOnSpawned(UFortAthenaAISpawnerDataComponent_InventoryBase* a1, APawn* Pawn)
+	inline void (*InventoryBaseOnSpawnedOG)(UFortAthenaAISpawnerDataComponent_InventoryBase* InventoryBase, APawn* Pawn);
+	void InventoryBaseOnSpawned(UFortAthenaAISpawnerDataComponent_InventoryBase* InventoryBase, APawn* Pawn)
 	{
 		if (!Pawn || !Pawn->Controller)
 			return;
@@ -405,7 +411,7 @@ namespace FortAthenaAIBotController {
 		if (!PC->Inventory)
 			PC->Inventory = SpawnActor<AFortInventory>({}, {}, PC);
 
-		InventoryBaseOnSpawnedOG(a1, Pawn);
+		InventoryBaseOnSpawnedOG(InventoryBase, Pawn);
 	}
 
 	void (*OnPossessedPawnDiedOG)(AFortAthenaAIBotController* PC, AActor* DamagedActor, float Damage, AController* InstigatedBy, AActor* DamageCauser, FVector HitLocation, UPrimitiveComponent* HitComp, FName BoneName, FVector Momentum);
@@ -477,12 +483,14 @@ namespace FortAthenaAIBotController {
 
 		MH_CreateHook((LPVOID)(ImageBase + 0x631C04C), OnPawnAISpawned, (LPVOID*)&OnPawnAISpawnedOG);
 
-		MH_CreateHook((LPVOID)(ImageBase + 0x70A86B0), InventoryBaseOnSpawned, (LPVOID*)&InventoryBaseOnSpawnedOG);
+		MH_CreateHook((LPVOID)(ImageBase + 0x651A43C), InventoryBaseOnSpawned, (LPVOID*)&InventoryBaseOnSpawnedOG);
 
 		MH_CreateHook((LPVOID)(ImageBase + 0x631C8C8), OnPossessedPawnDied, (LPVOID*)&OnPossessedPawnDiedOG);
 
 		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogAthenaAIServiceBots VeryVerbose", nullptr);
 		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogAthenaBots VeryVerbose", nullptr);
+		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogNavigation VeryVerbose", nullptr);
+		UKismetSystemLibrary::ExecuteConsoleCommand(UWorld::GetWorld(), L"log LogNavigationDataBuild VeryVerbose", nullptr);
 
 		Log("Bots Hooked!");
 	}

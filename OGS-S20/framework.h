@@ -34,6 +34,7 @@ using namespace SDK;
 static auto ImageBase = InSDKUtils::GetImageBase();
 
 static void* (*GetWorldContextFromObject)(UEngine*, UWorld*) = decltype(GetWorldContextFromObject)(ImageBase + 0xF1D080);
+static void* (*RegisterComponent)(UActorComponent*, UWorld*, void*) = decltype(RegisterComponent)(ImageBase + 0x1037A60);
 
 static UNetDriver* (*CreateNetDriver)(UEngine*, void*, FName) = decltype(CreateNetDriver)(ImageBase + 0x17B0EA0);
 static bool (*InitListen)(void*, void*, FURL&, bool, FString&) = decltype(InitListen)(ImageBase + 0x567d81c);

@@ -594,15 +594,15 @@ namespace Controller {
 
 		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x23F, ServerAttemptInventoryDrop, nullptr);
 
-		HookVTable(AAthena_PlayerController_C::GetDefaultObj(), 0x254, ServerCreateBuildingActor, (LPVOID*)&ServerCreateBuildingActorOG);
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x254, ServerCreateBuildingActor, (LPVOID*)&ServerCreateBuildingActorOG);
 
-		HookVTable(AAthena_PlayerController_C::GetDefaultObj(), 0x25B, ServerBeginEditingBuildingActor, (LPVOID*)&ServerBeginEditingBuildingActorOG);
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x25B, ServerBeginEditingBuildingActor, (LPVOID*)&ServerBeginEditingBuildingActorOG);
 
-		HookVTable(AAthena_PlayerController_C::GetDefaultObj(), 0x259, ServerEndEditingBuildingActor, nullptr);
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x259, ServerEndEditingBuildingActor, nullptr);
 
-		HookVTable(AAthena_PlayerController_C::GetDefaultObj(), 0x256, ServerEditBuildingActor, nullptr);
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x256, ServerEditBuildingActor, nullptr);
 
-		HookVTable(AAthena_PlayerController_C::GetDefaultObj(), 0x250, ServerRepairBuildingActor, nullptr);
+		HookVTable(AFortPlayerControllerAthena::GetDefaultObj(), 0x250, ServerRepairBuildingActor, nullptr);
 
 		MH_CreateHook((LPVOID)(ImageBase + 0x73B8A4C), ClientOnPawnDied, (LPVOID*)&ClientOnPawnDiedOG);
 

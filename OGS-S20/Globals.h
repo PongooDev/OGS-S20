@@ -15,5 +15,5 @@ namespace Globals {
 
 	float MaxTickRate = 30.f;
 
-	int MinPlayersForEarlyStart = 50;
+	int MinPlayersForEarlyStart = 90;
 }

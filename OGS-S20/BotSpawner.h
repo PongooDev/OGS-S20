@@ -57,8 +57,12 @@ namespace BotSpawner {
 		Transform.Rotation = FQuat();
 		Transform.Scale3D = FVector{ 1,1,1 };
 
-		static auto PhoebeSpawnerData = StaticLoadObject<UClass>("/Game/Athena/AI/Phoebe/BP_AISpawnerData_Phoebe.BP_AISpawnerData_Phoebe_C");
-		auto ComponentList = UFortAthenaAIBotSpawnerData::CreateComponentListFromClass(PhoebeSpawnerData, UWorld::GetWorld());
+		static UClass* PhoebeSpawnerData;
+		static UFortAthenaAISpawnerDataComponentList* ComponentList;
+		if (!PhoebeSpawnerData) {
+			PhoebeSpawnerData = StaticLoadObject<UClass>("/Game/Athena/AI/Phoebe/BP_AISpawnerData_Phoebe.BP_AISpawnerData_Phoebe_C");
+			ComponentList = UFortAthenaAIBotSpawnerData::CreateComponentListFromClass(PhoebeSpawnerData, UWorld::GetWorld());
+		}
 
 		int32 RequestID = ((UAthenaAISystem*)UWorld::GetWorld()->AISystem)->AISpawner->RequestSpawn(ComponentList, Transform);
 		BotSpawnData.RequestID = RequestID;

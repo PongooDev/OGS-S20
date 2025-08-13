@@ -243,6 +243,25 @@ namespace FortAthenaAIBotController {
 			{
 				if (!Items.Item)
 					continue;
+				if (Items.Item->IsA(UFortWeaponMeleeItemDefinition::StaticClass()))
+				{
+					static UFortWeaponMeleeItemDefinition* PickDef = StaticLoadObject<UFortWeaponMeleeItemDefinition>("/Game/Athena/Items/Weapons/WID_Harvest_Pickaxe_Athena_C_T01.WID_Harvest_Pickaxe_Athena_C_T01");;
+					if (!Pickaxes.empty()) {
+						PickDef = Pickaxes[UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(0, Pickaxes.size() - 1)]->WeaponDefinition;
+					}
+					UFortWorldItem* Item = Cast<UFortWorldItem>(PickDef->CreateTemporaryItemInstanceBP(1, 0));
+					Item->OwnerInventory = PC->Inventory;
+					FFortItemEntry& Entry = Item->ItemEntry;
+					Entry.LoadedAmmo = 1;
+					PC->Inventory->Inventory.ReplicatedEntries.Add(Entry);
+					PC->Inventory->Inventory.ItemInstances.Add(Item);
+					PC->Inventory->Inventory.MarkItemDirty(Entry);
+					PC->Inventory->HandleInventoryLocalUpdate();
+
+					PC->PendingEquipWeapon = Item;
+					Pawn->EquipWeaponDefinition((UFortWeaponItemDefinition*)Entry.ItemDefinition, Entry.ItemGuid, Entry.TrackerGuid, false);
+					continue;
+				}
 				UFortWorldItem* Item = Cast<UFortWorldItem>(Items.Item->CreateTemporaryItemInstanceBP(Items.Count, 0));
 				Item->OwnerInventory = PC->Inventory;
 				FFortItemEntry& Entry = Item->ItemEntry;
@@ -251,11 +270,6 @@ namespace FortAthenaAIBotController {
 				PC->Inventory->Inventory.ItemInstances.Add(Item);
 				PC->Inventory->Inventory.MarkItemDirty(Entry);
 				PC->Inventory->HandleInventoryLocalUpdate();
-				if (auto WeaponDef = Cast<UFortWeaponMeleeItemDefinition>(Entry.ItemDefinition))
-				{
-					PC->PendingEquipWeapon = Item;
-					Pawn->EquipWeaponDefinition(WeaponDef, Entry.ItemGuid, Entry.TrackerGuid, false);
-				}
 			}
 
 			GameMode->AliveBots.Add(PC);
@@ -397,9 +411,17 @@ namespace FortAthenaAIBotController {
 	void (*OnPossessedPawnDiedOG)(AFortAthenaAIBotController* PC, AActor* DamagedActor, float Damage, AController* InstigatedBy, AActor* DamageCauser, FVector HitLocation, UPrimitiveComponent* HitComp, FName BoneName, FVector Momentum);
 	void OnPossessedPawnDied(AFortAthenaAIBotController* PC, AActor* DamagedActor, float Damage, AController* InstigatedBy, AActor* DamageCauser, FVector HitLocation, UPrimitiveComponent* HitComp, FName BoneName, FVector Momentum)
 	{
-		if (!PC) {
+		if (!PC || !PC->Pawn || !PC->PlayerState) {
 			return;
 		}
+		AFortGameModeAthena* GameMode = (AFortGameModeAthena*)UWorld::GetWorld()->AuthorityGameMode;
+		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
+
+		AFortPlayerPawnAthena* Pawn = (AFortPlayerPawnAthena*)PC->Pawn;
+		AFortPlayerStateAthena* PlayerState = (AFortPlayerStateAthena*)PC->PlayerState;
+
+		AFortPlayerStateAthena* KillerState = (AFortPlayerStateAthena*)InstigatedBy->PlayerState;
+
 		static auto Bars = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
 
 		for (int32 i = 0; i < PC->Inventory->Inventory.ReplicatedEntries.Num(); i++)
@@ -416,8 +438,31 @@ namespace FortAthenaAIBotController {
 			if (AmmoDef) {
 				SpawnPickup(AmmoDef, AmmoDef->DropCount, 0, PC->Pawn->K2_GetActorLocation(), EFortPickupSourceTypeFlag::Other, EFortPickupSpawnSource::BotElimination);
 			}
+		}
+		SpawnPickup(Bars, UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(10, 30), 0, PC->Pawn->K2_GetActorLocation(), EFortPickupSourceTypeFlag::Other, EFortPickupSpawnSource::BotElimination);
 
-			SpawnPickup(Bars, UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(10, 30), 0, PC->Pawn->K2_GetActorLocation(), EFortPickupSourceTypeFlag::Other, EFortPickupSpawnSource::BotElimination);
+		if (PC->BotIDSuffix.ToString() == "DEFAULT") {
+			FDeathInfo& DeathInfo = PlayerState->DeathInfo;
+
+			DeathInfo.bDBNO = Pawn->bWasDBNOOnDeath;
+			DeathInfo.DeathLocation = Pawn->K2_GetActorLocation();
+			DeathInfo.DeathTags = Pawn->DeathTags;
+			DeathInfo.Downer = KillerState ? KillerState : nullptr;
+			AFortPawn* KillerPawn = KillerState ? KillerState->GetCurrentPawn() : nullptr;
+			DeathInfo.Distance = (KillerPawn && Pawn) ? KillerPawn->GetDistanceTo(Pawn) : 0.f;
+			DeathInfo.FinisherOrDowner = KillerState ? KillerState : nullptr;
+			DeathInfo.DeathCause = PlayerState->ToDeathCause(DeathInfo.DeathTags, DeathInfo.bDBNO);
+			DeathInfo.bInitialized = true;
+			PlayerState->OnRep_DeathInfo();
+
+			for (int i = 0; i < GameMode->AliveBots.Num(); i++) {
+				AFortAthenaAIBotController* Controller = GameMode->AliveBots[i];
+				if (Controller == PC) {
+					GameMode->AliveBots.Remove(i);
+				}
+			}
+			GameState->PlayerBotsLeft--;
+			GameState->OnRep_PlayerBotsLeft();
 		}
 
 		return;

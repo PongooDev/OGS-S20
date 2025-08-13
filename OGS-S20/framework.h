@@ -416,20 +416,6 @@ FVector PickSupplyDropLocation(SDK::AFortAthenaMapInfo* MapInfo, SDK::FVector Ce
 	return SDK::FVector(0, 0, 0);
 }
 
-template <typename T = AActor>
-static TArray<T*> GetAll(UClass* Class)
-{
-	TArray<AActor*> ret;
-	UGameplayStatics::GetAllActorsOfClass(UWorld::Get(), Class, &ret);
-	return ret;
-}
-
-template <typename T = AActor>
-static TArray<T*> GetAll()
-{
-	return GetAll<T>(T::StaticClass());
-}
-
 template<typename T>
 inline std::vector<T*> GetAllObjectsOfClass(UClass* Class = T::StaticClass())
 {
@@ -491,4 +477,21 @@ static int32 EvaluateMinMaxPercent(FScalableFloat Min, FScalableFloat Max, int32
 	auto OutVal = (int)(AmmoSpawnMax - AmmoSpawnMin) == 0 ? 0 : Count * (rand() % (int)(AmmoSpawnMax - AmmoSpawnMin));
 	OutVal += Count * (100 - (int)AmmoSpawnMax) / 100;
 	return OutVal;
+}
+
+template <class T>
+TArray<T*> GetAllActorsOfClass() {
+	TArray<T*> ResultActors;
+
+	if (UWorld* World = UWorld::GetWorld()) {
+		TArray<AActor*> OutActors;
+		UGameplayStatics::GetAllActorsOfClass(World, T::StaticClass(), &OutActors);
+
+		for (AActor* Actor : OutActors) {
+			if (T* CastedActor = Cast<T>(Actor)) {
+				ResultActors.Add(CastedActor);
+			}
+		}
+	}
+	return ResultActors;
 }

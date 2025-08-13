@@ -2,5 +2,5 @@
 #include "framework.h"
 
 namespace NpcSpawnLocs {
-
+	
 }

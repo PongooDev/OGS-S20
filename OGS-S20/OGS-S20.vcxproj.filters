@@ -34,6 +34,12 @@
     <Filter Include="Resources\Phoebe">
       <UniqueIdentifier>{a6b2530a-40b6-4913-8ed0-073ced053bc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\BehaviorTree">
+      <UniqueIdentifier>{512eebad-5ae6-4b7d-9841-2ad5de4bd246}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\BehaviorTree\BehaviorTree">
+      <UniqueIdentifier>{7d7957ff-4c62-453f-8a53-4b70d5730dc9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -131,6 +137,21 @@
     </ClInclude>
     <ClInclude Include="PhoebeDisplayNames.h">
       <Filter>Resources\Phoebe</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviorTreeSystem.h">
+      <Filter>Resources\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviorTreeDecorators.h">
+      <Filter>Resources\BehaviorTree\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviorTreeEvaluators.h">
+      <Filter>Resources\BehaviorTree\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviorTreeServices.h">
+      <Filter>Resources\BehaviorTree\BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="BehaviorTreeTasks.h">
+      <Filter>Resources\BehaviorTree\BehaviorTree</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

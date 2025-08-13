@@ -545,9 +545,9 @@ namespace Replication {
 
 				const float NextUpdateDelta = ActorInfo->OptimalNetUpdateDelta;
 
-				float RandDelay = UKismetMathLibrary::RandomFloatInRange(0.3, 1.0);
+				float RandDelay = UKismetMathLibrary::RandomFloatInRange(0.2, 0.5);
 				if (Actor->IsA(AController::StaticClass())) {
-					RandDelay = UKismetMathLibrary::RandomFloatInRange(0.1, 0.3);
+					RandDelay = UKismetMathLibrary::RandomFloatInRange(0.01, 0.2);
 				}
 
 				ActorInfo->NextUpdateTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + RandDelay + NextUpdateDelta;
@@ -874,7 +874,7 @@ namespace Replication {
 		float CurrentTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
 
 		if (CurrentTime >= NextReplicationTime) {
-			NextReplicationTime = CurrentTime + UKismetMathLibrary::RandomFloatInRange(0.f, 0.1f);
+			NextReplicationTime = CurrentTime + UKismetMathLibrary::RandomFloatInRange(0.01, 0.1);
 		}
 		else {
 			return 0;

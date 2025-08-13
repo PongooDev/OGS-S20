@@ -72,12 +72,12 @@ namespace Inventory {
 		Item->OwnerInventory = PC->WorldInventory;
 		Item->ItemEntry.LoadedAmmo = LoadedAmmo;
 
-		if (Item && Item->ItemEntry.ItemDefinition) {
+		/*if (Item && Item->ItemEntry.ItemDefinition) {
 			FFortItemEntryStateValue Value{};
 			Value.IntValue = true;
 			Value.StateType = EFortItemEntryState::ShouldShowItemToast;
 			Item->ItemEntry.StateValues.Add(Value);
-		}
+		}*/
 
 		PC->WorldInventory->Inventory.ReplicatedEntries.Add(Item->ItemEntry);
 		PC->WorldInventory->Inventory.ItemInstances.Add(Item);

@@ -545,10 +545,7 @@ namespace Replication {
 
 				const float NextUpdateDelta = ActorInfo->OptimalNetUpdateDelta;
 
-				float RandDelay = UKismetMathLibrary::RandomFloatInRange(0.2, 0.5);
-				if (Actor->IsA(AController::StaticClass())) {
-					RandDelay = UKismetMathLibrary::RandomFloatInRange(0.01, 0.2);
-				}
+				float RandDelay = UKismetMathLibrary::RandomFloatInRange(0.01, 0.1);
 
 				ActorInfo->NextUpdateTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + RandDelay + NextUpdateDelta;
 

@@ -31,6 +31,9 @@
     <Filter Include="Resources\Looting">
       <UniqueIdentifier>{9d198127-aee7-4ece-bc0a-7a3cea9bcd68}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resources\Phoebe">
+      <UniqueIdentifier>{a6b2530a-40b6-4913-8ed0-073ced053bc4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -125,6 +128,9 @@
     </ClInclude>
     <ClInclude Include="PossibleLoot.h">
       <Filter>Resources\Looting</Filter>
+    </ClInclude>
+    <ClInclude Include="PhoebeDisplayNames.h">
+      <Filter>Resources\Phoebe</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

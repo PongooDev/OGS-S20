@@ -34,12 +34,12 @@ namespace Misc {
         HookVTable(AAthenaNavMesh::GetDefaultObj(), 0x22, True, nullptr);
 
         MH_CreateHook((LPVOID)(ImageBase + 0x4834b50), nullFunc, nullptr);
-        //MH_CreateHook((LPVOID)(ImageBase + 0xd4fc70), nullFunc, nullptr);
-        //MH_CreateHook((LPVOID)(ImageBase + 0xdbd0b4), nullFunc, nullptr);
-        //MH_CreateHook((LPVOID)(ImageBase + 0xdbe928), nullFunc, nullptr);
-        //MH_CreateHook((LPVOID)(ImageBase + 0xdbdeb4), nullFunc, nullptr);
-        //MH_CreateHook((LPVOID)(ImageBase + 0x18aca00), nullFunc, nullptr);
-        //MH_CreateHook((LPVOID)(ImageBase + 0x6eb0d6c), nullFunc, nullptr);
+        MH_CreateHook((LPVOID)(ImageBase + 0xD4FC70), nullFunc, nullptr);
+        MH_CreateHook((LPVOID)(ImageBase + 0xDBD0B4), nullFunc, nullptr);
+        MH_CreateHook((LPVOID)(ImageBase + 0xDBE928), nullFunc, nullptr);
+        MH_CreateHook((LPVOID)(ImageBase + 0xDBDEB4), nullFunc, nullptr);
+        MH_CreateHook((LPVOID)(ImageBase + 0x18ACA00), nullFunc, nullptr);
+        MH_CreateHook((LPVOID)(ImageBase + 0x6EB0D6C), nullFunc, nullptr);
 
         // No FortLocalPlayer patch
         //MH_CreateHook((LPVOID)(ImageBase + 0x426A2D4), nullFunc, nullptr);

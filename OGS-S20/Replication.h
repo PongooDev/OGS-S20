@@ -483,6 +483,9 @@ namespace Replication {
 	}
 
 	void ServerReplicateActors_BuildConsiderList(TArray<FNetworkObjectInfo*>& OutConsiderList, UNetDriver* Driver, const float ServerTickTime) {
+		if (!Driver) {
+			return;
+		}
 		//Log("ServerReplicateActors_BuildConsiderList, Building ConsiderList at WorldTime : " + std::to_string(UGameplayStatics::GetTimeSeconds(UWorld::GetWorld())) + " ServerTickTime : " + std::to_string(ServerTickTime));
 
 		if (!&OutConsiderList) {
@@ -494,7 +497,7 @@ namespace Replication {
 
 		TArray<AActor*> ActorsToRemove;
 
-		if (GetNetworkObjectList(Driver).ActiveNetworkObjects.Num() == 0) {
+		if (!&GetNetworkObjectList(Driver) && GetNetworkObjectList(Driver).ActiveNetworkObjects.Num() == 0) {
 			Log("The fuck?!");
 			return;
 		}

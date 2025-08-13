@@ -11,8 +11,9 @@ namespace Globals {
 	bool bZeroBuild = false;
 
 	bool bBotsEnabled = true;
+	bool bBotsShouldUseManualTicking = false;
 
 	float MaxTickRate = 30.f;
 
-	int MinPlayersForEarlyStart = 3;
+	int MinPlayersForEarlyStart = 50;
 }

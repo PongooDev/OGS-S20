@@ -83,6 +83,8 @@ namespace GameMode {
 			GameState->AirCraftBehavior = Playlist->AirCraftBehavior;
 			GameState->OnRep_Aircraft();
 
+			GameState->bIsUsingDownloadOnDemand = false;
+
 			Log("Setup Playlist!");
 		}
 
@@ -95,8 +97,17 @@ namespace GameMode {
 
 			GameState->DefaultParachuteDeployTraceForGroundDistance = 10000;
 
-			GameMode->AISettings = GameState->CurrentPlaylistInfo.BasePlaylist->AISettings.Get();
-			GameMode->AISettings->AIServices[1] = UAthenaAIServicePlayerBots::StaticClass();
+			GameMode->AISettings = StaticLoadObject<UAthenaAISettings>("/Game/Athena/AI/AISettings/Phoebe_Default_AISettings.Phoebe_Default_AISettings");
+			GameMode->AISettings->AIServices.Free();
+
+			GameMode->AISettings->AIServices.Add(UAthenaAIServicePlayerBots::StaticClass());
+			GameMode->AISettings->AIServices.Add(StaticLoadObject<UClass>("/Game/Athena/AI/Phoebe/AIServices/BP_Phoebe_AIService_Loot.BP_Phoebe_AIService_Loot_C"));
+			GameMode->AISettings->AIServices.Add(StaticLoadObject<UClass>("/Game/Athena/AI/Phoebe/AIServices/BP_Phoebe_AIService_Cover.BP_Phoebe_AIService_Cover_C"));
+			GameMode->AISettings->AIServices.Add(UAthenaAIServiceVehicle::StaticClass());
+			GameMode->AISettings->AIServices.Add(UAthenaAIServiceGroup::StaticClass());
+			GameMode->AISettings->AIServices.Add(UAthenaAIServiceCreativePlayerBots::StaticClass());
+			GameMode->AISettings->AIServices.Add(UAthenaAIServiceLOFOccluder::StaticClass());
+			GameMode->AISettings->AIServices.Add(UAthenaAISettingsAIDIrectorLOD::StaticClass());
 
 			if (!GameMode->SpawningPolicyManager)
 			{
@@ -107,6 +118,7 @@ namespace GameMode {
 
 			GameMode->AIDirector = SpawnActor<AAthenaAIDirector>({});
 			if (GameMode->AIDirector) {
+				GameMode->AISettings->bAllowAIDirector = true;
 				GameMode->AIDirector->Activate();
 			}
 			else {
@@ -116,6 +128,7 @@ namespace GameMode {
 			if (!GameMode->AIGoalManager)
 			{
 				GameMode->AIGoalManager = SpawnActor<AFortAIGoalManager>({});
+				GameMode->AISettings->bAllowAIGoalManager = true;
 			}
 
 			UAISystem::GetDefaultObj()->AILoggingVerbose();
@@ -176,8 +189,6 @@ namespace GameMode {
 			}
 			GameState->OnRep_AdditionalPlaylistLevelsStreamed();
 			GameState->OnFinishedStreamingAdditionalPlaylistLevel();
-
-			UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(UWorld::GetWorld(), AFortPlayerStartWarmup::StaticClass(), &PlayerStarts);
 
 			GameState->DefaultBattleBus = StaticLoadObject<UAthenaBattleBusItemDefinition>("/Game/Athena/Items/Cosmetics/BattleBuses/BBID_BirthdayBus4th.BBID_BirthdayBus4th");
 
@@ -261,6 +272,9 @@ namespace GameMode {
 			else {
 				Log("No AthenaGameDataTable!");
 			}
+
+			UGameplayStatics::GetDefaultObj()->GetAllActorsOfClass(UWorld::GetWorld(), AFortPlayerStartWarmup::StaticClass(), &PlayerStarts);
+			UGameplayStatics::GetAllActorsOfClass(UWorld::GetWorld(), ABuildingFoundation::StaticClass(), &BuildingFoundations);
 
 			return true;
 		}

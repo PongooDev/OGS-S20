@@ -22,6 +22,8 @@
 #include "minhook/MinHook.h"
 #include "SDK/SDK.hpp"
 
+#include "Globals.h"
+
 template <class X, class Y>
 using xmap = std::map<X, Y, std::less<X>, std::allocator<std::pair<const X, Y>>>;
 
@@ -60,6 +62,7 @@ static void* (*StaticFindObjectOG)(UClass*, UObject* Package, const wchar_t* Ori
 static void* (*StaticLoadObjectOG)(UClass* Class, UObject* InOuter, const TCHAR* Name, const TCHAR* Filename, uint32_t LoadFlags, UObject* Sandbox, bool bAllowObjectReconciliation, void*) = decltype(StaticLoadObjectOG)(ImageBase + 0x1a34ba8);
 
 static TArray<AActor*> PlayerStarts;
+static TArray<AActor*> BuildingFoundations;
 
 static std::vector<UAthenaCharacterItemDefinition*> Characters{};
 static std::vector<UAthenaPickaxeItemDefinition*> Pickaxes{};
@@ -67,6 +70,8 @@ static std::vector<UAthenaBackpackItemDefinition*> Backpacks{};
 static std::vector<UAthenaGliderItemDefinition*> Gliders{};
 static std::vector<UAthenaSkyDiveContrailItemDefinition*> Contrails{};
 inline std::vector<UAthenaDanceItemDefinition*> Dances{};
+
+UAthenaNavSystem* AthenaNavSystem = nullptr;
 
 // text manipulation utils
 namespace TextManipUtils {

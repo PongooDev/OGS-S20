@@ -2,6 +2,7 @@
 #include "framework.h"
 #include "Globals.h"
 #include "Replication.h"
+#include "BotSpawner.h";
 
 namespace Tick {
 	void (*ServerReplicateActors)(void*) = decltype(ServerReplicateActors)(UReplicationGraph::GetDefaultObj()->VTable[0x66]);
@@ -19,6 +20,17 @@ namespace Tick {
 		//ServerReplicateActors(Driver->ReplicationDriver);
 
 		if (Driver->ClientConnections.Num() != 0) {
+			if (GameState->GamePhase == EAthenaGamePhase::Warmup &&
+				GameMode->AlivePlayers.Num() > 0
+				&& (GameMode->AlivePlayers.Num() + GameMode->AliveBots.Num()) < GameMode->GameSession->MaxPlayers
+				&& Globals::bBotsEnabled)
+			{
+				if (UKismetMathLibrary::GetDefaultObj()->RandomBoolWithWeight(0.045f))
+				{
+					BotSpawner::SpawnPlayerBot();
+				}
+			}
+
 			if (GameState->GamePhase == EAthenaGamePhase::Warmup
 				&& (GameMode->NumPlayers + GameMode->NumBots) >= Globals::MinPlayersForEarlyStart
 				&& GameState->WarmupCountdownEndTime > UGameplayStatics::GetTimeSeconds(UWorld::GetWorld()) + 10.f) {

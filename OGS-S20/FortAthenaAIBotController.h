@@ -109,12 +109,8 @@ namespace FortAthenaAIBotController {
 
 		if (PC->BotIDSuffix.ToString() == "DEFAULT")
 		{
-			if (!PC->RunBehaviorTree(PC->BehaviorTree)) {
-				Log("BehaviorTree Failed To Run For Pawn: " + Pawn->GetFullName());
-			}
-			else {
-				Log("Ran BehaviorTree: " + PC->BehaviorTree->GetFullName());
-				PC->BlueprintOnBehaviorTreeStarted();
+			if (Globals::bBotsShouldUseManualTicking) {
+				PC->BrainComponent->StopLogic(L"Manual Ticking Enabled!");
 			}
 
 			PC->Blackboard->SetValueAsEnum(UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(L"AIEvaluator_Global_GamePhaseStep"), (int)GameState->GamePhaseStep);
@@ -376,7 +372,6 @@ namespace FortAthenaAIBotController {
 		for (AActor* PatrolPointProviderActor : PatrolPointProviders) {
 			AFortAthenaPatrolPathPointProvider* PatrolPointProvider = (AFortAthenaPatrolPathPointProvider*)PatrolPointProviderActor;
 			if (PatrolPointProvider->AssociatedPatrolPath && PatrolPointProvider->AssociatedPatrolPath->GetFullName().contains(PC->BotIDSuffix.ToString())) {
-				Log("Found Patrol Path!");
 				PC->CachedPatrollingComponent->SetPatrolPath(PatrolPointProvider->AssociatedPatrolPath, false);
 				break;
 			}

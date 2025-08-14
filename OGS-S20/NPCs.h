@@ -82,6 +82,51 @@ namespace Npcs {
 				Selector->AddChild(Task);
 			}
 
+			{
+				auto* Task = new BTTask_SteerMovement();
+				auto* Service = new BTService_HandleFocusing_ScanAroundOnly();
+				Task->AddService(Service);
+				auto* Decorator = new BTDecorator_CheckEnum();
+				Decorator->SelectedKeyName = ConvFName(L"AIEvaluator_CharacterLaunched_ExecutionStatus");
+				Decorator->IntValue = (int)EExecutionStatus::ExecutionPending;
+				Decorator->Operator = EBlackboardCompareOp::GreaterThanOrEqual;
+				Task->AddDecorator(Decorator);
+				Selector->AddChild(Task);
+			}
+
+			{
+				// Look into: FortAthenaBTTask_ShootTrap_0
+				auto* Task = new BTTask_ShootTrap();
+				auto* Decorator = new BTDecorator_CheckEnum();
+				Decorator->SelectedKeyName = ConvFName(L"AIEvaluator_TrapOnPath_ExecutionStatus");
+				Decorator->IntValue = (int)EExecutionStatus::ExecutionPending;
+				Decorator->Operator = EBlackboardCompareOp::GreaterThanOrEqual;
+				Task->AddDecorator(Decorator);
+				Selector->AddChild(Task);
+			}
+
+			{
+				auto* Task = new BTTask_BotMoveTo();
+				Task->SelectedKeyName = ConvFName(L"AIEvaluator_AvoidThreat_Destination");
+				Task->MovementResultKey = ConvFName(L"AIEvaluator_AvoidThreat_MovementState");
+				auto* Decorator = new BTDecorator_CheckEnum();
+				Decorator->SelectedKeyName = ConvFName(L"AIEvaluator_AvoidThreat_ExecutionStatus");
+				Decorator->IntValue = (int)EExecutionStatus::ExecutionAllowed;
+				Decorator->Operator = EBlackboardCompareOp::GreaterThanOrEqual;
+				Task->AddDecorator(Decorator);
+				Selector->AddChild(Task);
+			}
+
+			{
+				auto* Service = new BTEvaluator_Escape_EvasiveManeuvers();
+				Selector->AddService(Service);
+			}
+
+			{
+				auto* Service = new BTEvaluator_CharacterLaunched();
+				Selector->AddService(Service);
+			}
+
 			Tree->AllNodes.push_back(Selector);
 		}
 
@@ -101,6 +146,14 @@ namespace Npcs {
 			Decorator->IntValue = 4;
 			Task->AddDecorator(Decorator);
 			RootSelector->AddChild(Task);
+		}
+
+		{
+			auto* Task = new BTTask_RunSelector();
+			Task->SelectorToRun = Tree->FindSelectorByName("On Ground");
+			if (Task->SelectorToRun) {
+				RootSelector->AddChild(Task);
+			}
 		}
 
 		{

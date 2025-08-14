@@ -76,7 +76,7 @@ namespace Tick {
 			if (GameMode && GameState && UKismetMathLibrary::RandomBool()) {
 				EAthenaGamePhaseStep CurrentGamePhaseStep = GetCurrentGamePhaseStep(GameMode, GameState);
 				GameState->GamePhaseStep = CurrentGamePhaseStep;
-				if (Globals::bBotsEnabled && !Globals::bBotsShouldUseManualTicking) {
+				if (Globals::bBotsEnabled && Globals::bBotsShouldUseManualTicking) {
 					for (FortAthenaAIBotController::BotSpawnData& SpawnedBot : FortAthenaAIBotController::SpawnedBots) {
 						if (!SpawnedBot.Controller || !SpawnedBot.Pawn || !SpawnedBot.PlayerState)
 							continue;

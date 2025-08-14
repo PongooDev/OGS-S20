@@ -116,6 +116,18 @@ public:
     }
 };
 
+class BTTask_RunSelector : public BTNode {
+public:
+    BTComposite_Selector* SelectorToRun = nullptr;
+public:
+    virtual EBTNodeResult ChildTask(BTContext Context) override {
+        if (SelectorToRun) {
+            return SelectorToRun->Tick(Context);
+        }
+        return EBTNodeResult::Failed;
+    }
+};
+
 class BTTask_Dive : public BTNode {
 public:
     virtual EBTNodeResult ChildTask(BTContext Context) override {
@@ -147,5 +159,15 @@ public:
 
         // I dont think we need any custom logic right now for gliding
         return EBTNodeResult::Succeeded;
+    }
+};
+
+class BTTask_ShootTrap : public BTNode {
+public:
+    FName TargetActorKey;
+public:
+    virtual EBTNodeResult ChildTask(BTContext Context) override {
+        // I will look into this later, since im not sure the best way to do this
+        return EBTNodeResult::Failed;
     }
 };

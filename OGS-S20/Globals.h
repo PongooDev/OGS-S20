@@ -11,7 +11,7 @@ namespace Globals {
 	bool bZeroBuild = false;
 
 	bool bBotsEnabled = true;
-	bool bBotsShouldUseManualTicking = false;
+	bool bBotsShouldUseManualTicking = true;
 
 	float MaxTickRate = 30.f;
 

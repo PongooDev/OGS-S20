@@ -501,3 +501,7 @@ static float RandomFloatRange(float Min, float Max)
 {
 	return Min + static_cast<float>(rand()) / static_cast<float>(RAND_MAX) * (Max - Min);
 }
+
+FName ConvFName(FString Name) {
+	return UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(Name);
+}

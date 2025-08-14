@@ -115,3 +115,37 @@ public:
         return EBTNodeResult::Failed;
     }
 };
+
+class BTTask_Dive : public BTNode {
+public:
+    virtual EBTNodeResult ChildTask(BTContext Context) override {
+        if (!Context.Pawn || !Context.Controller) {
+            return EBTNodeResult::Failed;
+        }
+
+        if (Context.Pawn->IsSkydiving()) {
+            FVector LocationToGo = Context.Pawn->K2_GetActorLocation();
+            LocationToGo.Z -= 100.f;
+
+            Context.Controller->K2_SetFocalPoint(LocationToGo);
+            Context.Controller->MoveToLocation(LocationToGo, 20.f, true, false, false, true, nullptr, true);
+        }
+        else {
+            Context.Pawn->BeginSkydiving(false);
+        }
+
+        return EBTNodeResult::Succeeded;
+    }
+};
+
+class BTTask_Glide : public BTNode {
+public:
+    virtual EBTNodeResult ChildTask(BTContext Context) override {
+        if (!Context.Pawn || !Context.Controller) {
+            return EBTNodeResult::Failed;
+        }
+
+        // I dont think we need any custom logic right now for gliding
+        return EBTNodeResult::Succeeded;
+    }
+};

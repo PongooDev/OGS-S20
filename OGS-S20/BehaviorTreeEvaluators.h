@@ -24,3 +24,29 @@ public:
         }
     }
 };
+
+class BTEvaluator_FreeFall : public BTService {
+public:
+	BTEvaluator_FreeFall() {
+		NodeName = "Evaluating...Free Fall";
+	}
+
+	virtual void TickService(BTContext Context) override {
+		if (!Context.Pawn || !Context.Controller) return;
+
+		if (Context.Pawn->IsSkydiving())
+		{
+			Context.Controller->Blackboard->SetValueAsEnum(ConvFName(L"AIEvaluator_Dive_ExecutionStatus"), (uint8)EExecutionStatus::ExecutionAllowed);
+		}
+		else
+		{
+			if (Context.Pawn->IsParachuteOpen()) {
+				Context.Controller->Blackboard->SetValueAsEnum(ConvFName(L"AIEvaluator_Glide_ExecutionStatus"), (uint8)EExecutionStatus::ExecutionAllowed);
+			}
+			else {
+				Context.Controller->Blackboard->SetValueAsEnum(ConvFName(L"AIEvaluator_Glide_ExecutionStatus"), (uint8)EExecutionStatus::ExecutionDenied);
+			}
+			Context.Controller->Blackboard->SetValueAsEnum(ConvFName(L"AIEvaluator_Dive_ExecutionStatus"), (uint8)EExecutionStatus::ExecutionDenied);
+		}
+	}
+};

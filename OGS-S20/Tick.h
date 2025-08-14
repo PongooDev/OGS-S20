@@ -3,9 +3,62 @@
 #include "Globals.h"
 #include "Replication.h"
 #include "BotSpawner.h";
+#include "FortAthenaAIBotController.h"
 
 namespace Tick {
 	void (*ServerReplicateActors)(void*) = decltype(ServerReplicateActors)(UReplicationGraph::GetDefaultObj()->VTable[0x66]);
+
+	EAthenaGamePhaseStep GetCurrentGamePhaseStep(AFortGameModeAthena* GameMode, AFortGameStateAthena* GameState) {
+		float CurrentTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
+
+		if (GameState->GamePhase == EAthenaGamePhase::Setup) {
+			return EAthenaGamePhaseStep::Setup;
+		}
+		else if (GameState->GamePhase == EAthenaGamePhase::Warmup) {
+			if (GameState->WarmupCountdownEndTime > CurrentTime + 10.f) {
+				return EAthenaGamePhaseStep::Warmup;
+			}
+			else {
+				return EAthenaGamePhaseStep::GetReady;
+			}
+		}
+		else if (GameState->GamePhase == EAthenaGamePhase::Aircraft) {
+			if (GameState->GamePhaseStep > EAthenaGamePhaseStep::BusLocked) {
+				// We handle this in OnAircraftEnteredDropZone
+				return GameState->GamePhaseStep;
+			}
+			else {
+				return EAthenaGamePhaseStep::BusLocked;
+			}
+		}
+		else if (GameState->GamePhase == EAthenaGamePhase::SafeZones) {
+			if (!GameState->SafeZoneIndicator) {
+				return EAthenaGamePhaseStep::StormForming;
+			}
+			else if (GameState->SafeZoneIndicator->bPaused) {
+				return EAthenaGamePhaseStep::StormHolding;
+			}
+			else {
+				return EAthenaGamePhaseStep::StormShrinking;
+			}
+		}
+		else if (GameState->GamePhase == EAthenaGamePhase::EndGame) {
+			return EAthenaGamePhaseStep::EndGame;
+		}
+		else if (GameState->GamePhase == EAthenaGamePhase::Count) {
+			return EAthenaGamePhaseStep::Count;
+		}
+		else {
+			return EAthenaGamePhaseStep::EAthenaGamePhaseStep_MAX;
+		}
+	}
+
+	void UpdateBotBlackboard(AFortAthenaAIBotController* bot, AFortGameModeAthena* GameMode, AFortGameStateAthena* GameState) {
+		if (!bot)
+			return;
+
+		bot->Blackboard->SetValueAsEnum(UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(L"AIEvaluator_Global_GamePhaseStep"), (int)GameState->GamePhaseStep);
+	}
 
 	inline void (*TickFlushOG)(UNetDriver*, float);
 	void TickFlush(UNetDriver* Driver, float DeltaTime)
@@ -20,6 +73,19 @@ namespace Tick {
 		//ServerReplicateActors(Driver->ReplicationDriver);
 
 		if (Driver->ClientConnections.Num() != 0) {
+			if (GameMode && GameState && UKismetMathLibrary::RandomBool()) {
+				EAthenaGamePhaseStep CurrentGamePhaseStep = GetCurrentGamePhaseStep(GameMode, GameState);
+				GameState->GamePhaseStep = CurrentGamePhaseStep;
+				if (Globals::bBotsEnabled && !Globals::bBotsShouldUseManualTicking) {
+					for (FortAthenaAIBotController::BotSpawnData& SpawnedBot : FortAthenaAIBotController::SpawnedBots) {
+						if (!SpawnedBot.Controller || !SpawnedBot.Pawn || !SpawnedBot.PlayerState)
+							continue;
+
+						UpdateBotBlackboard(SpawnedBot.Controller, GameMode, GameState);
+					}
+				}
+			}
+
 			if (GameState->GamePhase == EAthenaGamePhase::Warmup &&
 				GameMode->AlivePlayers.Num() > 0
 				&& (GameMode->AlivePlayers.Num() + GameMode->AliveBots.Num()) < GameMode->GameSession->MaxPlayers
@@ -42,6 +108,10 @@ namespace Tick {
 				GameMode->WarmupCountdownDuration = DR;
 				GameState->WarmupCountdownStartTime = TS;
 				GameMode->WarmupEarlyCountdownDuration = DR;
+			}
+
+			if (Globals::bBotsEnabled && Globals::bBotsShouldUseManualTicking) {
+				Npcs::TickBots();
 			}
 		}
 

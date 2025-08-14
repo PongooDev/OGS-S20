@@ -153,6 +153,9 @@
     <ClInclude Include="BehaviorTreeTasks.h">
       <Filter>Resources\BehaviorTree\BehaviorTree</Filter>
     </ClInclude>
+    <ClInclude Include="NPCs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

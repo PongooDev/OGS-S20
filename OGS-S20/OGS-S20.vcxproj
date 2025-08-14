@@ -156,6 +156,7 @@
     <ClInclude Include="GameMode.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="GuardSpawnLocs.h" />
+    <ClInclude Include="NPCs.h" />
     <ClInclude Include="Inventory.h" />
     <ClInclude Include="Looting.h" />
     <ClInclude Include="Misc.h" />

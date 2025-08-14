@@ -2,6 +2,8 @@
 #include "framework.h"
 #include "PhoebeDisplayNames.h"
 
+#include "NPCs.h"
+
 namespace FortAthenaAIBotController {
 	struct BotSpawnData {
 		UClass* BotSpawnerData;
@@ -379,6 +381,10 @@ namespace FortAthenaAIBotController {
 				break;
 			}
 		}
+
+		Npcs::NpcBot* Bot = new Npcs::NpcBot(PC, Pawn, PlayerState);
+		Npcs::NpcBots.push_back(Bot);
+		Bot->BT_NPC = Npcs::ConstructBehaviorTree();
 
 		AmountTimesCalled++;
 	}

@@ -19,104 +19,122 @@ namespace PossibleLoot {
             {
                 // Assault Rifles
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/RedDotAR/WID_Assault_RedDotAR_Athena_C.WID_Assault_RedDotAR_Athena_C"), 50, 30 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/RedDotAR/WID_Assault_RedDotAR_Athena_UC.WID_Assault_RedDotAR_Athena_UC"), 40, 30 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/RedDotAR/WID_Assault_RedDotAR_Athena_R.WID_Assault_RedDotAR_Athena_R"), 30, 30 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/RedDotAR/WID_Assault_RedDotAR_Athena_VR.WID_Assault_RedDotAR_Athena_VR"), 20, 30 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/RedDotAR/WID_Assault_RedDotAR_Athena_SR.WID_Assault_RedDotAR_Athena_SR"), 10, 30 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/RedDotAR/WID_Assault_RedDotAR_Athena_UC.WID_Assault_RedDotAR_Athena_UC"), 30, 30 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/RedDotAR/WID_Assault_RedDotAR_Athena_R.WID_Assault_RedDotAR_Athena_R"), 10, 30 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/RedDotAR/WID_Assault_RedDotAR_Athena_VR.WID_Assault_RedDotAR_Athena_VR"), 5, 30 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/RedDotAR/WID_Assault_RedDotAR_Athena_SR.WID_Assault_RedDotAR_Athena_SR"), 1, 30 });
 
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/ar/WID_Assault_Recoil_Athena_C.WID_Assault_Recoil_Athena_C"), 50, 35 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/ar/WID_Assault_Recoil_Athena_UC.WID_Assault_Recoil_Athena_UC"), 40, 35 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/ar/WID_Assault_Recoil_Athena_R.WID_Assault_Recoil_Athena_R"), 30, 35 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/ar/WID_Assault_Recoil_Athena_VR.WID_Assault_Recoil_Athena_VR"), 20, 35 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/ar/WID_Assault_Recoil_Athena_SR.WID_Assault_Recoil_Athena_SR"), 10, 35 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/ar/WID_Assault_Recoil_Athena_UC.WID_Assault_Recoil_Athena_UC"), 30, 35 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/ar/WID_Assault_Recoil_Athena_R.WID_Assault_Recoil_Athena_R"), 10, 35 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/ar/WID_Assault_Recoil_Athena_VR.WID_Assault_Recoil_Athena_VR"), 5, 35 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/ar/WID_Assault_Recoil_Athena_SR.WID_Assault_Recoil_Athena_SR"), 1, 35 });
 
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/RedDotBurst/WID_Assault_RedDotBurstAR_Athena_C.WID_Assault_RedDotBurstAR_Athena_C"), 50, 20 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/RedDotBurst/WID_Assault_RedDotBurstAR_Athena_UC.WID_Assault_RedDotBurstAR_Athena_UC"), 40, 20 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/RedDotBurst/WID_Assault_RedDotBurstAR_Athena_R.WID_Assault_RedDotBurstAR_Athena_R"), 30, 20 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/RedDotBurst/WID_Assault_RedDotBurstAR_Athena_VR.WID_Assault_RedDotBurstAR_Athena_VR"), 20, 20 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/RedDotBurst/WID_Assault_RedDotBurstAR_Athena_SR.WID_Assault_RedDotBurstAR_Athena_SR"), 10, 20 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/RedDotBurst/WID_Assault_RedDotBurstAR_Athena_UC.WID_Assault_RedDotBurstAR_Athena_UC"), 30, 20 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/RedDotBurst/WID_Assault_RedDotBurstAR_Athena_R.WID_Assault_RedDotBurstAR_Athena_R"), 10, 20 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/RedDotBurst/WID_Assault_RedDotBurstAR_Athena_VR.WID_Assault_RedDotBurstAR_Athena_VR"), 5, 20 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/RedDotBurst/WID_Assault_RedDotBurstAR_Athena_SR.WID_Assault_RedDotBurstAR_Athena_SR"), 1, 20 });
 
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreAR/WID_Assault_CoreAR_Athena_C.WID_Assault_CoreAR_Athena_C"), 50, 25 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreAR/WID_Assault_CoreAR_Athena_UC.WID_Assault_CoreAR_Athena_UC"), 40, 25 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreAR/WID_Assault_CoreAR_Athena_R.WID_Assault_CoreAR_Athena_R"), 30, 25 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreAR/WID_Assault_CoreAR_Athena_VR.WID_Assault_CoreAR_Athena_VR"), 20, 25 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreAR/WID_Assault_CoreAR_Athena_SR.WID_Assault_CoreAR_Athena_SR"), 10, 25 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreAR/WID_Assault_CoreAR_Athena_UC.WID_Assault_CoreAR_Athena_UC"), 30, 25 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreAR/WID_Assault_CoreAR_Athena_R.WID_Assault_CoreAR_Athena_R"), 10, 25 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreAR/WID_Assault_CoreAR_Athena_VR.WID_Assault_CoreAR_Athena_VR"), 5, 25 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreAR/WID_Assault_CoreAR_Athena_SR.WID_Assault_CoreAR_Athena_SR"), 1, 25 });
 
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Assault_Surgical_Thermal_Athena_R_Ore_T03.WID_Assault_Surgical_Thermal_Athena_R_Ore_T03"), 30, 15 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Assault_Surgical_Thermal_Athena_VR_Ore_T03.WID_Assault_Surgical_Thermal_Athena_VR_Ore_T03"), 20, 15 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Assault_Surgical_Thermal_Athena_SR_Ore_T03.WID_Assault_Surgical_Thermal_Athena_SR_Ore_T03"), 10, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Assault_Surgical_Thermal_Athena_R_Ore_T03.WID_Assault_Surgical_Thermal_Athena_R_Ore_T03"), 10, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Assault_Surgical_Thermal_Athena_VR_Ore_T03.WID_Assault_Surgical_Thermal_Athena_VR_Ore_T03"), 5, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Assault_Surgical_Thermal_Athena_SR_Ore_T03.WID_Assault_Surgical_Thermal_Athena_SR_Ore_T03"), 1, 15 });
             }
         
             {
                 // Shotguns
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/BurstShotgun/WID_Shotgun_CoreBurst_Athena_C.WID_Shotgun_CoreBurst_Athena_C"), 50, 5 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/BurstShotgun/WID_Shotgun_CoreBurst_Athena_UC.WID_Shotgun_CoreBurst_Athena_UC"), 40, 5 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/BurstShotgun/WID_Shotgun_CoreBurst_Athena_R.WID_Shotgun_CoreBurst_Athena_R"), 30, 5 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/BurstShotgun/WID_Shotgun_CoreBurst_Athena_VR.WID_Shotgun_CoreBurst_Athena_VR"), 20, 5 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/BurstShotgun/WID_Shotgun_CoreBurst_Athena_SR.WID_Shotgun_CoreBurst_Athena_SR"), 10, 5 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/BurstShotgun/WID_Shotgun_CoreBurst_Athena_UC.WID_Shotgun_CoreBurst_Athena_UC"), 30, 5 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/BurstShotgun/WID_Shotgun_CoreBurst_Athena_R.WID_Shotgun_CoreBurst_Athena_R"), 10, 5 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/BurstShotgun/WID_Shotgun_CoreBurst_Athena_VR.WID_Shotgun_CoreBurst_Athena_VR"), 5, 5 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/BurstShotgun/WID_Shotgun_CoreBurst_Athena_SR.WID_Shotgun_CoreBurst_Athena_SR"), 1, 5 });
 
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/BreakActionShotgun/WID_Shotgun_Break_Action_Athena_C_Ore_T03.WID_Shotgun_Break_Action_Athena_C_Ore_T03"), 50, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/BreakActionShotgun/WID_Shotgun_Break_Action_Athena_UC_Ore_T03.WID_Shotgun_Break_Action_Athena_UC_Ore_T03"), 40, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/BreakActionShotgun/WID_Shotgun_Break_Action_Athena_R_Ore_T03.WID_Shotgun_Break_Action_Athena_R_Ore_T03"), 30, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/BreakActionShotgun/WID_Shotgun_Break_Action_Athena_VR_Ore_T03.WID_Shotgun_Break_Action_Athena_VR_Ore_T03"), 20, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/BreakActionShotgun/WID_Shotgun_Break_Action_Athena_SR_Ore_T03.WID_Shotgun_Break_Action_Athena_SR_Ore_T03"), 10, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/BreakActionShotgun/WID_Shotgun_Break_Action_Athena_UC_Ore_T03.WID_Shotgun_Break_Action_Athena_UC_Ore_T03"), 30, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/BreakActionShotgun/WID_Shotgun_Break_Action_Athena_R_Ore_T03.WID_Shotgun_Break_Action_Athena_R_Ore_T03"), 10, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/BreakActionShotgun/WID_Shotgun_Break_Action_Athena_VR_Ore_T03.WID_Shotgun_Break_Action_Athena_VR_Ore_T03"), 5, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/BreakActionShotgun/WID_Shotgun_Break_Action_Athena_SR_Ore_T03.WID_Shotgun_Break_Action_Athena_SR_Ore_T03"), 1, 1 });
 
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_AutoDrum_Athena_C_Ore_T03.WID_Shotgun_AutoDrum_Athena_C_Ore_T03"), 50, 12 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_AutoDrum_Athena_UC_Ore_T03.WID_Shotgun_AutoDrum_Athena_UC_Ore_T03"), 40, 12 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_AutoDrum_Athena_R_Ore_T03.WID_Shotgun_AutoDrum_Athena_R_Ore_T03"), 30, 12 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_AutoDrum_Athena_VR_Ore_T03.WID_Shotgun_AutoDrum_Athena_VR_Ore_T03"), 20, 12 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_AutoDrum_Athena_SR_Ore_T03.WID_Shotgun_AutoDrum_Athena_SR_Ore_T03"), 10, 12 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_AutoDrum_Athena_UC_Ore_T03.WID_Shotgun_AutoDrum_Athena_UC_Ore_T03"), 30, 12 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_AutoDrum_Athena_R_Ore_T03.WID_Shotgun_AutoDrum_Athena_R_Ore_T03"), 10, 12 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_AutoDrum_Athena_VR_Ore_T03.WID_Shotgun_AutoDrum_Athena_VR_Ore_T03"), 5, 12 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Shotgun_AutoDrum_Athena_SR_Ore_T03.WID_Shotgun_AutoDrum_Athena_SR_Ore_T03"), 1, 12 });
             }
 
             {
                 // SMGs
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSMG/WID_SMG_CoreSMG_Athena_C.WID_SMG_CoreSMG_Athena_C"), 50, 30 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSMG/WID_SMG_CoreSMG_Athena_UC.WID_SMG_CoreSMG_Athena_UC"), 40, 30 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSMG/WID_SMG_CoreSMG_Athena_R.WID_SMG_CoreSMG_Athena_R"), 40, 30 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSMG/WID_SMG_CoreSMG_Athena_VR.WID_SMG_CoreSMG_Athena_VR"), 40, 30 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSMG/WID_SMG_CoreSMG_Athena_SR.WID_SMG_CoreSMG_Athena_SR"), 40, 30 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSMG/WID_SMG_CoreSMG_Athena_UC.WID_SMG_CoreSMG_Athena_UC"), 30, 30 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSMG/WID_SMG_CoreSMG_Athena_R.WID_SMG_CoreSMG_Athena_R"), 10, 30 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSMG/WID_SMG_CoreSMG_Athena_VR.WID_SMG_CoreSMG_Athena_VR"), 5, 30 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSMG/WID_SMG_CoreSMG_Athena_SR.WID_SMG_CoreSMG_Athena_SR"), 1, 30 });
 
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/SMG/WID_SMG_Recoil_Athena_C.WID_SMG_Recoil_Athena_C"), 50, 32 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/SMG/WID_SMG_Recoil_Athena_UC.WID_SMG_Recoil_Athena_UC"), 40, 32 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/SMG/WID_SMG_Recoil_Athena_R.WID_SMG_Recoil_Athena_R"), 30, 32 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/SMG/WID_SMG_Recoil_Athena_VR.WID_SMG_Recoil_Athena_VR"), 20, 32 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/SMG/WID_SMG_Recoil_Athena_SR.WID_SMG_Recoil_Athena_SR"), 10, 32 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/SMG/WID_SMG_Recoil_Athena_UC.WID_SMG_Recoil_Athena_UC"), 30, 32 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/SMG/WID_SMG_Recoil_Athena_R.WID_SMG_Recoil_Athena_R"), 10, 32 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/SMG/WID_SMG_Recoil_Athena_VR.WID_SMG_Recoil_Athena_VR"), 5, 32 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/SMG/WID_SMG_Recoil_Athena_SR.WID_SMG_Recoil_Athena_SR"), 1, 32 });
+
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/PowerUp/LMG/WID_Assault_LMG_Powerup_Athena_C.WID_Assault_LMG_Powerup_Athena_C"), 50, 32 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/PowerUp/LMG/WID_Assault_LMG_Powerup_Athena_UC.WID_Assault_LMG_Powerup_Athena_UC"), 30, 32 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/PowerUp/LMG/WID_Assault_LMG_Powerup_Athena_R.WID_Assault_LMG_Powerup_Athena_R"), 10, 32 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/PowerUp/LMG/WID_Assault_LMG_Powerup_Athena_VR.WID_Assault_LMG_Powerup_Athena_VR"), 5, 32 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/PowerUp/LMG/WID_Assault_LMG_Powerup_Athena_SR.WID_Assault_LMG_Powerup_Athena_SR"), 1, 32 });
             }
 
             {
                 // Pistols
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CorePistol/WID_Pistol_CorePistol_Athena_C.WID_Pistol_CorePistol_Athena_C"), 50, 15 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CorePistol/WID_Pistol_CorePistol_Athena_UC.WID_Pistol_CorePistol_Athena_UC"), 40, 15 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CorePistol/WID_Pistol_CorePistol_Athena_R.WID_Pistol_CorePistol_Athena_R"), 30, 15 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CorePistol/WID_Pistol_CorePistol_Athena_VR.WID_Pistol_CorePistol_Athena_VR"), 20, 15 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CorePistol/WID_Pistol_CorePistol_Athena_SR.WID_Pistol_CorePistol_Athena_SR"), 10, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CorePistol/WID_Pistol_CorePistol_Athena_UC.WID_Pistol_CorePistol_Athena_UC"), 30, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CorePistol/WID_Pistol_CorePistol_Athena_R.WID_Pistol_CorePistol_Athena_R"), 10, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CorePistol/WID_Pistol_CorePistol_Athena_VR.WID_Pistol_CorePistol_Athena_VR"), 5, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CorePistol/WID_Pistol_CorePistol_Athena_SR.WID_Pistol_CorePistol_Athena_SR"), 1, 15 });
+
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Pistol_SixShooter_Athena_C_Ore_T02.WID_Pistol_SixShooter_Athena_C_Ore_T02"), 50, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Pistol_SixShooter_Athena_UC_Ore_T03.WID_Pistol_SixShooter_Athena_UC_Ore_T03"), 30, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Pistol_SixShooter_Athena_R_Ore_T03.WID_Pistol_SixShooter_Athena_R_Ore_T03"), 10, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Pistol_SixShooter_Athena_VR_Ore_T03.WID_Pistol_SixShooter_Athena_VR_Ore_T03"), 5, 15 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Pistol_SixShooter_Athena_SR_Ore_T03.WID_Pistol_SixShooter_Athena_SR_Ore_T03"), 1, 15 });
 
                 Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Pistol_Flintlock_Athena_C.WID_Pistol_Flintlock_Athena_C"), 50, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Pistol_Flintlock_Athena_UC.WID_Pistol_Flintlock_Athena_UC"), 40, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Pistol_Flintlock_Athena_UC.WID_Pistol_Flintlock_Athena_UC"), 30, 1 });
             }
 
             {
                 // Snipers
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Sniper_Heavy_Athena_R_Ore_T03.WID_Sniper_Heavy_Athena_R_Ore_T03"), 30, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Sniper_Heavy_Athena_VR_Ore_T03.WID_Sniper_Heavy_Athena_VR_Ore_T03"), 20, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Sniper_Heavy_Athena_SR_Ore_T03.WID_Sniper_Heavy_Athena_SR_Ore_T03"), 10, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Sniper_Heavy_Athena_R_Ore_T03.WID_Sniper_Heavy_Athena_R_Ore_T03"), 10, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Sniper_Heavy_Athena_VR_Ore_T03.WID_Sniper_Heavy_Athena_VR_Ore_T03"), 5, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Weapons/WID_Sniper_Heavy_Athena_SR_Ore_T03.WID_Sniper_Heavy_Athena_SR_Ore_T03"), 1, 1 });
 
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSniper/WID_Sniper_CoreSniper_Athena_UC.WID_Sniper_CoreSniper_Athena_UC"), 40, 3 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSniper/WID_Sniper_CoreSniper_Athena_R.WID_Sniper_CoreSniper_Athena_R"), 30, 3 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSniper/WID_Sniper_CoreSniper_Athena_VR.WID_Sniper_CoreSniper_Athena_VR"), 20, 3 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSniper/WID_Sniper_CoreSniper_Athena_SR.WID_Sniper_CoreSniper_Athena_SR"), 10, 3 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSniper/WID_Sniper_CoreSniper_Athena_UC.WID_Sniper_CoreSniper_Athena_UC"), 30, 3 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSniper/WID_Sniper_CoreSniper_Athena_R.WID_Sniper_CoreSniper_Athena_R"), 10, 3 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSniper/WID_Sniper_CoreSniper_Athena_VR.WID_Sniper_CoreSniper_Athena_VR"), 5, 3 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/Weapons/CoreSniper/WID_Sniper_CoreSniper_Athena_SR.WID_Sniper_CoreSniper_Athena_SR"), 1, 3 });
 
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/MotherGameplay/Items/ReactorGrade/WID_Sniper_ReactorGrade_Athena_R_Ore_T03.WID_Sniper_ReactorGrade_Athena_R_Ore_T03"), 30, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/MotherGameplay/Items/ReactorGrade/WID_Sniper_ReactorGrade_Athena_VR_Ore_T03.WID_Sniper_ReactorGrade_Athena_VR_Ore_T03"), 20, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/MotherGameplay/Items/ReactorGrade/WID_Sniper_ReactorGrade_Athena_SR_Ore_T03.WID_Sniper_ReactorGrade_Athena_SR_Ore_T03"), 10, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/MotherGameplay/Items/ReactorGrade/WID_Sniper_ReactorGrade_Athena_R_Ore_T03.WID_Sniper_ReactorGrade_Athena_R_Ore_T03"), 10, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/MotherGameplay/Items/ReactorGrade/WID_Sniper_ReactorGrade_Athena_VR_Ore_T03.WID_Sniper_ReactorGrade_Athena_VR_Ore_T03"), 5, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/MotherGameplay/Items/ReactorGrade/WID_Sniper_ReactorGrade_Athena_SR_Ore_T03.WID_Sniper_ReactorGrade_Athena_SR_Ore_T03"), 1, 1 });
+
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/PowerUp/Rifle/WID_Rifle_Powerup_Athena_C.WID_Rifle_Powerup_Athena_C"), 50, 3 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/PowerUp/Rifle/WID_Rifle_Powerup_Athena_UC.WID_Rifle_Powerup_Athena_UC"), 30, 3 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/PowerUp/Rifle/WID_Rifle_Powerup_Athena_R.WID_Rifle_Powerup_Athena_R"), 10, 3 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/PowerUp/Rifle/WID_Rifle_Powerup_Athena_VR.WID_Rifle_Powerup_Athena_VR"), 5, 3 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/CorruptionGameplay/Gameplay/Items/Weapons/PowerUp/Rifle/WID_Rifle_Powerup_Athena_SR.WID_Rifle_Powerup_Athena_SR"), 1, 3 });
             }
 
             {
                 // Explosives
 
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/HomingRocket/WIDs/WID_Launcher_HomingRocket_Athena_R.WID_Launcher_HomingRocket_Athena_R"), 30, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/HomingRocket/WIDs/WID_Launcher_HomingRocket_Athena_VR.WID_Launcher_HomingRocket_Athena_VR"), 20, 1 });
-                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/HomingRocket/WIDs/WID_Launcher_HomingRocket_Athena_SR.WID_Launcher_HomingRocket_Athena_SR"), 10, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/HomingRocket/WIDs/WID_Launcher_HomingRocket_Athena_R.WID_Launcher_HomingRocket_Athena_R"), 10, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/HomingRocket/WIDs/WID_Launcher_HomingRocket_Athena_VR.WID_Launcher_HomingRocket_Athena_VR"), 5, 1 });
+                Weapons.Add({ StaticLoadObject<UFortWeaponRangedItemDefinition>("/ResolveGameplay/Items/Guns/HomingRocket/WIDs/WID_Launcher_HomingRocket_Athena_SR.WID_Launcher_HomingRocket_Athena_SR"), 1, 1 });
             }
 
             {
@@ -151,7 +169,7 @@ namespace PossibleLoot {
             Utility.Add(BigShield);
 
             ResourceInfo ChugSplash;
-            ChugSplash.Definition = StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Consumables/ChillBronco/GA_Athena_ChillBronco.GA_Athena_ChillBronco");
+            ChugSplash.Definition = StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Consumables/ChillBronco/Athena_ChillBronco.Athena_ChillBronco");
             ChugSplash.Quantity = 2;
             Utility.Add(ChugSplash);
 
@@ -184,6 +202,31 @@ namespace PossibleLoot {
             Grenade.Definition = StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Consumables/Grenade/Athena_Grenade.Athena_Grenade");
             Grenade.Quantity = 3;
             Utility.Add(Grenade);
+
+            ResourceInfo C4;
+            C4.Definition = StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Consumables/C4/Athena_C4.Athena_C4");
+            C4.Quantity = 3;
+            Utility.Add(C4);
+
+            ResourceInfo MedMist;
+            MedMist.Definition = StaticLoadObject<UFortWeaponRangedItemDefinition>("/FlipperGameplay/Items/HealSpray/WID_Athena_HealSpray.WID_Athena_HealSpray");
+            MedMist.Quantity = 100;
+            Utility.Add(MedMist);
+
+            ResourceInfo ReconScanner;
+            ReconScanner.Definition = StaticLoadObject<UFortWeaponRangedItemDefinition>("/MotherGameplay/Items/Scooter/WID_Athena_Mother_Scooter.WID_Athena_Mother_Scooter");
+            ReconScanner.Quantity = 1;
+            Utility.Add(ReconScanner);
+
+            ResourceInfo RiftToGo;
+            RiftToGo.Definition = StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Consumables/RiftItem/Athena_Rift_Item.Athena_Rift_Item");
+            RiftToGo.Quantity = 1;
+            Utility.Add(RiftToGo);
+
+            ResourceInfo Balloon;
+            Balloon.Definition = StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Consumables/Balloons/Athena_Balloons_Consumable.Athena_Balloons_Consumable");
+            Balloon.Quantity = 10;
+            Utility.Add(Balloon);
 
             ResourceInfo FireflyJar;
             FireflyJar.Definition = StaticLoadObject<UFortWeaponRangedItemDefinition>("/Game/Athena/Items/Consumables/MolotovCocktail/WID_Athena_Grenade_Molotov.WID_Athena_Grenade_Molotov");

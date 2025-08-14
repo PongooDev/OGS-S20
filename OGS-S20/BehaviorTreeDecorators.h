@@ -38,7 +38,7 @@ public:
         }
 
         const bool BBValue = Context.Controller->Blackboard->GetValueAsBool(SelectedKeyName);
-        if (BBValue) {
+        if (BBValue == true) {
             return true;
         }
     }

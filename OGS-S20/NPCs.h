@@ -75,14 +75,6 @@ namespace Npcs {
 			}
 
 			{
-				auto* Task = new BTTask_Wait(1.f);
-				auto* Decorator = new BTDecorator_IsSet();
-				Decorator->SelectedKeyName = ConvFName(L"AIEvaluator_Global_IsMovementBlocked");
-				Task->AddDecorator(Decorator);
-				Selector->AddChild(Task);
-			}
-
-			{
 				auto* Task = new BTTask_SteerMovement();
 				auto* Service = new BTService_HandleFocusing_ScanAroundOnly();
 				Task->AddService(Service);
@@ -108,7 +100,6 @@ namespace Npcs {
 			{
 				auto* Task = new BTTask_BotMoveTo();
 				Task->SelectedKeyName = ConvFName(L"AIEvaluator_AvoidThreat_Destination");
-				Task->MovementResultKey = ConvFName(L"AIEvaluator_AvoidThreat_MovementState");
 				auto* Decorator = new BTDecorator_CheckEnum();
 				Decorator->SelectedKeyName = ConvFName(L"AIEvaluator_AvoidThreat_ExecutionStatus");
 				Decorator->IntValue = (int)EExecutionStatus::ExecutionAllowed;

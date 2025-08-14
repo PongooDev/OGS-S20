@@ -37,17 +37,16 @@ public:
 
 class BTTask_BotMoveTo : public BTNode {
 public:
-    float AcceptableRadius = 100.f;
+    float AcceptableRadius = 50.f;
     bool bAllowStrafe = true;
     bool bStopOnOverlapNeedsUpdate = false;
     bool bUsePathfinding = false;
     bool bProjectDestinationToNavigation = false;
-    bool bAllowPartialPath = false;
+    bool bAllowPartialPath = true;
 
     bool bShouldSetFocalPoint = true;
 
     FName SelectedKeyName;
-    FName MovementResultKey = UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_MovementResult");
 public:
     EBTNodeResult ChildTask(BTContext Context) override {
         if (!Context.Controller) {
@@ -62,8 +61,9 @@ public:
             Context.Controller->K2_SetFocalPoint(Dest);
         }
         EPathFollowingRequestResult RequestResult = Context.Controller->MoveToLocation(Dest, AcceptableRadius, bStopOnOverlapNeedsUpdate, bUsePathfinding, bProjectDestinationToNavigation, bAllowStrafe, nullptr, bAllowPartialPath);
-        Context.Controller->Blackboard->SetValueAsEnum(MovementResultKey, (uint8)RequestResult);
+        Log("Move!");
         if (RequestResult == EPathFollowingRequestResult::Failed) {
+            Log("BotMoveTo Task: Failed!");
             return EBTNodeResult::Failed;
         }
 

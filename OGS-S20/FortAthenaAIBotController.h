@@ -346,7 +346,7 @@ namespace FortAthenaAIBotController {
 			{
 				UFortItemDefinition* ItemDef = Items.Item;
 				if (!ItemDef) {
-					return;
+					continue;
 				}
 
 				UFortWorldItem* Item = (UFortWorldItem*)ItemDef->CreateTemporaryItemInstanceBP(Items.Count, 0);

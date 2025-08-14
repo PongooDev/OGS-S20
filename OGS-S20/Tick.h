@@ -53,13 +53,6 @@ namespace Tick {
 		}
 	}
 
-	void UpdateBotBlackboard(AFortAthenaAIBotController* bot, AFortGameModeAthena* GameMode, AFortGameStateAthena* GameState) {
-		if (!bot)
-			return;
-
-		bot->Blackboard->SetValueAsEnum(UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(L"AIEvaluator_Global_GamePhaseStep"), (int)GameState->GamePhaseStep);
-	}
-
 	inline void (*TickFlushOG)(UNetDriver*, float);
 	void TickFlush(UNetDriver* Driver, float DeltaTime)
 	{
@@ -75,13 +68,15 @@ namespace Tick {
 		if (Driver->ClientConnections.Num() != 0) {
 			if (GameMode && GameState && UKismetMathLibrary::RandomBool()) {
 				EAthenaGamePhaseStep CurrentGamePhaseStep = GetCurrentGamePhaseStep(GameMode, GameState);
-				GameState->GamePhaseStep = CurrentGamePhaseStep;
-				if (Globals::bBotsEnabled && Globals::bBotsShouldUseManualTicking) {
-					for (FortAthenaAIBotController::BotSpawnData& SpawnedBot : FortAthenaAIBotController::SpawnedBots) {
-						if (!SpawnedBot.Controller || !SpawnedBot.Pawn || !SpawnedBot.PlayerState)
-							continue;
+				if (CurrentGamePhaseStep != GameState->GamePhaseStep) {
+					GameState->GamePhaseStep = CurrentGamePhaseStep;
+					if (Globals::bBotsEnabled && Globals::bBotsShouldUseManualTicking) {
+						for (FortAthenaAIBotController::BotSpawnData& SpawnedBot : FortAthenaAIBotController::SpawnedBots) {
+							if (!SpawnedBot.Controller || !SpawnedBot.Pawn || !SpawnedBot.PlayerState)
+								continue;
 
-						UpdateBotBlackboard(SpawnedBot.Controller, GameMode, GameState);
+							SpawnedBot.Controller->Blackboard->SetValueAsEnum(UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(L"AIEvaluator_Global_GamePhaseStep"), (int)GameState->GamePhaseStep);
+						}
 					}
 				}
 			}

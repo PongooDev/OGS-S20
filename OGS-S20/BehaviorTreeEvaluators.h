@@ -77,19 +77,34 @@ public:
         float CurrentTime = UGameplayStatics::GetTimeSeconds(UWorld::GetWorld());
         if (CurrentTime >= NextDirectionChangeTime)
         {
-            if (Context.Controller->GetMoveStatus() != EPathFollowingStatus::Moving) {
-                FVector AvoidDirection = Context.Pawn->K2_GetActorLocation();
-                AvoidDirection.X += UKismetMathLibrary::RandomFloatInRange((RandDirOffset * -1.f), RandDirOffset);
-                AvoidDirection.Y += UKismetMathLibrary::RandomFloatInRange((RandDirOffset * -1.f), RandDirOffset);
+            FVector AvoidDirection = Context.Pawn->K2_GetActorLocation();
+            AvoidDirection.X += UKismetMathLibrary::RandomFloatInRange((RandDirOffset * -1.f), RandDirOffset);
+            AvoidDirection.Y += UKismetMathLibrary::RandomFloatInRange((RandDirOffset * -1.f), RandDirOffset);
 
-                Context.Controller->Blackboard->SetValueAsVector(UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_AvoidThreat_Destination"), AvoidDirection);
-                Context.Controller->Blackboard->SetValueAsEnum(UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_AvoidThreat_ExecutionStatus"), 4);
-                NextDirectionChangeTime = CurrentTime + DirectionChangeInterval;
-            }
-            else {
-                Log("Testing 123");
-                Context.Controller->Blackboard->SetValueAsEnum(UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_AvoidThreat_ExecutionStatus"), (uint8)EExecutionStatus::ExecutionDenied);
-            }
+            Context.Controller->Blackboard->SetValueAsVector(UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_AvoidThreat_Destination"), AvoidDirection);
+            NextDirectionChangeTime = CurrentTime + DirectionChangeInterval;
         }
+
+        if (Context.Controller->GetMoveStatus() != EPathFollowingStatus::Moving) {
+            Log("Allow movement!");
+            Context.Controller->Blackboard->SetValueAsEnum(UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_AvoidThreat_ExecutionStatus"), (uint8)EExecutionStatus::ExecutionAllowed);
+        }
+        else {
+            Log("Testing 123");
+            Context.Controller->Blackboard->SetValueAsEnum(UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_AvoidThreat_ExecutionStatus"), (uint8)EExecutionStatus::ExecutionDenied);
+        }
+    }
+};
+
+class BTEvaluator_MovementBlocked : public BTService {
+public:
+    BTEvaluator_MovementBlocked() {
+        NodeName = "Evaluating...MovementBlocked";
+    }
+
+    virtual void TickService(BTContext Context) override {
+        if (!Context.Pawn || !Context.Controller) return;
+
+        Context.Controller->Blackboard->SetValueAsBool(ConvFName(L"AIEvaluator_Global_IsMovementBlocked"), false);
     }
 };

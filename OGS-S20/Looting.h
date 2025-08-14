@@ -104,14 +104,14 @@ namespace Looting {
                 }
 
                 if (UKismetMathLibrary::RandomBool()) {
-                    if (UKismetMathLibrary::RandomBool()) {
-                        LootDrops.push_back(PossibleLoot::GetRandomUtility());
-                    }
-                    else {
-                        LootDrops.push_back(PossibleLoot::GetRandomTrap());
-                    }
+                    auto Loot = PossibleLoot::GetRandomUtility();
+                    LootDrops.push_back(Loot);
                 }
-
+                else {
+                    auto Loot = PossibleLoot::GetRandomTrap();
+                    LootDrops.push_back(Loot);
+                }
+                
                 UFortItemDefinition* Mats = (rand() % 40 > 20) ? ((rand() % 20 > 10) ? Wood : Stone) : Metal;
 
                 FFortItemEntry ItemEntry{};
@@ -186,8 +186,11 @@ namespace Looting {
 
             LootDrops.push_back(ItemEntry);
         }
-        else if (TierGroupName.ToString().contains("FloorLoot") && !TierGroupName.ToString().contains("FloorLoot_Warmup")) {
+        else if (TierGroupName.ToString().contains("FloorLoot") && !TierGroupName.ToString().contains("Warmup")) {
             float Chance = UKismetMathLibrary::RandomFloat();
+
+            if (TierGroupName.ToString().contains("FloorLoot_Warmup")) //just incase
+                return {};
 
             if (Chance <= 0.7f) 
             { 

@@ -100,10 +100,7 @@ namespace FortAthenaAIBotController {
 		}
 
 		UAthenaAIServicePlayerBots* AIServicePlayerBots = UAthenaAIBlueprintLibrary::GetAIServicePlayerBots(UWorld::GetWorld());
-		if (!AIServicePlayerBots) {
-			Log("FUCK");
-		}
-		else {
+		if (AIServicePlayerBots) {
 			Log("Good!");
 			*(bool*)(__int64(AIServicePlayerBots) + 0x7b8) = true; // bCanActivateBrain
 		}
@@ -120,6 +117,7 @@ namespace FortAthenaAIBotController {
 
 			PC->Blackboard->SetValueAsEnum(UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(L"AIEvaluator_Global_GamePhaseStep"), (int)GameState->GamePhaseStep);
 			PC->Blackboard->SetValueAsEnum(UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(L"AIEvaluator_Global_GamePhase"), (int)GameState->GamePhase);
+			PC->Blackboard->SetValueAsBool(UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(L"AIEvaluator_Global_IsMovementBlocked"), false);
 			PC->Blackboard->SetValueAsBool(UKismetStringLibrary::GetDefaultObj()->Conv_StringToName(L"AIEvaluator_Global_HasEverJumpedFromBusKey"), false);
 			if (BuildingFoundations.Num() > 0) {
 				AActor* DropZone = BuildingFoundations[UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(0, BuildingFoundations.Num() - 1)];
@@ -178,12 +176,13 @@ namespace FortAthenaAIBotController {
 				auto Contrail = Contrails[UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(0, Contrails.size() - 1)];
 				Pawn->CosmeticLoadout.SkyDiveContrail = Contrail;
 			}
+			BotPlayerState->OnRep_CharacterData();
+			ApplyCharacterCustomization(BotPlayerState, Pawn);
+
 			for (size_t i = 0; i < Dances.size(); i++)
 			{
 				Pawn->CosmeticLoadout.Dances.Add(Dances.at(i));
 			}
-			BotPlayerState->OnRep_CharacterData();
-			ApplyCharacterCustomization(BotPlayerState, Pawn);
 
 			if (PhoebeDisplayNames.size() != 0) {
 				std::srand(static_cast<unsigned int>(std::time(0)));
@@ -331,32 +330,6 @@ namespace FortAthenaAIBotController {
 				PC->CacheUnstuckSkillSet = UnstuckSkill;
 		}
 
-		if (PC->CosmeticLoadoutBC.Character)
-		{
-			if (PC->CosmeticLoadoutBC.Character->HeroDefinition)
-			{
-				for (int i = 0; i < PC->CosmeticLoadoutBC.Character->HeroDefinition->Specializations.Num(); i++)
-				{
-					auto SpecStr = UKismetStringLibrary::Conv_NameToString(PC->CosmeticLoadoutBC.Character->HeroDefinition->Specializations[i].ObjectID.AssetPathName);
-					UFortHeroSpecialization* Spec = StaticLoadObject<UFortHeroSpecialization>(SpecStr.ToString());
-					if (Spec)
-					{
-						for (int j = 0; j < Spec->CharacterParts.Num(); j++)
-						{
-							auto PartStr = UKismetStringLibrary::Conv_NameToString(Spec->CharacterParts[j].ObjectID.AssetPathName);
-							UCustomCharacterPart* CharacterPart = StaticLoadObject<UCustomCharacterPart>(PartStr.ToString());
-							if (CharacterPart)
-							{
-								PlayerState->CharacterData.Parts[(uintptr_t)CharacterPart->CharacterPartType] = CharacterPart;
-							}
-							PartStr.Free();
-						}
-					}
-					SpecStr.Free();
-				}
-			}
-		}
-		PlayerState->OnRep_CharacterData();
 		ApplyCharacterCustomization(PlayerState, Pawn);
 
 		if (Globals::bBotsShouldUseManualTicking) {

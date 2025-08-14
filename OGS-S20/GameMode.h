@@ -97,17 +97,49 @@ namespace GameMode {
 
 			GameState->DefaultParachuteDeployTraceForGroundDistance = 10000;
 
-			GameMode->AISettings = StaticLoadObject<UAthenaAISettings>("/Game/Athena/AI/AISettings/Phoebe_Default_AISettings.Phoebe_Default_AISettings");
-			GameMode->AISettings->AIServices.Free();
+			UAthenaAISettings* AISettingsInstance = nullptr;
+			for (int i = 0; i < UObject::GObjects->Num(); i++)
+			{
+				auto Object = UObject::GObjects->GetByIndex(i);
+				if (Object && Object->Class == UAthenaAISettings::StaticClass())
+				{
+					AISettingsInstance = (UAthenaAISettings*)Object;
+					break;
+				}
+			}
 
-			GameMode->AISettings->AIServices.Add(UAthenaAIServicePlayerBots::StaticClass());
-			GameMode->AISettings->AIServices.Add(StaticLoadObject<UClass>("/Game/Athena/AI/Phoebe/AIServices/BP_Phoebe_AIService_Loot.BP_Phoebe_AIService_Loot_C"));
-			GameMode->AISettings->AIServices.Add(StaticLoadObject<UClass>("/Game/Athena/AI/Phoebe/AIServices/BP_Phoebe_AIService_Cover.BP_Phoebe_AIService_Cover_C"));
-			GameMode->AISettings->AIServices.Add(UAthenaAIServiceVehicle::StaticClass());
-			GameMode->AISettings->AIServices.Add(UAthenaAIServiceGroup::StaticClass());
-			GameMode->AISettings->AIServices.Add(UAthenaAIServiceCreativePlayerBots::StaticClass());
-			GameMode->AISettings->AIServices.Add(UAthenaAIServiceLOFOccluder::StaticClass());
-			GameMode->AISettings->AIServices.Add(UAthenaAISettingsAIDIrectorLOD::StaticClass());
+			if (AISettingsInstance) {
+				Log("FoundAISettingsInstance!");
+
+				AISettingsInstance->AIServices.Add(UAthenaAIServicePlayerBots::StaticClass());
+				AISettingsInstance->AIServices.Add(StaticLoadObject<UClass>("/Game/Athena/AI/Phoebe/AIServices/BP_Phoebe_AIService_Loot.BP_Phoebe_AIService_Loot_C"));
+				AISettingsInstance->AIServices.Add(StaticLoadObject<UClass>("/Game/Athena/AI/Phoebe/AIServices/BP_Phoebe_AIService_Cover.BP_Phoebe_AIService_Cover_C"));
+				AISettingsInstance->AIServices.Add(UAthenaAIServiceVehicle::StaticClass());
+				AISettingsInstance->AIServices.Add(UAthenaAIServiceGroup::StaticClass());
+				AISettingsInstance->AIServices.Add(UAthenaAIServiceCreativePlayerBots::StaticClass());
+				AISettingsInstance->AIServices.Add(UAthenaAIServiceLOFOccluder::StaticClass());
+				AISettingsInstance->AIServices.Add(UAthenaAISettingsAIDIrectorLOD::StaticClass());
+
+				GameMode->AISettings = AISettingsInstance;
+
+				GameMode->AISettings->MaxFootstepHearingRange = 3000.0f;
+				GameMode->AISettings->ReducedDeAggroRange = 3500.0f;
+			}
+			else {
+				Log("Couldnt Find AISettingsInstance!");
+				GameMode->AISettings = StaticLoadObject<UAthenaAISettings>("/Game/Athena/AI/AISettings/Phoebe_Default_AISettings.Phoebe_Default_AISettings");
+
+				GameMode->AISettings->AIServices.Free();
+
+				GameMode->AISettings->AIServices.Add(UAthenaAIServicePlayerBots::StaticClass());
+				GameMode->AISettings->AIServices.Add(StaticLoadObject<UClass>("/Game/Athena/AI/Phoebe/AIServices/BP_Phoebe_AIService_Loot.BP_Phoebe_AIService_Loot_C"));
+				GameMode->AISettings->AIServices.Add(StaticLoadObject<UClass>("/Game/Athena/AI/Phoebe/AIServices/BP_Phoebe_AIService_Cover.BP_Phoebe_AIService_Cover_C"));
+				GameMode->AISettings->AIServices.Add(UAthenaAIServiceVehicle::StaticClass());
+				GameMode->AISettings->AIServices.Add(UAthenaAIServiceGroup::StaticClass());
+				GameMode->AISettings->AIServices.Add(UAthenaAIServiceCreativePlayerBots::StaticClass());
+				GameMode->AISettings->AIServices.Add(UAthenaAIServiceLOFOccluder::StaticClass());
+				GameMode->AISettings->AIServices.Add(UAthenaAISettingsAIDIrectorLOD::StaticClass());
+			}
 
 			if (!GameMode->SpawningPolicyManager)
 			{
@@ -117,19 +149,11 @@ namespace GameMode {
 			GameMode->SpawningPolicyManager->GameStateAthena = GameState;
 
 			GameMode->AIDirector = SpawnActor<AAthenaAIDirector>({});
-			if (GameMode->AIDirector) {
-				GameMode->AISettings->bAllowAIDirector = true;
-				GameMode->AIDirector->Activate();
-			}
-			else {
-				Log("No AIDirector!");
-			}
+			GameMode->AISettings->bAllowAIDirector = true;
+			GameMode->AIDirector->Activate();
 
-			if (!GameMode->AIGoalManager)
-			{
-				GameMode->AIGoalManager = SpawnActor<AFortAIGoalManager>({});
-				GameMode->AISettings->bAllowAIGoalManager = true;
-			}
+			GameMode->AIGoalManager = SpawnActor<AFortAIGoalManager>({});
+			GameMode->AISettings->bAllowAIGoalManager = true;
 
 			UAISystem::GetDefaultObj()->AILoggingVerbose();
 
@@ -297,7 +321,7 @@ namespace GameMode {
 
 		AActor* StartSpot = GameMode->FindPlayerStart(Player, L"");
 		auto Transform = StartSpot->GetTransform();
-		auto Pawn = GameMode->SpawnDefaultPawnAtTransform(Player, Transform);
+		AFortPlayerPawnAthena* Pawn = (AFortPlayerPawnAthena*)GameMode->SpawnDefaultPawnAtTransform(Player, Transform);
 
 		Pawn->NetUpdateFrequency = 100.f;
 		Pawn->MinNetUpdateFrequency = 100.f;
@@ -333,6 +357,17 @@ namespace GameMode {
 				Inventory::GiveItem(PC, GameMode->StartingItems[i].Item, GameMode->StartingItems[i].Count, 0);
 			}
 		}
+
+		auto SprintCompClass = StaticLoadObject<UClass>("/TacticalSprint/Gameplay/TacticalSprintControllerComponent.TacticalSprintControllerComponent_C");
+		auto EnergyCompClass = StaticLoadObject<UClass>("/TacticalSprint/Gameplay/TacticalSprintEnergyComponent.TacticalSprintEnergyComponent_C");
+
+		UFortPlayerControllerComponent_TacticalSprint* SprintComp = (UFortPlayerControllerComponent_TacticalSprint*)PC->AddComponentByClass(SprintCompClass, false, FTransform(), false);
+		UFortComponent_Energy* EnergyComp = (UFortComponent_Energy*)Pawn->AddComponentByClass(EnergyCompClass, false, FTransform(), false);
+
+		SprintComp->CurrentBoundPlayerPawn = (AFortPlayerPawn*)Pawn;
+		SprintComp->OnPawnChanged(SprintComp->CurrentBoundPlayerPawn);
+
+		SprintComp->OnPawnChanged(Pawn);
 
 		Pawn->OnRep_PlayerState();
 		Pawn->OnRep_Controller();

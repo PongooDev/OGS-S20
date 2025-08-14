@@ -99,6 +99,15 @@ namespace FortAthenaAIBotController {
 			RegisterComponent(PC->BrainComponent, UWorld::GetWorld(), nullptr);
 		}
 
+		UAthenaAIServicePlayerBots* AIServicePlayerBots = UAthenaAIBlueprintLibrary::GetAIServicePlayerBots(UWorld::GetWorld());
+		if (!AIServicePlayerBots) {
+			Log("FUCK");
+		}
+		else {
+			Log("Good!");
+			*(bool*)(__int64(AIServicePlayerBots) + 0x7b8) = true; // bCanActivateBrain
+		}
+
 		if (PC->BotIDSuffix.ToString() == "DEFAULT")
 		{
 			if (!PC->RunBehaviorTree(PC->BehaviorTree)) {

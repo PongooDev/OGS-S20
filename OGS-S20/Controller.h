@@ -55,6 +55,11 @@ namespace Controller {
 		GameState->GameMemberInfoArray.Members.Add(Member);
 		GameState->GameMemberInfoArray.MarkItemDirty(Member);
 
+		if (!PC->MatchReport)
+		{
+			PC->MatchReport = (UAthenaPlayerMatchReport*)UGameplayStatics::SpawnObject(UAthenaPlayerMatchReport::StaticClass(), PC);
+		}
+
 		static auto Bars = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
 		if (Bars) {
 			Inventory::GiveItem(PC, Bars, UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(0, 5000), 0);

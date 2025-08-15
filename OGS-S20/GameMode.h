@@ -338,6 +338,8 @@ namespace GameMode {
 		UFortKismetLibrary::UpdatePlayerCustomCharacterPartsVisualization(PlayerState);
 		PlayerState->OnRep_CharacterData();
 
+		AbilitySystemComponent::InitAbilitiesForPlayer(PC);
+
 		UAthenaPickaxeItemDefinition* PickDef;
 		FFortAthenaLoadout& CosmecticLoadoutPC = PC->CosmeticLoadoutPC;
 		PickDef = CosmecticLoadoutPC.Pickaxe != nullptr ? CosmecticLoadoutPC.Pickaxe : StaticLoadObject<UAthenaPickaxeItemDefinition>("/Game/Athena/Items/Weapons/WID_Harvest_Pickaxe_Athena_C_T01.WID_Harvest_Pickaxe_Athena_C_T01");

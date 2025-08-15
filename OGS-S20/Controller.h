@@ -39,8 +39,6 @@ namespace Controller {
 			Log("Setup World!");
 		}
 
-		AbilitySystemComponent::InitAbilitiesForPlayer(PC);
-
 		PlayerState->SquadId = PlayerState->TeamIndex - 3;
 		PlayerState->OnRep_SquadId();
 

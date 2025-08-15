@@ -53,7 +53,7 @@ public:
 
 class BTEvaluator_Escape_EvasiveManeuvers : public BTService {
 public:
-    float RandDirOffset = 1500.f;
+    float RandDirOffset = 500.f;
     float DirectionChangeInterval = 5.f;
     float NextDirectionChangeTime = 0.f;
 public:

@@ -61,7 +61,6 @@ public:
             Context.Controller->K2_SetFocalPoint(Dest);
         }
         EPathFollowingRequestResult RequestResult = Context.Controller->MoveToLocation(Dest, AcceptableRadius, bStopOnOverlapNeedsUpdate, bUsePathfinding, bProjectDestinationToNavigation, bAllowStrafe, nullptr, bAllowPartialPath);
-        Log("Move!");
         if (RequestResult == EPathFollowingRequestResult::Failed) {
             Log("BotMoveTo Task: Failed!");
             return EBTNodeResult::Failed;

@@ -29,6 +29,8 @@ class BTEvaluator_FreeFall : public BTService {
 public:
 	BTEvaluator_FreeFall() {
 		NodeName = "Evaluating...Free Fall";
+
+        Interval = 1.f;
 	}
 
 	virtual void TickService(BTContext Context) override {

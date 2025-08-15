@@ -45,9 +45,6 @@ namespace FortAthenaAIBotController {
 		AFortGameStateAthena* GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
 
 		OnPawnAISpawnedOG(Controller, Pawn);
-		if (!AthenaNavSystem->MainNavData) {
-			Log("NavData Dont Exist!");
-		}
 
 		UClass* BotSpawnerData = nullptr;
 
@@ -87,24 +84,6 @@ namespace FortAthenaAIBotController {
 			UFortAthenaAISpawnerDataComponent_ConversationBase* ConversationComp = SpawnerData->GetConversationComponent();
 
 			AbilitySystemComponent::GrantAbilitySet((AFortPlayerController*)PC, StaticLoadObject<UFortAbilitySet>("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer"));
-		}
-
-		if (!PC->PathFollowingComponent->MyNavData) {
-			PC->PathFollowingComponent->MyNavData = AthenaNavSystem->MainNavData;
-		}
-		PC->PathFollowingComponent->OnNavDataRegistered(PC->PathFollowingComponent->MyNavData);
-		PC->PathFollowingComponent->Activate(true);
-
-		if (!PC->BrainComponent || !PC->BrainComponent->IsA(UBrainComponent::StaticClass()))
-		{
-			PC->BrainComponent = (UBrainComponent*)UGameplayStatics::SpawnObject(UBrainComponent::StaticClass(), PC);
-			RegisterComponent(PC->BrainComponent, UWorld::GetWorld(), nullptr);
-		}
-
-		UAthenaAIServicePlayerBots* AIServicePlayerBots = UAthenaAIBlueprintLibrary::GetAIServicePlayerBots(UWorld::GetWorld());
-		if (AIServicePlayerBots) {
-			Log("Good!");
-			*(bool*)(__int64(AIServicePlayerBots) + 0x7b8) = true; // bCanActivateBrain
 		}
 
 		if (PC->BotIDSuffix.ToString() == "DEFAULT")
@@ -377,6 +356,8 @@ namespace FortAthenaAIBotController {
 			}
 		}
 
+		PC->Possess(Pawn);
+		PC->K2_ClearFocus();
 		Npcs::NpcBot* Bot = new Npcs::NpcBot(PC, Pawn, PlayerState);
 		Npcs::NpcBots.push_back(Bot);
 		Bot->BT_NPC = Npcs::ConstructBehaviorTree();
@@ -452,6 +433,15 @@ namespace FortAthenaAIBotController {
 			}
 			GameState->PlayerBotsLeft--;
 			GameState->OnRep_PlayerBotsLeft();
+		}
+		else {
+			if (PC->BehaviorTree->GetName().contains("NPC")) {
+				for (int i = 0; i < Npcs::NpcBots.size(); i++) {
+					if (Npcs::NpcBots[i]->PC == PC) {
+						Npcs::NpcBots[i]->bTickEnabled = false;
+					}
+				}
+			}
 		}
 
 		return;

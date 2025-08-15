@@ -62,7 +62,6 @@ public:
         }
         EPathFollowingRequestResult RequestResult = Context.Controller->MoveToLocation(Dest, AcceptableRadius, bStopOnOverlapNeedsUpdate, bUsePathfinding, bProjectDestinationToNavigation, bAllowStrafe, nullptr, bAllowPartialPath);
         if (RequestResult == EPathFollowingRequestResult::Failed) {
-            Log("BotMoveTo Task: Failed!");
             return EBTNodeResult::Failed;
         }
 

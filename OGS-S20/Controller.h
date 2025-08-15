@@ -436,6 +436,8 @@ namespace Controller {
 		auto GameState = (AFortGameStateAthena*)UWorld::GetWorld()->GameState;
 		auto GameMode = (AFortGameModeAthena*)UWorld::GetWorld()->AuthorityGameMode;
 
+		static auto Bars = StaticLoadObject<UFortItemDefinition>("/Game/Items/ResourcePickups/Athena_WadsItemData.Athena_WadsItemData");
+
 		AFortPlayerStateAthena* PlayerState = (AFortPlayerStateAthena*)PC->PlayerState;
 		if (!PlayerState) {
 			return;
@@ -472,6 +474,7 @@ namespace Controller {
 						SpawnPickup(PC->WorldInventory->Inventory.ItemInstances[i]->ItemEntry.ItemDefinition, PC->WorldInventory->Inventory.ItemInstances[i]->ItemEntry.Count, PC->WorldInventory->Inventory.ItemInstances[i]->ItemEntry.LoadedAmmo, DeathLocation, EFortPickupSourceTypeFlag::Player, EFortPickupSpawnSource::PlayerElimination, PC->MyFortPawn);
 					}
 				}
+				SpawnPickup(Bars, UKismetMathLibrary::GetDefaultObj()->RandomIntegerInRange(10, 30), 0, PC->Pawn->K2_GetActorLocation(), EFortPickupSourceTypeFlag::Other, EFortPickupSpawnSource::BotElimination);
 			}
 
 			FAthenaRewardResult Result;

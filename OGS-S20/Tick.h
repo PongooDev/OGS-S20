@@ -81,7 +81,7 @@ namespace Tick {
 				}
 			}
 
-			if (GameState->GamePhase == EAthenaGamePhase::Warmup &&
+			/*if (GameState->GamePhase == EAthenaGamePhase::Warmup &&
 				GameMode->AlivePlayers.Num() > 0
 				&& (GameMode->AlivePlayers.Num() + GameMode->AliveBots.Num()) < GameMode->GameSession->MaxPlayers
 				&& Globals::bBotsEnabled)
@@ -90,7 +90,7 @@ namespace Tick {
 				{
 					BotSpawner::SpawnPlayerBot();
 				}
-			}
+			}*/
 
 			if (GameState->GamePhase == EAthenaGamePhase::Warmup
 				&& (GameMode->NumPlayers + GameMode->NumBots) >= Globals::MinPlayersForEarlyStart

@@ -59,7 +59,7 @@ public:
     float DirectionChangeInterval = 5.f;
     float NextDirectionChangeTime = 0.f;
 public:
-    BTEvaluator_Escape_EvasiveManeuvers(float InDirectionChangeInterval = 5.f, float InOffset = 1500.f) {
+    BTEvaluator_Escape_EvasiveManeuvers(float InDirectionChangeInterval = 5.f, float InOffset = 500.f) {
         NodeName = "Evaluating...Escape Evasive Maneuvers";
 
         Interval = 1.f;
@@ -88,11 +88,9 @@ public:
         }
 
         if (Context.Controller->GetMoveStatus() != EPathFollowingStatus::Moving) {
-            Log("Allow movement!");
             Context.Controller->Blackboard->SetValueAsEnum(UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_AvoidThreat_ExecutionStatus"), (uint8)EExecutionStatus::ExecutionAllowed);
         }
         else {
-            Log("Testing 123");
             Context.Controller->Blackboard->SetValueAsEnum(UKismetStringLibrary::Conv_StringToName(L"AIEvaluator_AvoidThreat_ExecutionStatus"), (uint8)EExecutionStatus::ExecutionDenied);
         }
     }
